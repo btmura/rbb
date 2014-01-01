@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2013 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.text;
+package com.btmura.android.reddit.app;
 
-public class Formatter_HeadingTest extends AbstractFormatterTest {
+interface Filterable {
 
-    public void testFormat() {
-        assertHeadingFormat("#Hello", "Hello");
-        assertHeadingFormat("##Hello", "Hello");
-        assertHeadingFormat("#Hello#", "Hello");
-        assertHeadingFormat("##Hello##", "Hello");
-    }
+    int getFilter();
+
+    void setFilter(int filter);
 }

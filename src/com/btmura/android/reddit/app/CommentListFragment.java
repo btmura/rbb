@@ -38,11 +38,13 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 public class CommentListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener,
-        OnThingViewClickListener {
+        OnThingViewClickListener,
+        Filterable {
 
     public static final String TAG = "CommentListFragment";
 
     private CommentListController controller;
+    private CommentMenuController menuController;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId) {
@@ -60,9 +62,11 @@ public class CommentListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = new CommentListController(getActivity(), getArguments(), this);
+        menuController = new CommentMenuController(getActivity(), this);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -113,6 +117,42 @@ public class CommentListFragment extends ListFragment implements
         int position = getListView().getPositionForView(view);
         controller.vote(action, position);
     }
+
+    @Override
+    public int getFilter() {
+        return controller.getFilter();
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        if (filter != controller.getFilter()) {
+            controller.setFilter(filter);
+            controller.swapCursor(null);
+            setListAdapter(controller.getAdapter());
+            setListShown(false);
+            getLoaderManager().restartLoader(0, null, this);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menuController.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menuController.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return menuController.onOptionsItemSelected(item)
+                || super.onOptionsItemSelected(item);
+    }
+
+    // TODO(btmura): Move action mode code into separate ActionModeController impl.
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

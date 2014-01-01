@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,16 +38,6 @@ class MessageThingMenuController implements MenuController {
         this.accountName = accountName;
         this.thingHolder = thingHolder;
         this.refreshable = refreshable;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override

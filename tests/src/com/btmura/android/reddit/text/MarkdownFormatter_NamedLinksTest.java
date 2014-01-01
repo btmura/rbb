@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.text;
 
-public class Formatter_NamedLinksTest extends AbstractFormatterTest {
+public class MarkdownFormatter_NamedLinksTest extends AbstractFormatterTest {
 
     public void testFormat() {
         CharSequence cs = assertNamedLinksFormat("[foo](abc)", "foo");

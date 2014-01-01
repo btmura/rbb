@@ -39,6 +39,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
@@ -55,7 +56,6 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * URI MATCHING PATTERNS:
@@ -287,12 +287,14 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String thingId,
             String linkId,
+            int filter,
             Bundle sessionData,
             int numComments) {
-        Bundle extras = new Bundle(5);
+        Bundle extras = new Bundle(6);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_COMMENTS);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putString(EXTRA_LINK_ID, linkId);
+        extras.putInt(EXTRA_FILTER, filter);
         extras.putInt(EXTRA_COUNT, numComments);
         extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
@@ -302,12 +304,14 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String subreddit,
             String query,
+            int filter,
             Bundle sessionData,
             String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putString(EXTRA_QUERY, query);
+        extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
         extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
@@ -335,8 +339,7 @@ public class ThingProvider extends BaseProvider {
         extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         if (!TextUtils.isEmpty(more)) {
             extras.putString(EXTRA_MORE, more);
-        } else if (filter == FilterAdapter.MESSAGE_INBOX
-                || filter == FilterAdapter.MESSAGE_UNREAD) {
+        } else if (filter == Filter.MESSAGE_INBOX || filter == Filter.MESSAGE_UNREAD) {
             extras.putBoolean(EXTRA_MARK, true);
         }
         return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
@@ -616,6 +619,7 @@ public class ThingProvider extends BaseProvider {
                         accountName,
                         thingId,
                         linkId,
+                        filter,
                         count,
                         cookie);
 
@@ -625,6 +629,7 @@ public class ThingProvider extends BaseProvider {
                         accountName,
                         subreddit,
                         query,
+                        filter,
                         more,
                         cookie);
 

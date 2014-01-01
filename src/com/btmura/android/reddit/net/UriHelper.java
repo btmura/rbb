@@ -21,10 +21,10 @@ import java.util.List;
 import android.content.UriMatcher;
 import android.net.Uri;
 
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.util.ThingIds;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class UriHelper {
 
@@ -134,16 +134,16 @@ public class UriHelper {
         if (uri != null) {
             switch (MATCHER.match(uri)) {
                 case MATCH_SUBREDDIT_HOT:
-                    return FilterAdapter.SUBREDDIT_HOT;
+                    return Filter.SUBREDDIT_HOT;
 
                 case MATCH_SUBREDDIT_NEW:
-                    return FilterAdapter.SUBREDDIT_NEW;
+                    return Filter.SUBREDDIT_NEW;
 
                 case MATCH_SUBREDDIT_CONTROVERSIAL:
-                    return FilterAdapter.SUBREDDIT_CONTROVERSIAL;
+                    return Filter.SUBREDDIT_CONTROVERSIAL;
 
                 case MATCH_SUBREDDIT_TOP:
-                    return FilterAdapter.SUBREDDIT_TOP;
+                    return Filter.SUBREDDIT_TOP;
             }
         }
         return -1;
@@ -187,16 +187,16 @@ public class UriHelper {
         if (data != null) {
             switch (MATCHER.match(data)) {
                 case MATCH_USER_OVERVIEW:
-                    return FilterAdapter.PROFILE_OVERVIEW;
+                    return Filter.PROFILE_OVERVIEW;
 
                 case MATCH_USER_COMMENTS:
-                    return FilterAdapter.PROFILE_COMMENTS;
+                    return Filter.PROFILE_COMMENTS;
 
                 case MATCH_USER_SUBMITTED:
-                    return FilterAdapter.PROFILE_SUBMITTED;
+                    return Filter.PROFILE_SUBMITTED;
 
                 case MATCH_USER_SAVED:
-                    return FilterAdapter.PROFILE_SAVED;
+                    return Filter.PROFILE_SAVED;
             }
         }
         return -1;

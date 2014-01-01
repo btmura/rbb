@@ -21,15 +21,18 @@ import android.os.Bundle;
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SearchThingListFragment
-        extends ThingTableListFragment<SearchThingListController> {
+        extends ThingListFragment<SearchThingListController, SearchThingMenuController,
+        ThingTableActionModeController>
+        implements Filterable {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
-            String query, boolean singleChoice) {
-        Bundle args = new Bundle(5);
+            String query, int filter, boolean singleChoice) {
+        Bundle args = new Bundle(6);
         args.putString(SearchThingListController.EXTRA_ACCOUNT_NAME, accountName);
         args.putString(SearchThingListController.EXTRA_PARENT_SUBREDDIT, subreddit);
         args.putString(SearchThingListController.EXTRA_SUBREDDIT, subreddit);
         args.putString(SearchThingListController.EXTRA_QUERY, query);
+        args.putInt(SearchThingListController.EXTRA_FILTER, filter);
         args.putBoolean(SearchThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
         SearchThingListFragment frag = new SearchThingListFragment();
@@ -43,6 +46,21 @@ public class SearchThingListFragment
     }
 
     @Override
+    protected SearchThingMenuController createMenuController(
+            SearchThingListController controller) {
+        return new SearchThingMenuController(getActivity(), this, this);
+    }
+
+    @Override
+    protected ThingTableActionModeController createActionModeController(
+            SearchThingListController controller) {
+        return new ThingTableActionModeController(getActivity(),
+                controller.getAccountName(),
+                controller.getSwipeAction(),
+                controller.getAdapter());
+    }
+
+    @Override
     public boolean equalFragments(ComparableFragment o) {
         return ComparableFragments.equalClasses(this, o)
                 && ComparableFragments.equalStrings(this, o,
@@ -51,5 +69,22 @@ public class SearchThingListFragment
                         SearchThingListController.EXTRA_SUBREDDIT)
                 && ComparableFragments.equalStrings(this, o,
                         SearchThingListController.EXTRA_QUERY);
+    }
+
+    @Override
+    public int getFilter() {
+        return controller.getFilter();
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        // TODO(btmura): remove code duplication with CommentListFragment.
+        if (filter != controller.getFilter()) {
+            controller.setFilter(filter);
+            controller.swapCursor(null);
+            setListAdapter(controller.getAdapter());
+            setListShown(false);
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 }

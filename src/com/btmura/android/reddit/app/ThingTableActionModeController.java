@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -51,16 +50,6 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         this.accountName = accountName;
         this.swipeAction = swipeAction;
         this.adapter = adapter;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override
@@ -179,7 +168,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         // Comment references just provide a thing and link id.
         String thingId = getThingId(position);
         String linkId = getLinkId(position);
-        return Urls.commentListing(thingId, linkId, -1, Urls.TYPE_HTML);
+        return Urls.commentListing(thingId, linkId, -1, -1, Urls.TYPE_HTML);
     }
 
     private void prepareSubredditActionItem(Menu menu, ListView listView, int position) {
@@ -244,7 +233,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private void handleCopyUrl(ListView listView) {
         int position = Views.getCheckedPosition(listView);
-        MenuHelper.setClipAndToast(context, getThingTitle(position), getThingUrl(position));
+        MenuHelper.copyUrl(context, getThingTitle(position), getThingUrl(position));
     }
 
     private void handleAuthor(ListView listView) {

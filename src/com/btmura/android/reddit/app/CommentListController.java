@@ -30,6 +30,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentLogic.CommentList;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
@@ -41,11 +42,12 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 /**
  * Controller that handles all the logic required by {@link CommentListFragment}.
  */
-class CommentListController implements Controller<CommentAdapter>, CommentList {
+class CommentListController implements Controller<CommentAdapter>, Filterable, CommentList {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
     static final String EXTRA_LINK_ID = "linkId";
+    static final String EXTRA_FILTER = "filter";
     static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
@@ -53,6 +55,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     private final String thingId;
     private final String linkId;
     private final CommentAdapter adapter;
+    private int filter;
     private Bundle cursorExtras;
 
     CommentListController(Context context, Bundle args, OnThingViewClickListener listener) {
@@ -61,21 +64,25 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         this.thingId = getThingIdExtra(args);
         this.linkId = getLinkIdExtra(args);
         this.adapter = new CommentAdapter(context, accountName, listener);
+        restoreInstanceState(args);
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
+        int defFilter = AccountPrefs.getLastCommentFilter(context, Filter.COMMENTS_BEST);
+        this.filter = savedInstanceState.getInt(EXTRA_FILTER, defFilter);
         this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
+        outState.putInt(EXTRA_FILTER, filter);
         outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new CommentLoader(context, accountName, thingId, linkId, cursorExtras);
+        return new CommentLoader(context, accountName, thingId, linkId, filter, cursorExtras);
     }
 
     @Override
@@ -96,7 +103,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     public void copyUrl(int position) {
-        MenuHelper.setClipAndToast(context, getCommentLabel(position), getCommentUrl(position));
+        MenuHelper.copyUrl(context, getCommentLabel(position), getCommentUrl(position));
     }
 
     private CharSequence getCommentLabel(int position) {
@@ -419,7 +426,20 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         return adapter.getBoolean(position, CommentLoader.INDEX_SELF);
     }
 
-    // CommentList implementation.
+    // Filterable implementation
+
+    @Override
+    public int getFilter() {
+        return filter;
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        this.filter = filter;
+        AccountPrefs.setLastCommentFilter(context, filter);
+    }
+
+    // CommentList implementation
 
     @Override
     public int getCommentCount() {
@@ -454,5 +474,4 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     private static String getLinkIdExtra(Bundle extras) {
         return extras.getString(EXTRA_LINK_ID);
     }
-
 }

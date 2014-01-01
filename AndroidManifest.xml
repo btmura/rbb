@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.btmura.android.reddit"
-    android:versionCode="9"
-    android:versionName="3.2" >
+    android:versionCode="10"
+    android:versionName="3.3" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -45,7 +45,6 @@
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
             android:label="@string/label_accounts"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,6 +87,15 @@
         <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser" />
+        <activity
+            android:name=".app.MarkdownTableActivity"
+            android:theme="@style/Theme.Transition.DialogWhenLarge" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SearchActivity"

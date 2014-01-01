@@ -56,7 +56,6 @@ import com.btmura.android.reddit.widget.AccountResultAdapter;
 import com.btmura.android.reddit.widget.AccountResultAdapter.Item;
 import com.btmura.android.reddit.widget.AccountResultAdapter.OnAccountMessagesSelectedListener;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 
 public class NavigationFragment extends ListFragment implements
@@ -166,7 +165,8 @@ public class NavigationFragment extends ListFragment implements
             filter = savedInstanceState.getInt(STATE_FILTER);
         }
 
-        accountAdapter = new AccountResultAdapter(getActivity(), this);
+        accountAdapter = AccountResultAdapter.newNavigationFragmentInstance(getActivity());
+        accountAdapter.setOnAccountMessagesSelectedListener(this);
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
         mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
@@ -250,7 +250,7 @@ public class NavigationFragment extends ListFragment implements
         selectPlace(PLACE_SUBREDDIT,
                 requestedSubreddit,
                 Subreddits.isRandom(requestedSubreddit),
-                AccountPrefs.getLastSubredditFilter(getActivity(), FilterAdapter.SUBREDDIT_HOT),
+                AccountPrefs.getLastSubredditFilter(getActivity(), Filter.SUBREDDIT_HOT),
                 requestedThingBundle,
                 false,
                 false);
@@ -279,20 +279,20 @@ public class NavigationFragment extends ListFragment implements
                         accountName,
                         false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                        FilterAdapter.SUBREDDIT_HOT);
+                        Filter.SUBREDDIT_HOT);
                 selectPlace(place, subreddit, isRandom, filter, null, true, force);
                 break;
 
             case PLACE_PROFILE:
-                selectPlaceWithNoSubreddit(place, FilterAdapter.PROFILE_OVERVIEW, force);
+                selectPlaceWithNoSubreddit(place, Filter.PROFILE_OVERVIEW, force);
                 break;
 
             case PLACE_SAVED:
-                selectPlaceWithNoSubreddit(place, FilterAdapter.PROFILE_SAVED, force);
+                selectPlaceWithNoSubreddit(place, Filter.PROFILE_SAVED, force);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlaceWithNoSubreddit(place, FilterAdapter.MESSAGE_INBOX, force);
+                selectPlaceWithNoSubreddit(place, Filter.MESSAGE_INBOX, force);
                 break;
         }
     }
@@ -349,17 +349,12 @@ public class NavigationFragment extends ListFragment implements
                             newLoaderArgs(accountName),
                             randomLoaderCallbacks);
                 } else if (listener != null) {
-                    getListView().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onNavigationSubredditSelected(accountName,
-                                    subreddit,
-                                    isRandom,
-                                    filter,
-                                    thingBundle,
-                                    force);
-                        }
-                    });
+                    listener.onNavigationSubredditSelected(accountName,
+                            subreddit,
+                            isRandom,
+                            filter,
+                            thingBundle,
+                            force);
                 }
                 break;
 
@@ -367,12 +362,7 @@ public class NavigationFragment extends ListFragment implements
                 getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    getListView().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onNavigationProfileSelected(accountName, filter, force);
-                        }
-                    });
+                    listener.onNavigationProfileSelected(accountName, filter, force);
                 }
                 break;
 
@@ -380,12 +370,7 @@ public class NavigationFragment extends ListFragment implements
                 getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    getListView().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onNavigationSavedSelected(accountName, filter, force);
-                        }
-                    });
+                    listener.onNavigationSavedSelected(accountName, filter, force);
                 }
                 break;
 
@@ -393,12 +378,7 @@ public class NavigationFragment extends ListFragment implements
                 getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    getListView().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onNavigationMessagesSelected(accountName, filter, force);
-                        }
-                    });
+                    listener.onNavigationMessagesSelected(accountName, filter, force);
                 }
                 break;
 
@@ -410,7 +390,7 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onAccountMessagesSelected(String accountName) {
         selectAccount(accountName);
-        selectPlaceWithNoSubreddit(PLACE_MESSAGES, FilterAdapter.MESSAGE_UNREAD, true);
+        selectPlaceWithNoSubreddit(PLACE_MESSAGES, Filter.MESSAGE_UNREAD, true);
     }
 
     @Override
@@ -623,7 +603,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private void handleCopyUrl() {
-        MenuHelper.setClipAndToast(getActivity(), getClipLabel(), getClipText());
+        MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
     }
 
     @Override

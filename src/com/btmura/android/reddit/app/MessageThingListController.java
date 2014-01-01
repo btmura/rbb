@@ -38,9 +38,9 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     private final Context context;
     private final String accountName;
     private final String messageUser;
-    private final int filter;
     private final MessageListAdapter adapter;
 
+    private int filter;
     private String moreId;
     private Bundle cursorExtras;
 
@@ -149,6 +149,11 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     // Simple setters.
+
+    @Override
+    public void setFilter(int filter) {
+        this.filter = filter;
+    }
 
     @Override
     public void setMoreId(String moreId) {

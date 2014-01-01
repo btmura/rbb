@@ -16,9 +16,9 @@
 
 package com.btmura.android.reddit.text;
 
-import com.btmura.android.reddit.text.Formatter.RawLinks;
+import com.btmura.android.reddit.text.MarkdownFormatter.RawLinks;
 
-public class Formatter_RawLinksTest extends AbstractFormatterTest {
+public class MarkdownFormatter_RawLinksTest extends AbstractFormatterTest {
 
     public void testPattern() {
         // Test some examples.

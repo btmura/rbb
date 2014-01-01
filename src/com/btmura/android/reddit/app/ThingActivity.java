@@ -30,7 +30,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.Strings;
 
@@ -46,7 +46,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private String accountName;
     private ThingBundle thingBundle;
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

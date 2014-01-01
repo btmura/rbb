@@ -23,7 +23,7 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.JsonParser;
 
 /**
@@ -42,7 +42,7 @@ public class SidebarResult extends JsonParser {
     /** {@link Bitmap} of the header. Call {@link #fetchHeaderImage()} to get it. */
     public Bitmap headerImageBitmap;
 
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
     private final Context context;
 
     public static SidebarResult fromJsonReader(Context context, JsonReader reader)

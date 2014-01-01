@@ -175,7 +175,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setCenterFragment(R.id.right_container,
                 ControlFragment.newSearchThingsInstance(accountName, subreddit, query, filter),
                 SearchThingListFragment
-                        .newInstance(accountName, subreddit, query, isSingleChoice),
+                        .newInstance(accountName, subreddit, query, filter, isSingleChoice),
                 false);
     }
 

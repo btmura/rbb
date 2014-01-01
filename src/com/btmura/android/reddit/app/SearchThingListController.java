@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.SearchThingLoader;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
@@ -32,7 +33,9 @@ class SearchThingListController extends ThingTableListController {
 
     private String query;
 
-    public SearchThingListController(Context context, Bundle args, OnThingViewClickListener listener) {
+    public SearchThingListController(Context context,
+            Bundle args,
+            OnThingViewClickListener listener) {
         super(context, args, listener);
     }
 
@@ -42,6 +45,7 @@ class SearchThingListController extends ThingTableListController {
                 getAccountName(),
                 getSubreddit(),
                 getQuery(),
+                getFilter(),
                 getMoreId(),
                 getCursorExtras());
     }
@@ -69,5 +73,11 @@ class SearchThingListController extends ThingTableListController {
     @Override
     public int getSwipeAction() {
         return SWIPE_ACTION_HIDE;
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        super.setFilter(filter);
+        AccountPrefs.setLastSearchFilter(context, filter);
     }
 }

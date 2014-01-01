@@ -29,9 +29,9 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.GlobalMenuFragment.SearchQueryHandler;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements
         LoaderCallbacks<AccountResult>,
@@ -39,7 +39,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         SearchQueryHandler,
         AccountResultHolder {
 
-    public static final String TAG = "SearchActivity";
+    private static final String TAG = "SearchActivity";
 
     /** Optional string subreddit to additionally search within a subreddit. */
     public static final String EXTRA_SUBREDDIT = "subreddit";
@@ -138,11 +138,16 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void refreshSubredditList() {
-        setSearchSubredditsFragments(accountName, getQuery(), FilterAdapter.SUBREDDIT_HOT);
+        setSearchSubredditsFragments(accountName, getQuery(), Filter.SUBREDDIT_HOT);
     }
 
     private void refreshThingList(String subreddit) {
-        setSearchThingsFragments(accountName, subreddit, getQuery(), FilterAdapter.SUBREDDIT_HOT);
+        // TODO(btmura): don't load the preferences here
+        int filter = AccountPrefs.getLastSearchFilter(this, Filter.SEARCH_RELEVANCE);
+        setSearchThingsFragments(accountName,
+                subreddit,
+                getQuery(),
+                filter);
     }
 
     @Override

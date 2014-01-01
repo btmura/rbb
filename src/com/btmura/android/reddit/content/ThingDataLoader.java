@@ -33,7 +33,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 
 public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
@@ -117,7 +117,7 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
 
             case ThingBundle.TYPE_COMMENT_REFERENCE:
                 String cookie = getCookie();
-                Formatter formatter = newFormatter();
+                MarkdownFormatter formatter = newFormatter();
                 parent = RedditApi.getInfo(getContext(),
                         thingBundle.getLinkId(),
                         cookie,
@@ -139,8 +139,8 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
         return AccountUtils.getCookie(getContext(), accountName);
     }
 
-    private Formatter newFormatter() {
-        return new Formatter();
+    private MarkdownFormatter newFormatter() {
+        return new MarkdownFormatter();
     }
 
     private void reloadSaveActionCursor() {

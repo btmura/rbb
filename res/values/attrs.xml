@@ -24,6 +24,7 @@
         <attr name="menu_comments_icon" format="reference" />
         <attr name="menu_delete_icon" format="reference" />
         <attr name="menu_edit_icon" format="reference" />
+        <attr name="menu_filter_icon" format="reference" />
         <attr name="menu_link_icon" format="reference" />
         <attr name="menu_messages_icon" format="reference" />
         <attr name="menu_profile_icon" format="reference" />

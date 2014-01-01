@@ -38,8 +38,8 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
-public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
-        OnAccountsUpdateListener {
+public class AccountLoader extends BaseAsyncTaskLoader<AccountResult>
+        implements OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
 
@@ -185,6 +185,7 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
         }
     }
 
+    @Override
     public void onAccountsUpdated(Account[] accounts) {
         onContentChanged();
     }

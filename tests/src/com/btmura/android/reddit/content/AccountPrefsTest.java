@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2013 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.text;
+package com.btmura.android.reddit.content;
 
-public class Formatter_BulletsTest extends AbstractFormatterTest {
+import android.test.AndroidTestCase;
 
-    public void testFormat_bullet() {
-        CharSequence cs = assertBulletFormat("* bullet1\n* bullet2", "bullet1\nbullet2");
-        assertBulletSpan(cs, 0, 7);
-        assertBulletSpan(cs, 8, 15);
-    }
+public class AccountPrefsTest extends AndroidTestCase {
 
-    public void testFormat_bulletBadFormat() {
-        assertBulletFormat("1* bullet1\n2* bullet2", "1* bullet1\n2* bullet2");
+    // TODO(btmura): add tests for other trivial methods
+
+    public void testSetLastCommentFilter() {
+        AccountPrefs.setLastCommentFilter(mContext, 0);
+        assertEquals(0, AccountPrefs.getLastCommentFilter(mContext, 1337));
+
+        AccountPrefs.setLastCommentFilter(mContext, 1);
+        assertEquals(1, AccountPrefs.getLastCommentFilter(mContext, 1337));
     }
 }

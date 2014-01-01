@@ -23,12 +23,12 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.CommentLoader;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 public class CommentAdapter extends BaseCursorAdapter {
 
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
     private final long nowTimeMs = System.currentTimeMillis();
 
     private final String accountName;

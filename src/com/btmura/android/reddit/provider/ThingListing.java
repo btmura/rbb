@@ -34,6 +34,7 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
@@ -42,10 +43,9 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 class ThingListing extends JsonParser implements Listing {
 
@@ -178,7 +178,7 @@ class ThingListing extends JsonParser implements Listing {
     private final int filter;
     private final String more;
     private final String cookie;
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private Map<String, Integer> hideActionMap;
@@ -191,6 +191,7 @@ class ThingListing extends JsonParser implements Listing {
             String accountName,
             String subreddit,
             String query,
+            int filter,
             String more,
             String cookie) {
         return new ThingListing(context,
@@ -200,7 +201,7 @@ class ThingListing extends JsonParser implements Listing {
                 subreddit,
                 query,
                 null,
-                0,
+                filter,
                 more,
                 cookie);
     }
@@ -300,7 +301,7 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(profileUser)) {
             return Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
         } else if (!TextUtils.isEmpty(query)) {
-            return Urls.search(subreddit, query, more);
+            return Urls.search(subreddit, query, filter, more);
         } else {
             return Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
         }
@@ -467,16 +468,16 @@ class ThingListing extends JsonParser implements Listing {
         // network to do things in parallel.
         if (!TextUtils.isEmpty(profileUser)) {
             switch (filter) {
-                case FilterAdapter.PROFILE_HIDDEN:
+                case Filter.PROFILE_HIDDEN:
                     mergeHideAction();
                     break;
 
-                case FilterAdapter.PROFILE_SAVED:
+                case Filter.PROFILE_SAVED:
                     mergeSaveActions();
                     break;
 
-                case FilterAdapter.PROFILE_LIKED:
-                case FilterAdapter.PROFILE_DISLIKED:
+                case Filter.PROFILE_LIKED:
+                case Filter.PROFILE_DISLIKED:
                     mergeVoteActions(filter);
                     break;
             }
@@ -545,7 +546,7 @@ class ThingListing extends JsonParser implements Listing {
         boolean firstPage = TextUtils.isEmpty(more);
         String selection;
         switch (filter) {
-            case FilterAdapter.PROFILE_LIKED:
+            case Filter.PROFILE_LIKED:
                 // If we're on the first page, then grab both likes, dislikes, and neutral votes.
                 // The liked items will be prepended to the top and disliked and netural items will
                 // be pruned.
@@ -557,7 +558,7 @@ class ThingListing extends JsonParser implements Listing {
                         : VoteActions.SELECT_SHOWABLE_NOT_UP_BY_ACCOUNT;
                 break;
 
-            case FilterAdapter.PROFILE_DISLIKED:
+            case Filter.PROFILE_DISLIKED:
                 selection = firstPage
                         ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
                         : VoteActions.SELECT_SHOWABLE_NOT_DOWN_BY_ACCOUNT;
@@ -573,9 +574,9 @@ class ThingListing extends JsonParser implements Listing {
         while (c.moveToNext()) {
             int action = c.getInt(VOTE_ACTION);
             if (action == VoteActions.ACTION_VOTE_UP
-                    && filter == FilterAdapter.PROFILE_LIKED
+                    && filter == Filter.PROFILE_LIKED
                     || action == VoteActions.ACTION_VOTE_DOWN
-                    && filter == FilterAdapter.PROFILE_DISLIKED) {
+                    && filter == Filter.PROFILE_DISLIKED) {
                 addVote(c);
             } else {
                 removeByThingId(c.getString(VOTE_THING_ID));

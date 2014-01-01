@@ -50,6 +50,8 @@ interface ThingListController<A extends AbstractThingListAdapter> extends
 
     // Setters.
 
+    void setFilter(int filter);
+
     void setMoreId(String moreId);
 
     void setParentSubreddit(String parentSubreddit);

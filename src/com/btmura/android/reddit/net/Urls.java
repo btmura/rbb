@@ -23,10 +23,10 @@ import java.net.URLEncoder;
 
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
@@ -114,7 +114,10 @@ public class Urls {
         return b.toString();
     }
 
-    public static CharSequence commentListing(String id, String linkId, int numComments,
+    public static CharSequence commentListing(String id,
+            String linkId,
+            int filter,
+            int numComments,
             int apiType) {
         boolean hasLinkId = !TextUtils.isEmpty(linkId);
         boolean hasLimit = numComments != -1;
@@ -124,11 +127,40 @@ public class Urls {
         if (apiType == TYPE_JSON) {
             b.append(".json");
         }
-        if (hasLinkId || hasLimit) {
+        if (hasLinkId || hasLimit || filter != -1) {
             b.append("?");
         }
         if (hasLinkId) {
             b.append("&comment=").append(id).append("&context=3");
+        } else if (filter != -1) {
+            switch (filter) {
+                case Filter.COMMENTS_BEST:
+                    b.append("&sort=confidence");
+                    break;
+
+                case Filter.COMMENTS_CONTROVERSIAL:
+                    b.append("&sort=controversial");
+                    break;
+
+                case Filter.COMMENTS_HOT:
+                    b.append("&sort=hot");
+                    break;
+
+                case Filter.COMMENTS_NEW:
+                    b.append("&sort=new");
+                    break;
+
+                case Filter.COMMENTS_OLD:
+                    b.append("&sort=old");
+                    break;
+
+                case Filter.COMMENTS_TOP:
+                    b.append("&sort=top");
+                    break;
+
+                default:
+                    break;
+            }
         }
         if (hasLimit) {
             b.append("&limit=").append(numComments);
@@ -209,15 +241,15 @@ public class Urls {
     public static CharSequence message(int filter, String more, boolean mark) {
         StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
         switch (filter) {
-            case FilterAdapter.MESSAGE_INBOX:
+            case Filter.MESSAGE_INBOX:
                 b.append("inbox");
                 break;
 
-            case FilterAdapter.MESSAGE_UNREAD:
+            case Filter.MESSAGE_UNREAD:
                 b.append("unread");
                 break;
 
-            case FilterAdapter.MESSAGE_SENT:
+            case Filter.MESSAGE_SENT:
                 b.append("sent");
                 break;
 
@@ -287,14 +319,14 @@ public class Urls {
         return save ? API_SAVE_URL : API_UNSAVE_URL;
     }
 
-    public static CharSequence search(String subreddit, String query, String more) {
+    public static CharSequence search(String subreddit, String query, int filter, String more) {
         if (!TextUtils.isEmpty(subreddit)) {
             StringBuilder b = new StringBuilder(BASE_SUBREDDIT_URL);
             b.append(encode(subreddit));
             b.append(BASE_SEARCH_QUERY);
-            return newSearchUrl(b.toString(), query, more, true);
+            return newSearchUrl(b.toString(), query, filter, more, true);
         } else {
-            return newSearchUrl(BASE_SEARCH_URL, query, more, false);
+            return newSearchUrl(BASE_SEARCH_URL, query, filter, more, false);
         }
     }
 
@@ -334,23 +366,23 @@ public class Urls {
         // Only add the filter for non random subreddits.
         if (!Subreddits.isRandom(subreddit)) {
             switch (filter) {
-                case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
+                case Filter.SUBREDDIT_CONTROVERSIAL:
                     b.append("/controversial");
                     break;
 
-                case FilterAdapter.SUBREDDIT_HOT:
+                case Filter.SUBREDDIT_HOT:
                     b.append("/hot");
                     break;
 
-                case FilterAdapter.SUBREDDIT_NEW:
+                case Filter.SUBREDDIT_NEW:
                     b.append("/new");
                     break;
 
-                case FilterAdapter.SUBREDDIT_RISING:
+                case Filter.SUBREDDIT_RISING:
                     b.append("/rising");
                     break;
 
-                case FilterAdapter.SUBREDDIT_TOP:
+                case Filter.SUBREDDIT_TOP:
                     b.append("/top");
                     break;
             }
@@ -375,7 +407,7 @@ public class Urls {
     }
 
     public static CharSequence subredditSearch(String query, String more) {
-        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more, false);
+        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, -1, more, false);
     }
 
     public static CharSequence subscribe() {
@@ -407,31 +439,31 @@ public class Urls {
         b.append(encode(user));
 
         switch (filter) {
-            case FilterAdapter.PROFILE_OVERVIEW:
+            case Filter.PROFILE_OVERVIEW:
                 b.append("/overview");
                 break;
 
-            case FilterAdapter.PROFILE_COMMENTS:
+            case Filter.PROFILE_COMMENTS:
                 b.append("/comments");
                 break;
 
-            case FilterAdapter.PROFILE_SUBMITTED:
+            case Filter.PROFILE_SUBMITTED:
                 b.append("/submitted");
                 break;
 
-            case FilterAdapter.PROFILE_LIKED:
+            case Filter.PROFILE_LIKED:
                 b.append("/liked");
                 break;
 
-            case FilterAdapter.PROFILE_DISLIKED:
+            case Filter.PROFILE_DISLIKED:
                 b.append("/disliked");
                 break;
 
-            case FilterAdapter.PROFILE_HIDDEN:
+            case Filter.PROFILE_HIDDEN:
                 b.append("/hidden");
                 break;
 
-            case FilterAdapter.PROFILE_SAVED:
+            case Filter.PROFILE_SAVED:
                 b.append("/saved");
                 break;
         }
@@ -457,9 +489,33 @@ public class Urls {
         return b;
     }
 
-    private static CharSequence newSearchUrl(String base, String query, String more,
+    private static CharSequence newSearchUrl(String base, String query, int filter, String more,
             boolean restrict) {
         StringBuilder b = new StringBuilder(base).append(encode(query));
+        switch (filter) {
+            case Filter.SEARCH_RELEVANCE:
+                b.append("&sort=relevance");
+                break;
+
+            case Filter.SEARCH_NEW:
+                b.append("&sort=new");
+                break;
+
+            case Filter.SEARCH_HOT:
+                b.append("&sort=hot");
+                break;
+
+            case Filter.SEARCH_TOP:
+                b.append("&sort=top");
+                break;
+
+            case Filter.SEARCH_COMMENTS:
+                b.append("&sort=comments");
+                break;
+
+            default:
+                break;
+        }
         if (more != null) {
             b.append("&count=25&after=").append(encode(more));
         }

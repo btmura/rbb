@@ -333,11 +333,11 @@ public class ThingFragment extends Fragment implements
     }
 
     private void handleOpen() {
-        MenuHelper.startIntentChooser(getActivity(), getUrl());
+        MenuHelper.openUrl(getActivity(), getUrl());
     }
 
     private void handleCopyUrl() {
-        MenuHelper.setClipAndToast(getActivity(), thingData.parent.getTitle(), getUrl());
+        MenuHelper.copyUrl(getActivity(), thingData.parent.getTitle(), getUrl());
     }
 
     private void handleAddSubreddit() {

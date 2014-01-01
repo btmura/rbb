@@ -126,7 +126,7 @@ public class SidebarFragment extends ListFragment
     }
 
     private void handleCopyUrl() {
-        MenuHelper.setClipAndToast(getActivity(), getClipLabel(), getClipText());
+        MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
     }
 
     private String getClipLabel() {

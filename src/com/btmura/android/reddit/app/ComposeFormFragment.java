@@ -66,7 +66,7 @@ import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.util.Views;
-import com.btmura.android.reddit.widget.AccountNameAdapter;
+import com.btmura.android.reddit.widget.AccountResultAdapter;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
@@ -139,7 +139,7 @@ public class ComposeFormFragment extends Fragment implements
     private EditText textText;
     private ProgressBar submitProgress;
 
-    private AccountNameAdapter accountAdapter;
+    private AccountResultAdapter accountAdapter;
     private SubredditAdapter subredditAdapter;
     private Matcher linkMatcher;
 
@@ -183,7 +183,7 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        accountAdapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
+        accountAdapter = AccountResultAdapter.newAccountNameListInstance(getActivity());
         setRetainInstance(true);
         setHasOptionsMenu(true);
     }
@@ -373,8 +373,7 @@ public class ComposeFormFragment extends Fragment implements
         noAccountView.setVisibility(hasAccounts ? View.GONE : View.VISIBLE);
         accountView.setVisibility(hasAccounts ? View.VISIBLE : View.GONE);
 
-        accountAdapter.clear();
-        accountAdapter.addAll(result.accountNames);
+        accountAdapter.setAccountResult(result);
 
         if (!hasAccounts && isSpecificAccountRequired()) {
             onComposeCancelled();
@@ -416,6 +415,7 @@ public class ComposeFormFragment extends Fragment implements
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
+        accountAdapter.setAccountResult(null);
     }
 
     @Override
@@ -428,8 +428,7 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         if (subredditAdapter != null) {
-            String accountName = accountAdapter.getItem(accountSpinner.getSelectedItemPosition());
-            subredditAdapter.setAccountName(accountName);
+            subredditAdapter.setAccountName(getSelectedAccountName());
         }
     }
 
@@ -493,7 +492,7 @@ public class ComposeFormFragment extends Fragment implements
     private void submit(String captchaId, String captchaGuess) {
         onSubmitStarted();
 
-        String accountName = accountAdapter.getItem(accountSpinner.getSelectedItemPosition());
+        String accountName = getSelectedAccountName();
         String destination = destinationText.getText().toString();
         String title = titleText.getText().toString();
         String text = textText.getText().toString();
@@ -778,6 +777,10 @@ public class ComposeFormFragment extends Fragment implements
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    private String getSelectedAccountName() {
+        return accountAdapter.getItem(accountSpinner.getSelectedItemPosition()).getAccountName();
     }
 
     private String getAccountName() {

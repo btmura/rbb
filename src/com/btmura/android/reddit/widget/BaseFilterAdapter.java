@@ -16,6 +16,21 @@
 
 package com.btmura.android.reddit.widget;
 
+import static com.btmura.android.reddit.app.Filter.MESSAGE_INBOX;
+import static com.btmura.android.reddit.app.Filter.MESSAGE_SENT;
+import static com.btmura.android.reddit.app.Filter.MESSAGE_UNREAD;
+import static com.btmura.android.reddit.app.Filter.PROFILE_COMMENTS;
+import static com.btmura.android.reddit.app.Filter.PROFILE_DISLIKED;
+import static com.btmura.android.reddit.app.Filter.PROFILE_HIDDEN;
+import static com.btmura.android.reddit.app.Filter.PROFILE_LIKED;
+import static com.btmura.android.reddit.app.Filter.PROFILE_OVERVIEW;
+import static com.btmura.android.reddit.app.Filter.PROFILE_SAVED;
+import static com.btmura.android.reddit.app.Filter.PROFILE_SUBMITTED;
+import static com.btmura.android.reddit.app.Filter.SUBREDDIT_CONTROVERSIAL;
+import static com.btmura.android.reddit.app.Filter.SUBREDDIT_HOT;
+import static com.btmura.android.reddit.app.Filter.SUBREDDIT_NEW;
+import static com.btmura.android.reddit.app.Filter.SUBREDDIT_RISING;
+import static com.btmura.android.reddit.app.Filter.SUBREDDIT_TOP;
 import android.content.Context;
 import android.widget.BaseAdapter;
 
@@ -25,24 +40,6 @@ import com.btmura.android.reddit.R;
  * {@link BaseAdapter} that defines filters used across the application.
  */
 abstract class BaseFilterAdapter extends BaseAdapter {
-
-    public static final int MESSAGE_INBOX = 0;
-    public static final int MESSAGE_UNREAD = 1;
-    public static final int MESSAGE_SENT = 2;
-
-    public static final int PROFILE_OVERVIEW = 0;
-    public static final int PROFILE_COMMENTS = 1;
-    public static final int PROFILE_SUBMITTED = 2;
-    public static final int PROFILE_LIKED = 3;
-    public static final int PROFILE_DISLIKED = 4;
-    public static final int PROFILE_HIDDEN = 5;
-    public static final int PROFILE_SAVED = 6;
-
-    public static final int SUBREDDIT_HOT = 0;
-    public static final int SUBREDDIT_TOP = 1;
-    public static final int SUBREDDIT_CONTROVERSIAL = 2;
-    public static final int SUBREDDIT_NEW = 3;
-    public static final int SUBREDDIT_RISING = 4;
 
     public void addMessageFilters(Context context) {
         clear();

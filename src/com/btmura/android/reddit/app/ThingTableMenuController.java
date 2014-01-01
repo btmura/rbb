@@ -17,9 +17,7 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,12 +26,12 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 
+// TODO(btmura): Split this apart into separate classes for profile and subreddits.
 class ThingTableMenuController implements MenuController {
 
     private final Context context;
     private final FragmentManager fragmentManager;
     private final String accountName;
-    private final String query;
     private final SubredditHolder subredditNameHolder;
     private final ThingHolder thingHolder;
     private final Refreshable refreshable;
@@ -48,20 +46,9 @@ class ThingTableMenuController implements MenuController {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.accountName = accountName;
-        this.query = query;
         this.subredditNameHolder = subredditNameHolder;
         this.thingHolder = thingHolder;
         this.refreshable = refreshable;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override
@@ -73,12 +60,11 @@ class ThingTableMenuController implements MenuController {
     public void onPrepareOptionsMenu(Menu menu) {
         String subreddit = getSubreddit();
 
-        boolean isQuery = !TextUtils.isEmpty(query);
         boolean hasAccount = AccountUtils.isAccount(accountName);
         boolean hasSubreddit = subreddit != null;
         boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
         boolean hasSidebar = Subreddits.hasSidebar(subreddit);
-        boolean isSubreddit = !isQuery && hasSubreddit && !hasThing;
+        boolean isSubreddit = hasSubreddit && !hasThing;
 
         boolean showAddSubreddit = isSubreddit;
         boolean showNewPost = isSubreddit && hasAccount;

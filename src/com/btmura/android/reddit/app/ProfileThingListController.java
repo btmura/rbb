@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.ProfileThingLoader;
-import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class ProfileThingListController extends ThingTableListController {
@@ -64,7 +63,7 @@ class ProfileThingListController extends ThingTableListController {
 
     private int getSwipeActionExtra(Bundle extras) {
         switch (getFilterExtra(extras)) {
-            case FilterAdapter.PROFILE_HIDDEN:
+            case Filter.PROFILE_HIDDEN:
                 return SWIPE_ACTION_UNHIDE;
 
             default:

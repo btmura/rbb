@@ -30,14 +30,15 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.util.Patterns;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.text.style.MarkdownTableSpan;
 import com.btmura.android.reddit.text.style.SubredditSpan;
 import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
 import com.btmura.android.reddit.util.Array;
 
-// TODO: Rename class to stop clashing with framework class.
-public class Formatter {
+public class MarkdownFormatter {
 
     private final Matcher matcher = RawLinks.PATTERN.matcher("");
     private final StringBuilder builder = new StringBuilder();
@@ -59,6 +60,7 @@ public class Formatter {
             c = Bullets.format(matcher, c);
             c = NamedLinks.format(c, builder);
             c = RawLinks.format(matcher, c);
+            c = Tables.format(context, matcher, c);
             return RelativeLinks.format(matcher, c);
         }
         return null;
@@ -92,29 +94,29 @@ public class Formatter {
 
                 deleted += 2;
                 if ("amp".equals(value)) {
-                    s = Formatter.replace(s, start, end, "&");
+                    s = replace(s, start, end, "&");
                     deleted += 2;
                 } else if ("gt".equals(value)) {
-                    s = Formatter.replace(s, start, end, ">");
+                    s = replace(s, start, end, ">");
                     deleted += 1;
                 } else if ("lt".equals(value)) {
-                    s = Formatter.replace(s, start, end, "<");
+                    s = replace(s, start, end, "<");
                     deleted += 1;
                 } else if ("quot".equals(value)) {
-                    s = Formatter.replace(s, start, end, "\"");
+                    s = replace(s, start, end, "\"");
                     deleted += 3;
                 } else if ("apos".equals(value)) {
-                    s = Formatter.replace(s, start, end, "'");
+                    s = replace(s, start, end, "'");
                     deleted += 3;
                 } else if ("nbsp".equals(value)) {
-                    s = Formatter.replace(s, start, end, " ");
+                    s = replace(s, start, end, " ");
                     deleted += 3;
                 } else if ("mdash".equals(value)) {
-                    s = Formatter.replace(s, start, end, "—");
+                    s = replace(s, start, end, "—");
                     deleted += 4;
                 } else {
                     String r = decodeReference(m);
-                    s = Formatter.replace(s, start, end, r);
+                    s = replace(s, start, end, r);
                     deleted += value.length() - r.length();
                 }
             }
@@ -130,7 +132,7 @@ public class Formatter {
 
     static class CodeBlock {
 
-        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
+        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("(?m)^(    |\t)(?:.*)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -138,10 +140,13 @@ public class Formatter {
             int totalStart = -1;
             int totalEnd = -1;
             for (int deleted = 0; m.find();) {
-                // Remove the leading indentation on the line.
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                s = Formatter.replace(s, start, end, m.group(2));
+
+                // Remove the leading indentation on the line.
+                int headStart = start;
+                int headEnd = start + m.group(1).length();
+                s = delete(s, headStart, headEnd);
 
                 // Update the end of the match and the deleted count.
                 end -= m.group(1).length();
@@ -155,7 +160,7 @@ public class Formatter {
 
                 // New block or 1st time. Set the span on the prior block and reset the markers.
                 if (totalStart != -1) {
-                    s = Formatter.setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
+                    s = setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
                 }
                 totalStart = start;
                 totalEnd = end;
@@ -163,7 +168,7 @@ public class Formatter {
 
             // There may not have been a new match to flush out the pending block so do it here.
             if (totalStart != -1) {
-                s = Formatter.setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
+                s = setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
             }
 
             return s;
@@ -188,9 +193,9 @@ public class Formatter {
         static final int STYLE_ITALIC = 1;
         static final int STYLE_STRIKETHROUGH = 2;
 
-        private static final Pattern PATTERN_BOLD = Pattern.compile("\\*\\*(.+?)\\*\\*");
-        private static final Pattern PATTERN_ITALIC = Pattern.compile("\\*(.+?)\\*");
-        private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("~~(.+?)~~");
+        private static final Pattern PATTERN_BOLD = Pattern.compile("\\*\\*.+?\\*\\*");
+        private static final Pattern PATTERN_ITALIC = Pattern.compile("\\*.+?\\*");
+        private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("~~.+?~~");
 
         static CharSequence format(Matcher matcher, CharSequence text, int style) {
             Pattern p = null;
@@ -227,9 +232,13 @@ public class Formatter {
                     continue;
                 }
 
-                String value = m.group(1);
-                s = Formatter.replace(s, start, end, value);
-                deleted += charsDeleted;
+                int headStart = start;
+                int headEnd = start + charsDeleted / 2;
+                s = delete(s, headStart, headEnd);
+
+                int tailEnd = end - charsDeleted / 2;
+                int tailStart = tailEnd - charsDeleted / 2;
+                s = delete(s, tailStart, tailEnd);
 
                 Object span = null;
                 switch (style) {
@@ -249,7 +258,11 @@ public class Formatter {
                         throw new IllegalArgumentException("Unsupported style: " + style);
                 }
 
-                s = Formatter.setSpan(s, start, start + value.length(), span);
+                int totalStart = start;
+                int totalEnd = end - charsDeleted;
+                s = setSpan(s, totalStart, totalEnd, span);
+
+                deleted += charsDeleted;
             }
 
             return s;
@@ -258,7 +271,7 @@ public class Formatter {
 
     static class Bullets {
 
-        private static Pattern PATTERN = Pattern.compile("^( *\\* )(.+)$", Pattern.MULTILINE);
+        private static Pattern PATTERN = Pattern.compile("(?m)^( *[*+-] )(?:.+)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -272,11 +285,16 @@ public class Formatter {
                     continue;
                 }
 
-                deleted += m.group(1).length();
-                String value = m.group(2);
+                // Apply the bullet span to the entire line.
+                s = setSpan(s, start, end, new BulletSpan(20));
 
-                s = Formatter.setSpan(s, start, end, new BulletSpan(20));
-                s = Formatter.replace(s, start, end, value);
+                // Delete the beginning *s.
+                int headStart = start;
+                int headEnd = start + m.group(1).length();
+                s = delete(s, headStart, headEnd);
+
+                // Increment how much we deleted.
+                deleted += m.group(1).length();
             }
             return s;
         }
@@ -292,7 +310,7 @@ public class Formatter {
             while (m.find()) {
                 String url = m.group();
                 URLSpan span = new URLSpan(url);
-                s = Formatter.setSpan(s, m.start(), m.end(), span);
+                s = setSpan(s, m.start(), m.end(), span);
             }
             return s;
         }
@@ -338,11 +356,11 @@ public class Formatter {
                 }
 
                 String url = s.subSequence(startParen + 1, endUrl).toString();
-                Object span = Formatter.getUrlSpan(url, builder);
+                Object span = getUrlSpan(url, builder);
 
-                s = Formatter.setSpan(s, startBrack + 1, endParen, span);
-                s = Formatter.delete(s, startBrack, startBrack + 1);
-                s = Formatter.delete(s, endBrack - 1, endParen);
+                s = setSpan(s, startBrack + 1, endParen, span);
+                s = delete(s, startBrack, startBrack + 1);
+                s = delete(s, endBrack - 1, endParen);
             }
             return s;
         }
@@ -399,7 +417,7 @@ public class Formatter {
                 } else {
                     span = new UserSpan(value);
                 }
-                s = Formatter.setSpan(s, m.start(), m.end(), span);
+                s = setSpan(s, m.start(), m.end(), span);
             }
             return s;
         }
@@ -407,7 +425,7 @@ public class Formatter {
 
     static class Heading {
 
-        private static Pattern PATTERN = Pattern.compile("^(#{1,} ?)(.+?)(#*)$", Pattern.MULTILINE);
+        private static Pattern PATTERN = Pattern.compile("(?m)^(#{1,} ?)(?:.+?)(#*)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -421,11 +439,50 @@ public class Formatter {
                     continue;
                 }
 
-                deleted += m.group(1).length() + m.group(3).length();
-                String value = m.group(2);
+                // Apply the span to the entire matching line.
+                s = setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
 
-                s = Formatter.setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
-                s = Formatter.replace(s, start, end, value);
+                // Trim off the beginning #s
+                int headStart = start;
+                int headEnd = start + m.group(1).length();
+                s = delete(s, headStart, headEnd);
+
+                // Trim off the ending #s
+                int tailEnd = end - m.group(1).length();
+                int tailStart = tailEnd - m.group(2).length();
+                s = delete(s, tailStart, tailEnd);
+
+                // Increment how much we deleted.
+                deleted += m.group(1).length() + m.group(2).length();
+            }
+            return s;
+        }
+    }
+
+    static class Tables {
+
+        static final Pattern PATTERN = Pattern.compile("(?m)(?:"
+                + "^.*\\|.*[\\r\\n]" // Header row
+                + "(?:[-:]*\\|)+.*[\\r\\n]" // Justification row with dashes, colons, or nothing.
+                + "(?:^.*\\|.*[\\r\\n]?){1,}" // 1 or more data rows.
+                + ")");
+
+        static CharSequence format(Context context, Matcher matcher, CharSequence text) {
+            CharSequence s = text;
+            Matcher m = matcher.usePattern(PATTERN).reset(text);
+            for (int deleted = 0; m.find();) {
+                int start = m.start() - deleted;
+                int end = m.end() - deleted;
+
+                // Don't apply formatting within code blocks.
+                if (CodeBlock.isCodeBlock(s, start, end)) {
+                    continue;
+                }
+
+                String replacement = context.getString(R.string.view_table);
+                deleted += m.group().length() - replacement.length();
+                s = setSpan(s, start, end, new MarkdownTableSpan(m.group()));
+                s = replace(s, start, end, replacement);
             }
             return s;
         }

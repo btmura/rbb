@@ -28,7 +28,7 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.BundleSupport;
 import com.btmura.android.reddit.util.JsonParser;
 import com.btmura.android.reddit.util.Strings;
@@ -85,7 +85,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     private final int type;
 
     public static ThingBundle fromJsonReader(Context context, JsonReader reader,
-            Formatter formatter) throws IOException {
+            MarkdownFormatter formatter) throws IOException {
         ThingBundleParser parser = new ThingBundleParser(context, formatter);
         parser.parseListingObject(reader);
         return new ThingBundle(parser.data, TYPE_LINK);
@@ -354,9 +354,9 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
         private final Bundle data = new Bundle(NUM_KEYS);
         private final Context context;
-        private final Formatter formatter;
+        private final MarkdownFormatter formatter;
 
-        ThingBundleParser(Context context, Formatter formatter) {
+        ThingBundleParser(Context context, MarkdownFormatter formatter) {
             this.context = context;
             this.formatter = formatter;
         }

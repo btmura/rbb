@@ -23,6 +23,7 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.btmura.android.reddit.app.UserProfileActivity;
+import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.net.Urls;
 
 public class UserSpan extends ClickableSpan {
@@ -38,6 +39,6 @@ public class UserSpan extends ClickableSpan {
         Context context = widget.getContext();
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.setData(Uri.parse(Urls.user(user, -1, null, Urls.TYPE_HTML).toString()));
-        context.startActivity(intent);
+        Contexts.startActivity(context, intent);
     }
 }

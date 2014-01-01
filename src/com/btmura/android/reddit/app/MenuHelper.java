@@ -16,9 +16,14 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +35,7 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.SubredditProvider;
@@ -39,6 +45,43 @@ public class MenuHelper {
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
     };
+
+    /**
+     * Sets a plain text {@link ClipData} with the provided label and text to the clipboard and
+     * shows a toast with the text.
+     */
+    public static void copyUrl(Context context, CharSequence label, CharSequence text) {
+        context = context.getApplicationContext();
+        ClipboardManager cb =
+                (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        cb.setPrimaryClip(ClipData.newPlainText(label, text));
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void downloadUrl(Context context, String title, String url) {
+        context = context.getApplicationContext();
+        DownloadManager manager =
+                (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Request request = new Request(Uri.parse(url));
+        request.setNotificationVisibility(Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setTitle(title);
+        manager.enqueue(request);
+    }
+
+    public static void openUrl(Context context, CharSequence url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url.toString()));
+        Contexts.startActivity(
+                context,
+                Intent.createChooser(intent, context.getString(R.string.menu_open)));
+    }
+
+    public static void shareImageUrl(Context context, String url) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(url));
+        Contexts.startActivity(context, intent);
+    }
 
     public static String getSubredditTitle(Context context, String subreddit) {
         return context.getString(R.string.menu_subreddit, subreddit);
@@ -50,24 +93,6 @@ public class MenuHelper {
 
     public static boolean isUserItemVisible(String user) {
         return !TextUtils.isEmpty(user) && !Things.DELETED_AUTHOR.equals(user);
-    }
-
-    public static void openUrl(Context context, CharSequence url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url.toString()));
-        context.startActivity(intent);
-    }
-
-    /**
-     * Sets a plain text {@link ClipData} with the provided label and text to the clipboard and
-     * shows a toast with the text.
-     */
-    public static void setClipAndToast(Context context, CharSequence label, CharSequence text) {
-        context = context.getApplicationContext();
-        ClipboardManager cb = (ClipboardManager)
-                context.getSystemService(Context.CLIPBOARD_SERVICE);
-        cb.setPrimaryClip(ClipData.newPlainText(label, text));
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
     public static void setShareProvider(MenuItem shareItem, String label, CharSequence text) {
@@ -87,6 +112,32 @@ public class MenuHelper {
         AddSubredditFragment.newInstance(subreddits).show(fm, AddSubredditFragment.TAG);
     }
 
+    public static void showSortCommentsDialog(Context context, final Filterable filterable) {
+        showSortDialog(context, filterable, R.string.menu_sort_comments, R.array.filters_comments);
+    }
+
+    public static void showSortSearchThingsDialog(Context context, final Filterable filterable) {
+        showSortDialog(context, filterable, R.string.menu_sort_results, R.array.filters_search);
+    }
+
+    private static void showSortDialog(Context context,
+            final Filterable filterable,
+            int titleResId,
+            int itemArrayResId) {
+        new AlertDialog.Builder(context)
+                .setTitle(titleResId)
+                .setSingleChoiceItems(itemArrayResId,
+                        filterable.getFilter(),
+                        new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                filterable.setFilter(which);
+                            }
+                        })
+                .show();
+    }
+
     public static void startAccountListActivity(Context context) {
         context.startActivity(new Intent(context, AccountListActivity.class));
     }
@@ -99,12 +150,6 @@ public class MenuHelper {
 
     public static void startContentBrowserActivity(Context context) {
         context.startActivity(new Intent(context, ContentBrowserActivity.class));
-    }
-
-    public static void startIntentChooser(Context context, CharSequence url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url.toString()));
-        context.startActivity(Intent.createChooser(intent, context.getString(R.string.menu_open)));
     }
 
     public static void startProfileActivity(Context context, String user, int filter) {

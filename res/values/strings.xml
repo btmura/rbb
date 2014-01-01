@@ -51,6 +51,12 @@
     <string name="error_account_required">You need an account to do this…</string>
     <string name="error_blank_field">This field cannot be blank…</string>
     <string name="filter_category">Filters</string>
+    <string name="filter_comments_best">best</string>
+    <string name="filter_comments_controversial">controversial</string>
+    <string name="filter_comments_hot">hot</string>
+    <string name="filter_comments_new">new</string>
+    <string name="filter_comments_old">old</string>
+    <string name="filter_comments_top">top</string>
     <string name="filter_message_inbox">inbox</string>
     <string name="filter_message_unread">unread</string>
     <string name="filter_message_sent">sent</string>
@@ -61,6 +67,11 @@
     <string name="filter_profile_disliked">disliked</string>
     <string name="filter_profile_hidden">hidden</string>
     <string name="filter_profile_saved">saved</string>
+    <string name="filter_search_comments">comments</string>
+    <string name="filter_search_hot">hot</string>
+    <string name="filter_search_new">new</string>
+    <string name="filter_search_relevance">relevance</string>
+    <string name="filter_search_top">top</string>
     <string name="filter_subreddit_controversial">controversial</string>
     <string name="filter_subreddit_hot">what\'s hot</string>
     <string name="filter_subreddit_new">new</string>
@@ -98,12 +109,14 @@
     <string name="menu_new_comment">New comment</string>
     <string name="menu_new_message">New message</string>
     <string name="menu_new_post">New post</string>
-    <string name="menu_open">Open in another app</string>
+    <string name="menu_open">Open</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_reply">Reply</string>
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
+    <string name="menu_sort_comments">Sort comments</string>
+    <string name="menu_sort_results">Sort results</string>
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_switch_themes">Switch themes</string>
@@ -129,5 +142,6 @@
     <string name="tab_posts">Posts</string>
     <string name="tab_related">Related</string>
     <string name="tab_subreddits">Subreddits</string>
+    <string name="view_table">View table</string>
 
 </resources>

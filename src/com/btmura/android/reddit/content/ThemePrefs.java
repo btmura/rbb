@@ -45,7 +45,6 @@ public class ThemePrefs extends Prefs {
     }
 
     public static final void switchTheme(Context context) {
-        // TODO: Check the current theme rather than using preferences.
         int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);
         getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();
     }

@@ -45,7 +45,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.widget.AccountNameAdapter;
+import com.btmura.android.reddit.widget.AccountResultAdapter;
 
 public class AccountListFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
         MultiChoiceModeListener {
@@ -59,7 +59,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private OnAccountEventListener listener;
-    private AccountNameAdapter adapter;
+    private AccountResultAdapter adapter;
 
     public static AccountListFragment newInstance() {
         return new AccountListFragment();
@@ -76,7 +76,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new AccountNameAdapter(getActivity(), R.layout.account_list_row);
+        adapter = AccountResultAdapter.newAccountListInstance(getActivity());
     }
 
     @Override
@@ -97,42 +97,48 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(getActivity(), false, false);
+        return new AccountLoader(getActivity(), false, true);
     }
 
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.clear();
-        adapter.addAll(result.accountNames);
+        adapter.setAccountResult(result);
         setEmptyText(getString(result != null ? R.string.empty_accounts : R.string.error));
         setListShown(true);
     }
 
+    @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         if (listener != null) {
-            listener.onAccountSelected(adapter.getItem(position));
+            listener.onAccountSelected(adapter.getItem(position).getAccountName());
         }
     }
 
+    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.account_action_menu, menu);
         return true;
     }
 
+    @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.accounts, count, count));
         return true;
     }
 
+    @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
     }
 
+    @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
@@ -149,7 +155,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (checked.get(i)) {
-                removeAccount(adapter.getItem(i));
+                removeAccount(adapter.getItem(i).getAccountName());
             }
         }
         mode.finish();
@@ -184,6 +190,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         }.execute();
     }
 
+    @Override
     public void onDestroyActionMode(ActionMode mode) {
     }
 }

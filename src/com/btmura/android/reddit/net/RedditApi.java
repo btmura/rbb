@@ -38,7 +38,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.app.ThingBundle;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 
 public class RedditApi {
 
@@ -47,7 +47,7 @@ public class RedditApi {
     private static final String CHARSET = "UTF-8";
     private static final String CONTENT_TYPE =
             "application/x-www-form-urlencoded;charset=" + CHARSET;
-    static final String USER_AGENT = "reddit by brian v3.2 by /u/btmura";
+    static final String USER_AGENT = "reddit by brian v3.3 by /u/btmura";
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
@@ -108,7 +108,7 @@ public class RedditApi {
     }
 
     public static ThingBundle getInfo(Context context, String thingId, String cookie,
-            Formatter formatter) throws IOException {
+            MarkdownFormatter formatter) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {

@@ -36,7 +36,6 @@ import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * {@link Activity} for viewing a user's profile.
@@ -113,7 +112,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         adapter.setAccountInfo(Array.of(currentUser), null, null, null);
 
         if (currentFilter == -1) {
-            currentFilter = FilterAdapter.PROFILE_OVERVIEW;
+            currentFilter = Filter.PROFILE_OVERVIEW;
         }
         adapter.setFilter(currentFilter);
 
