@@ -56,12 +56,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
     /** String argument that is used to paginate things. */
     private static final String LOADER_MORE_ID = "moreId";
 
-    public interface OnThingSelectedListener {
-        void onThingSelected(View view, ThingBundle thingBundle, int pageType);
-
-        int onThingBodyMeasure();
-    }
-
     protected C controller;
     protected MC menuController;
     protected AC actionModeController;

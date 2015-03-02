@@ -89,21 +89,6 @@ public class NavigationFragment extends ListFragment implements
 
     private static final String LOADER_ARG_ACCOUNT_NAME = "accountName";
 
-    public interface OnNavigationEventListener {
-        void onNavigationSubredditSelected(String accountName,
-                String subreddit,
-                boolean isRandom,
-                int filter,
-                ThingBundle thingBundle,
-                boolean force);
-
-        void onNavigationProfileSelected(String accountName, int filter, boolean force);
-
-        void onNavigationSavedSelected(String accountName, int filter, boolean force);
-
-        void onNavigationMessagesSelected(String accountName, int filter, boolean force);
-    }
-
     private final SubredditLoaderCallbacks subredditLoaderCallbacks =
             new SubredditLoaderCallbacks();
     private final RandomSubredditLoaderCallbacks randomLoaderCallbacks =

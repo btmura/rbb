@@ -1,10 +1,13 @@
 .classpath
+.idea
 .project
 .settings
+*.iml
 *.json
 apk
 bin
 hprof
 gen
+out
 project.properties
 res/values-v14
