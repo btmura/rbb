@@ -19,9 +19,19 @@
     <group android:orderInCategory="@integer/menu_order_thing" >
         <item
             android:id="@+id/menu_new_comment"
-            android:icon="?attr/menu_edit_icon"
-            android:showAsAction="ifRoom"
+            android:showAsAction="never"
             android:title="@string/menu_new_comment"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_open"
+            android:showAsAction="never"
+            android:title="@string/menu_open"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_share"
+            android:actionProviderClass="android.widget.ShareActionProvider"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_share"
             android:visible="false"/>
         <item
             android:id="@+id/menu_link"
@@ -46,17 +56,6 @@
             android:icon="?attr/menu_unsaved_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_save"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_open"
-            android:showAsAction="never"
-            android:title="@string/menu_open"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_share"
-            android:actionProviderClass="android.widget.ShareActionProvider"
-            android:showAsAction="ifRoom"
-            android:title="@string/menu_share"
             android:visible="false"/>
         <item
             android:id="@+id/menu_copy_url"
