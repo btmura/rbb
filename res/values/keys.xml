@@ -16,6 +16,7 @@
 -->
 <resources>
 
+    <string name="key_reddit_client_id">https://www.reddit.com/prefs/apps</string>
     <string name="key_youtube">https://developers.google.com/youtube/android/player/register</string>
 
 </resources>

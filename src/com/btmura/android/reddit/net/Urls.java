@@ -36,9 +36,13 @@ public class Urls {
     /** Type for getting a JSON response. */
     public static final int TYPE_JSON = 1;
 
+    public static final String OAUTH_REDIRECT_URL = "rbb://oauth/redirect";
+
     public static final String BASE_URL = "http://www.reddit.com";
+    public static final String BASE_SECURE_URL = "https://www.reddit.com";
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
+    private static final String API_AUTHORIZE_URL = BASE_SECURE_URL + "/api/v1/authorize";
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
     private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
@@ -85,6 +89,13 @@ public class Urls {
         return new StringBuilder(BASE_USER_JSON_URL).append(user).append("/about.json");
     }
 
+    public static CharSequence authorize(CharSequence clientId, CharSequence state, CharSequence redirectUri) {
+        return new StringBuilder(API_AUTHORIZE_URL)
+                .append("?client_id=").append(clientId)
+                .append("&response_type=code&state=").append(state)
+                .append("&redirect_uri=").append(redirectUri)
+                .append("&duration=permanent&scope=read");
+    }
     public static CharSequence captcha(String id) {
         return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
