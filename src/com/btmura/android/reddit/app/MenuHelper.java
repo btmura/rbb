@@ -81,16 +81,14 @@ public class MenuHelper {
     public static void openUrl(Context context, CharSequence url) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url.toString()));
-        Contexts.startActivity(
-                context,
-                Intent.createChooser(intent, context.getString(R.string.menu_open)));
+        Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_open));
     }
 
     public static void share(Context context, CharSequence text) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, text);
-        Contexts.startActivity(context, intent);
+        Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_share));
     }
 
     public static void shareImageUrl(Context context, String url) {
@@ -320,4 +318,7 @@ public class MenuHelper {
         context.startActivity(intent);
     }
 
+    private static Intent makeChooser(Context context, Intent intent, int titleResId) {
+        return Intent.createChooser(intent, context.getString(titleResId));
+    }
 }
