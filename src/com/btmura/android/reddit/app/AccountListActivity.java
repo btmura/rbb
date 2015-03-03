@@ -38,6 +38,7 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
@@ -144,6 +145,13 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_add_oauth_account).setVisible(BuildConfig.DEBUG);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -154,6 +162,10 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
                 handleAddAccount();
                 return true;
 
+            case R.id.menu_add_oauth_account:
+                handleAddOAuthAccount();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -161,5 +173,9 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
 
     private void handleAddAccount() {
         MenuHelper.startAddAccountActivity(this);
+    }
+
+    private void handleAddOAuthAccount() {
+        MenuHelper.openAuthorizeUrl(this);
     }
 }

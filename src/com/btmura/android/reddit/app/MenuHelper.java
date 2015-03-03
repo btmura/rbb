@@ -68,6 +68,16 @@ public class MenuHelper {
         manager.enqueue(request);
     }
 
+    public static void openAuthorizeUrl(Context context) {
+        String clientId = context.getString(R.string.key_reddit_client_id);
+        StringBuilder state = new StringBuilder("rbb_").append(System.currentTimeMillis());
+        CharSequence url = Urls.authorize(clientId, state, Urls.OAUTH_REDIRECT_URL);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url.toString()));
+        Contexts.startActivity(context, intent);
+    }
+
     public static void openUrl(Context context, CharSequence url) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url.toString()));
