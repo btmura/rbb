@@ -48,15 +48,15 @@
             android:title="@string/menu_save"
             android:visible="false"/>
         <item
+            android:id="@+id/menu_share"
+            android:icon="?attr/menu_share_icon"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_share"
+            android:visible="false"/>
+        <item
             android:id="@+id/menu_open"
             android:showAsAction="never"
             android:title="@string/menu_open"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_share"
-            android:actionProviderClass="android.widget.ShareActionProvider"
-            android:showAsAction="never"
-            android:title="@string/menu_share"
             android:visible="false"/>
         <item
             android:id="@+id/menu_copy_url"

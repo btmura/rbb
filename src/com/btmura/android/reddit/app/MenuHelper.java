@@ -76,6 +76,13 @@ public class MenuHelper {
                 Intent.createChooser(intent, context.getString(R.string.menu_open)));
     }
 
+    public static void share(Context context, CharSequence text) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        Contexts.startActivity(context, intent);
+    }
+
     public static void shareImageUrl(Context context, String url) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("image/*");
