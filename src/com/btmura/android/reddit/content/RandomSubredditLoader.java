@@ -16,9 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
@@ -32,6 +29,9 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.net.Urls;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
 
 public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
@@ -54,13 +54,12 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
             CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM,
                     Filter.SUBREDDIT_HOT,
                     null,
-                    Urls.TYPE_JSON);
+                    Urls.TYPE_HTML);
             String cookie = AccountUtils.getCookie(getContext(), accountName);
 
             HttpURLConnection conn = RedditApi.connect(url, cookie, false, false);
             if (conn.getResponseCode() == 302) {
-                String location = conn.getHeaderField("Location");
-                return UriHelper.getSubreddit(Uri.parse(location));
+                return UriHelper.getSubreddit(Uri.parse(conn.getHeaderField("Location")));
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
