@@ -203,6 +203,11 @@ public class CommentListFragment extends ListFragment implements
                 mode.finish();
                 return true;
 
+            case R.id.menu_share_comment:
+                controller.share(position);
+                mode.finish();
+                return true;
+
             case R.id.menu_copy_url:
                 controller.copyUrl(position);
                 mode.finish();
