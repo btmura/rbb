@@ -194,7 +194,7 @@ class SubredditActionModeController implements ActionModeController {
     }
 
     private CharSequence getClipText(ListView lv) {
-        return Urls.subreddit(getFirstCheckedSubreddit(lv), -1, null, Urls.TYPE_HTML);
+        return Urls.subreddit(getFirstCheckedSubreddit(lv), -1, Urls.TYPE_HTML);
     }
 
     @Override

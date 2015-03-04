@@ -134,7 +134,7 @@ public class SidebarFragment extends ListFragment
     }
 
     private CharSequence getClipText() {
-        return Urls.subreddit(getSubreddit(), -1, null, Urls.TYPE_HTML);
+        return Urls.subreddit(getSubreddit(), -1, Urls.TYPE_HTML);
     }
 
     private void handleAddSubreddit() {

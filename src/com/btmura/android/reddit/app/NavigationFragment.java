@@ -585,7 +585,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private CharSequence getClipText() {
-        return Urls.subreddit(getFirstCheckedSubreddit(), -1, null, Urls.TYPE_HTML);
+        return Urls.subreddit(getFirstCheckedSubreddit(), -1, Urls.TYPE_HTML);
     }
 
     @Override

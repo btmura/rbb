@@ -182,7 +182,7 @@ public class MenuHelper {
     public static void startSubredditActivity(Context context, String subreddit) {
         // TODO: Remove duplication with SubredditSpan.
         Intent intent = new Intent(context, BrowserActivity.class);
-        intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML).toString()));
+        intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, Urls.TYPE_HTML).toString()));
         context.startActivity(intent);
     }
 

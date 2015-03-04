@@ -367,7 +367,11 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence subreddit(String subreddit, int filter, String more, int apiType) {
+    public static CharSequence subreddit(String subreddit, int filter, int apiType) {
+        return subredditMore(subreddit, filter, null, apiType);
+    }
+
+    public static CharSequence subredditMore(String subreddit, int filter, String more, int apiType) {
         StringBuilder b = new StringBuilder(BASE_URL);
 
         if (!Subreddits.isFrontPage(subreddit)) {
