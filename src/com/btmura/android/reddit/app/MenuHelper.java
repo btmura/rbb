@@ -84,6 +84,7 @@ public class MenuHelper {
         Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_open));
     }
 
+    // TODO(btmura): add subject and title extras
     public static void share(Context context, CharSequence text) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
@@ -108,15 +109,6 @@ public class MenuHelper {
 
     public static boolean isUserItemVisible(String user) {
         return !TextUtils.isEmpty(user) && !Things.DELETED_AUTHOR.equals(user);
-    }
-
-    public static void setShareProvider(MenuItem shareItem, String label, CharSequence text) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, label);
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        ShareActionProvider provider = (ShareActionProvider) shareItem.getActionProvider();
-        provider.setShareIntent(intent);
     }
 
     public static void showAddSubredditDialog(FragmentManager fm, String subreddit) {
