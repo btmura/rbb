@@ -140,11 +140,6 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     private void prepareShareActionItem(Menu menu, ListView listView, int position) {
         MenuItem item = menu.findItem(R.id.menu_share_thing);
         item.setVisible(isCheckedCount(listView, 1));
-        if (item.isVisible()) {
-            String title = getThingTitle(position);
-            CharSequence url = getThingUrl(position);
-            MenuHelper.setShareProvider(item, title, url);
-        }
     }
 
     private String getThingTitle(int position) {
@@ -203,6 +198,11 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
                 mode.finish();
                 return true;
 
+            case R.id.menu_share_thing:
+                handleShare(listView);
+                mode.finish();;
+                return true;
+
             case R.id.menu_copy_url:
                 handleCopyUrl(listView);
                 mode.finish();
@@ -229,6 +229,11 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     private void handleHide(ListView listView, boolean hide) {
         int position = Views.getCheckedPosition(listView);
         hide(position, hide);
+    }
+
+    private void handleShare(ListView listView) {
+        int position = Views.getCheckedPosition(listView);
+        MenuHelper.share(context, getThingUrl(position));
     }
 
     private void handleCopyUrl(ListView listView) {

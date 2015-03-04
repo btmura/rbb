@@ -40,7 +40,7 @@
         android:title="@string/menu_unhide"/>
     <item
         android:id="@+id/menu_share_thing"
-        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:icon="?attr/menu_share_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_share"/>
     <item
