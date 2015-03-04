@@ -23,7 +23,6 @@ import android.support.v4.app.FragmentTransaction;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
 import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
-import com.btmura.android.reddit.app.OAuthFragment;
 import com.btmura.android.reddit.content.ThemePrefs;
 
 public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity
