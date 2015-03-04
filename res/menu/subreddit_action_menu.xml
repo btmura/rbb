@@ -33,12 +33,12 @@
         android:title="@string/menu_delete"/>
     <item
         android:id="@+id/menu_share"
-        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:icon="?attr/menu_share_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_share"/>
     <item
         android:id="@+id/menu_copy_url"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_copy_url"/>
 
 </menu>

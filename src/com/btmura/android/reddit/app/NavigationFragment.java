@@ -474,53 +474,34 @@ public class NavigationFragment extends ListFragment implements
         return true;
     }
 
-    private void prepareMode(ActionMode mode, int checkedCount) {
+    private void prepareMode(ActionMode mode, int checked) {
         mode.setTitle(getResources().getQuantityString(R.plurals.subreddits,
-                checkedCount, checkedCount));
+                checked, checked));
     }
 
     private void prepareAddItem(Menu menu) {
-        MenuItem addItem = menu.findItem(R.id.menu_add_subreddit);
-        addItem.setVisible(accountAdapter.getCount() > 1);
+        menu.findItem(R.id.menu_add_subreddit).setVisible(accountAdapter.getCount() > 1);
     }
 
     private void prepareAboutItem(Menu menu, boolean visible) {
-        MenuItem aboutItem = menu.findItem(R.id.menu_subreddit);
-        aboutItem.setVisible(visible);
+        MenuItem item = menu.findItem(R.id.menu_subreddit);
+        item.setVisible(visible);
         if (visible) {
-            aboutItem.setTitle(getString(R.string.menu_subreddit, getFirstCheckedSubreddit()));
+            item.setTitle(getString(R.string.menu_subreddit, getFirstCheckedSubreddit()));
         }
     }
 
     private void prepareDeleteItem(Menu menu, boolean visible) {
-        MenuItem deleteItem = menu.findItem(R.id.menu_delete);
-        deleteItem.setVisible(visible);
+        menu.findItem(R.id.menu_delete).setVisible(visible);
     }
 
     private void prepareShareItems(Menu menu, boolean visible) {
-        MenuItem shareItem = menu.findItem(R.id.menu_share);
-        shareItem.setVisible(visible);
-        if (visible) {
-            MenuHelper.setShareProvider(shareItem, getClipLabel(), getClipText());
-        }
-
-        MenuItem copyUrlItem = menu.findItem(R.id.menu_copy_url);
-        copyUrlItem.setVisible(visible);
-    }
-
-    private String getClipLabel() {
-        return getFirstCheckedSubreddit();
-    }
-
-    private CharSequence getClipText() {
-        return Urls.subreddit(getFirstCheckedSubreddit(), -1, null, Urls.TYPE_HTML);
+        menu.findItem(R.id.menu_share).setVisible(visible);
+        menu.findItem(R.id.menu_copy_url).setVisible(visible);
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode,
-            int position,
-            long id,
-            boolean checked) {
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
     }
 
@@ -542,6 +523,11 @@ public class NavigationFragment extends ListFragment implements
                 mode.finish();
                 return true;
 
+            case R.id.menu_share:
+                handleShare();
+                mode.finish();
+                return true;
+
             case R.id.menu_copy_url:
                 handleCopyUrl();
                 mode.finish();
@@ -558,23 +544,29 @@ public class NavigationFragment extends ListFragment implements
         MenuHelper.startSidebarActivity(getActivity(), getFirstCheckedSubreddit());
     }
 
+    private void handleDelete() {
+        Provider.removeSubredditsAsync(getActivity(), accountName, getCheckedSubreddits());
+    }
+
+    private void handleShare() {
+        MenuHelper.share(getActivity(), getClipText());
+    }
+
+    private void handleCopyUrl() {
+        MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
+    }
+
     private String getFirstCheckedSubreddit() {
         int position = Views.getCheckedPosition(getListView());
         int adapterPosition = mergeAdapter.getAdapterPosition(position);
         return subredditAdapter.getName(adapterPosition);
     }
 
-    private void handleDelete() {
-        String[] subreddits = getCheckedSubreddits();
-        Provider.removeSubredditsAsync(getActivity(), accountName, subreddits);
-    }
-
     private String[] getCheckedSubreddits() {
-        ListView listView = getListView();
-        int checkedCount = listView.getCheckedItemCount();
-        String[] subreddits = new String[checkedCount];
+        ListView lv = getListView();
+        SparseBooleanArray checked = lv.getCheckedItemPositions();
+        String[] subreddits = new String[lv.getCheckedItemCount()];
 
-        SparseBooleanArray checked = listView.getCheckedItemPositions();
         int size = checked.size();
         int j = 0;
         for (int i = 0; i < size; i++) {
@@ -584,11 +576,16 @@ public class NavigationFragment extends ListFragment implements
                 subreddits[j++] = subredditAdapter.getName(adapterPosition);
             }
         }
+
         return subreddits;
     }
 
-    private void handleCopyUrl() {
-        MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
+    private String getClipLabel() {
+        return getFirstCheckedSubreddit();
+    }
+
+    private CharSequence getClipText() {
+        return Urls.subreddit(getFirstCheckedSubreddit(), -1, null, Urls.TYPE_HTML);
     }
 
     @Override
