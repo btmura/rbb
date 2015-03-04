@@ -101,17 +101,15 @@ public class SidebarFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.sidebar_menu, menu);
-        prepareShareItems(menu);
-    }
-
-    private void prepareShareItems(Menu menu) {
-        MenuItem shareItem = menu.findItem(R.id.menu_share);
-        MenuHelper.setShareProvider(shareItem, getClipLabel(), getClipText());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_share:
+                handleShare();
+                return true;
+
             case R.id.menu_copy_url:
                 handleCopyUrl();
                 return true;
@@ -125,8 +123,16 @@ public class SidebarFragment extends ListFragment
         }
     }
 
+    private void handleShare() {
+        MenuHelper.share(getActivity(), getClipText());
+    }
+
     private void handleCopyUrl() {
         MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private String getClipLabel() {
@@ -135,10 +141,6 @@ public class SidebarFragment extends ListFragment
 
     private CharSequence getClipText() {
         return Urls.subreddit(getSubreddit(), -1, Urls.TYPE_HTML);
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private String getSubreddit() {
