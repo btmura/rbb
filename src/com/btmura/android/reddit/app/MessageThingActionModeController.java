@@ -86,11 +86,6 @@ public class MessageThingActionModeController implements ThingActionModeControll
     private void prepareShareActionItem(Menu menu, ListView listView, int position) {
         MenuItem item = menu.findItem(R.id.menu_share_thing);
         item.setVisible(isCheckedCount(listView, 1));
-        if (item.isVisible()) {
-            String title = getMessageTitle(position);
-            CharSequence url = getMessageUrl(position);
-            MenuHelper.setShareProvider(item, title, url);
-        }
     }
 
     private String getMessageTitle(int position) {
@@ -127,6 +122,11 @@ public class MessageThingActionModeController implements ThingActionModeControll
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView) {
         switch (item.getItemId()) {
+            case R.id.menu_share_thing:
+                handleShare(listView);
+                mode.finish();
+                return true;
+
             case R.id.menu_copy_url:
                 handleCopyUrl(listView);
                 mode.finish();
@@ -143,6 +143,11 @@ public class MessageThingActionModeController implements ThingActionModeControll
                 return true;
         }
         return false;
+    }
+
+    private void handleShare(ListView listView) {
+        int position = Views.getCheckedPosition(listView);
+        MenuHelper.share(context, getMessageUrl(position));
     }
 
     private void handleCopyUrl(ListView listView) {
