@@ -18,6 +18,10 @@
 
     <group android:orderInCategory="@integer/menu_order_thing" >
         <item
+            android:id="@+id/menu_refresh"
+            android:showAsAction="never"
+            android:title="@string/menu_refresh" />
+        <item
             android:id="@+id/menu_sort_comments"
             android:showAsAction="never"
             android:title="@string/menu_sort_comments"/>
