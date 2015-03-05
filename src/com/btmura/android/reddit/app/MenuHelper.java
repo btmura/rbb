@@ -30,8 +30,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.view.MenuItem;
-import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;

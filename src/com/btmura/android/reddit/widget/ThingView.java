@@ -651,7 +651,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         for (int i = 0; i < nesting; i++) {
             int offset = i * 4;
-            nestingPoints[offset + 0] = nestingPoints[offset + 2] = nestingIndent * (i + 1);
+            nestingPoints[offset] = nestingPoints[offset + 2] = nestingIndent * (i + 1);
             nestingPoints[offset + 1] = 0;
             nestingPoints[offset + 3] = measuredHeight;
         }

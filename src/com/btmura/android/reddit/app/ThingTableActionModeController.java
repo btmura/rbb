@@ -200,7 +200,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
             case R.id.menu_share_thing:
                 handleShare(listView);
-                mode.finish();;
+                mode.finish();
                 return true;
 
             case R.id.menu_copy_url:
