@@ -206,7 +206,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     }
 
     public void share(int position) {
-        MenuHelper.share(context, getCommentUrl(position));
+        MenuHelper.share(context, getCommentLabel(position), getCommentUrl(position));
     }
 
     public void vote(int action, int position) {

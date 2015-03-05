@@ -335,7 +335,7 @@ public class ThingFragment extends Fragment implements
     }
 
     private void handleShare() {
-        MenuHelper.share(getActivity(), getUrl());
+        MenuHelper.share(getActivity(), thingData.parent.getTitle(), getUrl());
     }
 
     private void handleOpen() {

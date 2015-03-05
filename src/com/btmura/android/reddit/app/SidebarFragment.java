@@ -124,7 +124,7 @@ public class SidebarFragment extends ListFragment
     }
 
     private void handleShare() {
-        MenuHelper.share(getActivity(), getClipText());
+        MenuHelper.share(getActivity(), getClipLabel(), getClipText());
     }
 
     private void handleCopyUrl() {

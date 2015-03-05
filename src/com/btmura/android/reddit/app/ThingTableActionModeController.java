@@ -233,7 +233,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private void handleShare(ListView listView) {
         int position = Views.getCheckedPosition(listView);
-        MenuHelper.share(context, getThingUrl(position));
+        MenuHelper.share(context, getThingTitle(position), getThingUrl(position));
     }
 
     private void handleCopyUrl(ListView listView) {

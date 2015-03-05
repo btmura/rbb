@@ -147,7 +147,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
 
     private void handleShare(ListView listView) {
         int position = Views.getCheckedPosition(listView);
-        MenuHelper.share(context, getMessageUrl(position));
+        MenuHelper.share(context, getMessageTitle(position), getMessageUrl(position));
     }
 
     private void handleCopyUrl(ListView listView) {

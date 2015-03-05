@@ -84,10 +84,10 @@ public class MenuHelper {
         Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_open));
     }
 
-    // TODO(btmura): add subject and title extras
-    public static void share(Context context, CharSequence text) {
+    public static void share(Context context, CharSequence subject, CharSequence text) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.putExtra(Intent.EXTRA_TEXT, text);
         Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_share));
     }

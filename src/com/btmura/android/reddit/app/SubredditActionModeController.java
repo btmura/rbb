@@ -162,7 +162,7 @@ class SubredditActionModeController implements ActionModeController {
     }
 
     private void handleShare(ListView lv) {
-        MenuHelper.share(context, getClipText(lv));
+        MenuHelper.share(context, getClipLabel(lv), getClipText(lv));
     }
 
     private void handleCopyUrl(ListView lv) {
