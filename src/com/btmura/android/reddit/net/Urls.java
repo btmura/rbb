@@ -36,7 +36,7 @@ public class Urls {
     /** Type for getting a JSON response. */
     public static final int TYPE_JSON = 1;
 
-    public static final String OAUTH_REDIRECT_URL = "rbb://oauth/redirect";
+    public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
     public static final String BASE_URL = "http://www.reddit.com";
     public static final String BASE_SECURE_URL = "https://www.reddit.com";
