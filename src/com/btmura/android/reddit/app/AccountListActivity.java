@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
@@ -44,6 +42,8 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
 import com.btmura.android.reddit.content.SelectAccountBroadcast;
 import com.btmura.android.reddit.content.ThemePrefs;
+
+import java.io.IOException;
 
 public class AccountListActivity extends FragmentActivity implements OnAccountEventListener,
         OnClickListener {
