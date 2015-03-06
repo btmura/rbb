@@ -44,9 +44,8 @@ public class RedditApi {
 
     public static final String TAG = "RedditApi";
 
-    private static final String CHARSET = "UTF-8";
-    private static final String CONTENT_TYPE =
-            "application/x-www-form-urlencoded;charset=" + CHARSET;
+    static final String CHARSET = "UTF-8";
+    static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset=" + CHARSET;
     static final String USER_AGENT = "reddit by brian v3.3 by /u/btmura";
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
@@ -273,7 +272,7 @@ public class RedditApi {
      * Logs entire response and returns a fresh InputStream as if nothing happened. Make sure to
      * delete all usages of this method, since it is only for debugging.
      */
-    private static InputStream logResponse(InputStream in) throws IOException {
+    static InputStream logResponse(InputStream in) throws IOException {
         // Make a copy of the InputStream.
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
