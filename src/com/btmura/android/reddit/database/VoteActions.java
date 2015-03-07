@@ -39,8 +39,11 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     /** Boolean column indicating whether to show this in the liked listing. */
     public static final String COLUMN_SHOW_IN_LISTING = "showInListing";
 
-    /** Number of sync attempts. */
-    public static final String COLUMN_SYNC_ATTEMPTS = "syncAttempts";
+    /** Number of sync failures excluding rate limits. */
+    public static final String COLUMN_SYNC_FAILURES = "syncFailures";
+
+    /** Unused string column with sync status. */
+    public static final String COLUMN_SYNC_STATUS = "syncStatus";
 
     /** String ID of the thing that the user wants to vote on. */
     public static final String COLUMN_THING_ID = "thingId";
@@ -72,7 +75,8 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
                 + COLUMN_SHOW_IN_LISTING + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0,"
+                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
+                + COLUMN_SYNC_STATUS + " TEXT,"
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
 
                 // Create thing columns to store enough info needed to display a
@@ -84,7 +88,9 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     }
 
     static void upgradeToV3(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
+
     }
 
     static void createV2(SQLiteDatabase db) {

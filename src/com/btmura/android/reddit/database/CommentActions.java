@@ -49,8 +49,11 @@ public class CommentActions implements BaseColumns {
     /** Unused long column for expiration of this row. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    /** Number of sync attempts. */
-    public static final String COLUMN_SYNC_ATTEMPTS = "syncAttempts";
+    /** Number of sync failures excluding rate limits. */
+    public static final String COLUMN_SYNC_FAILURES = "syncFailures";
+
+    /** Unused string column with sync status. */
+    public static final String COLUMN_SYNC_STATUS = "syncStatus";
 
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
@@ -76,11 +79,13 @@ public class CommentActions implements BaseColumns {
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
                 + COLUMN_TEXT + " TEXT,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0)");
+                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
+                + COLUMN_SYNC_STATUS + " TEXT)");
     }
 
     static void upgradeToV2(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
     }
 
     static void create(SQLiteDatabase db) {

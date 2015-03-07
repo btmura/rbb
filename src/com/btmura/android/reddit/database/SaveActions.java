@@ -38,8 +38,11 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     /** Unused long column for expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    /** Number of sync attempts. */
-    public static final String COLUMN_SYNC_ATTEMPTS = "syncAttempts";
+    /** Number of sync failures excluding rate limits. */
+    public static final String COLUMN_SYNC_FAILURES = "syncFailures";
+
+    /** Unused string column with sync status. */
+    public static final String COLUMN_SYNC_STATUS = "syncStatus";
 
     /** String ID of the thing that the user wants to save or unsave. */
     public static final String COLUMN_THING_ID = "thingId";
@@ -67,7 +70,8 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0,"
+                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
+                + COLUMN_SYNC_STATUS + " TEXT,"
 
                 // Create the base columns to display pending save items in the listing.
                 + CREATE_THING_COLUMNS_V2 + ","
@@ -77,7 +81,8 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     }
 
     static void upgradeToV3(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
     }
 
     static void createV2(SQLiteDatabase db) {
