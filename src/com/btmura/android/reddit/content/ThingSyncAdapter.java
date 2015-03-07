@@ -190,7 +190,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            Syncer.Ops ops = new Syncer.Ops(syncer.getEstimatedOpCount(count));
+            Ops ops = new Ops(syncer.getEstimatedOpCount(count));
 
             // Process as many actions until we hit some rate limit.
             for (; c.moveToNext(); count--) {
