@@ -2,6 +2,7 @@
 .idea
 .project
 .settings
+*.apk
 *.iml
 *.json
 apk
@@ -9,5 +10,6 @@ bin
 hprof
 gen
 out
+proguard_logs
 project.properties
 res/values-v14
