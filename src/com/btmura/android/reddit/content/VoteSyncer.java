@@ -33,17 +33,17 @@ import com.btmura.android.reddit.util.Array;
 
 class VoteSyncer implements Syncer {
 
-    private static final String[] VOTE_PROJECTION = {
+    private static final String[] PROJECTION = {
             VoteActions._ID,
             VoteActions.COLUMN_ACTION,
             VoteActions.COLUMN_THING_ID,
             VoteActions.COLUMN_SYNC_FAILURES,
     };
 
-    private static final int VOTE_ID = 0;
-    private static final int VOTE_ACTION = 1;
-    private static final int VOTE_THING_ID = 2;
-    private static final int VOTE_SYNC_FAILURES = 3;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int THING_ID = 2;
+    private static final int SYNC_FAILURES = 3;
 
     @Override
     public String getTag() {
@@ -53,7 +53,7 @@ class VoteSyncer implements Syncer {
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.VOTE_ACTIONS_URI,
-                VOTE_PROJECTION,
+                PROJECTION,
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 null);
@@ -61,20 +61,20 @@ class VoteSyncer implements Syncer {
 
     @Override
     public int getSyncFailures(Cursor c) {
-        return c.getInt(VOTE_SYNC_FAILURES);
+        return c.getInt(SYNC_FAILURES);
     }
 
     @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash)
             throws IOException {
-        String thingId = c.getString(VOTE_THING_ID);
-        int action = c.getInt(VOTE_ACTION);
+        String thingId = c.getString(THING_ID);
+        int action = c.getInt(ACTION);
         return RedditApi.vote(context, thingId, action, cookie, modhash);
     }
 
     @Override
     public void addRemoveAction(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(VOTE_ID);
+        long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
@@ -82,7 +82,7 @@ class VoteSyncer implements Syncer {
 
     @Override
     public void addSyncFailure(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(VOTE_ID);
+        long id = c.getLong(ID);
         int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.VOTE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))

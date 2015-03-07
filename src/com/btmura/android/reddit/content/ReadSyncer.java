@@ -33,17 +33,17 @@ import com.btmura.android.reddit.util.Array;
 
 class ReadSyncer implements Syncer {
 
-    private static final String[] READ_PROJECTION = {
+    private static final String[] PROJECTION = {
             ReadActions._ID,
             ReadActions.COLUMN_ACTION,
             ReadActions.COLUMN_THING_ID,
             ReadActions.COLUMN_SYNC_FAILURES,
     };
 
-    private static final int READ_ID = 0;
-    private static final int READ_ACTION = 1;
-    private static final int READ_THING_ID = 2;
-    private static final int READ_SYNC_FAILURES = 3;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int THING_ID = 2;
+    private static final int SYNC_FAILURES = 3;
 
     @Override
     public String getTag() {
@@ -53,7 +53,7 @@ class ReadSyncer implements Syncer {
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.READ_ACTIONS_URI,
-                READ_PROJECTION,
+                PROJECTION,
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 null);
@@ -61,20 +61,20 @@ class ReadSyncer implements Syncer {
 
     @Override
     public int getSyncFailures(Cursor c) {
-        return c.getInt(READ_SYNC_FAILURES);
+        return c.getInt(SYNC_FAILURES);
     }
 
     @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash)
             throws IOException {
-        String thingId = c.getString(READ_THING_ID);
-        boolean read = c.getInt(READ_ACTION) == ReadActions.ACTION_READ;
+        String thingId = c.getString(THING_ID);
+        boolean read = c.getInt(ACTION) == ReadActions.ACTION_READ;
         return RedditApi.readMessage(thingId, read, cookie, modhash);
     }
 
     @Override
     public void addRemoveAction(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(READ_ID);
+        long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
@@ -82,7 +82,7 @@ class ReadSyncer implements Syncer {
 
     @Override
     public void addSyncFailure(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(READ_ID);
+        long id = c.getLong(ID);
         int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))

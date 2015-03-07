@@ -35,7 +35,7 @@ import com.btmura.android.reddit.util.Array;
 
 class MessageSyncer implements Syncer {
 
-    private static final String[] MESSAGE_PROJECTION = {
+    private static final String[] PROJECTION = {
             MessageActions._ID,
             MessageActions.COLUMN_ACTION,
             MessageActions.COLUMN_THING_ID,
@@ -43,11 +43,11 @@ class MessageSyncer implements Syncer {
             MessageActions.COLUMN_SYNC_FAILURES,
     };
 
-    private static final int MESSAGE_ID = 0;
-    private static final int MESSAGE_ACTION = 1;
-    private static final int MESSAGE_THING_ID = 2;
-    private static final int MESSAGE_TEXT = 3;
-    private static final int MESSAGE_SYNC_FAILURES = 4;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int THING_ID = 2;
+    private static final int TEXT = 3;
+    private static final int SYNC_FAILURES = 4;
 
     @Override
     public String getTag() {
@@ -57,7 +57,7 @@ class MessageSyncer implements Syncer {
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.MESSAGE_ACTIONS_URI,
-                MESSAGE_PROJECTION,
+                PROJECTION,
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 SharedColumns.SORT_BY_ID);
@@ -65,15 +65,15 @@ class MessageSyncer implements Syncer {
 
     @Override
     public int getSyncFailures(Cursor c) {
-        return c.getInt(MESSAGE_SYNC_FAILURES);
+        return c.getInt(SYNC_FAILURES);
     }
 
     @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash)
             throws IOException {
-        int action = c.getInt(MESSAGE_ACTION);
-        String thingId = c.getString(MESSAGE_THING_ID);
-        String text = c.getString(MESSAGE_TEXT);
+        int action = c.getInt(ACTION);
+        String thingId = c.getString(THING_ID);
+        String text = c.getString(TEXT);
 
         switch (action) {
             case MessageActions.ACTION_INSERT:
@@ -89,7 +89,7 @@ class MessageSyncer implements Syncer {
 
     @Override
     public void addRemoveAction(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(MESSAGE_ID);
+        long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
@@ -101,7 +101,7 @@ class MessageSyncer implements Syncer {
 
     @Override
     public void addSyncFailure(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(MESSAGE_ID);
+        long id = c.getLong(ID);
         int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))

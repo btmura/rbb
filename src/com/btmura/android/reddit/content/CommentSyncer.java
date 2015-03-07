@@ -34,7 +34,7 @@ import com.btmura.android.reddit.util.Array;
 
 class CommentSyncer implements Syncer {
 
-    private static final String[] COMMENT_PROJECTION = {
+    private static final String[] PROJECTION = {
             CommentActions._ID,
             CommentActions.COLUMN_ACTION,
             CommentActions.COLUMN_TEXT,
@@ -42,11 +42,11 @@ class CommentSyncer implements Syncer {
             CommentActions.COLUMN_SYNC_FAILURES,
     };
 
-    private static final int COMMENT_ID = 0;
-    private static final int COMMENT_ACTION = 1;
-    private static final int COMMENT_TEXT = 2;
-    private static final int COMMENT_THING_ID = 3;
-    private static final int COMMENT_SYNC_FAILURES = 4;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int TEXT = 2;
+    private static final int THING_ID = 3;
+    private static final int SYNC_FAILURES = 4;
 
     @Override
     public String getTag() {
@@ -56,7 +56,7 @@ class CommentSyncer implements Syncer {
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.COMMENT_ACTIONS_URI,
-                COMMENT_PROJECTION,
+                PROJECTION,
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 SharedColumns.SORT_BY_ID);
@@ -64,15 +64,15 @@ class CommentSyncer implements Syncer {
 
     @Override
     public int getSyncFailures(Cursor c) {
-        return c.getInt(COMMENT_SYNC_FAILURES);
+        return c.getInt(SYNC_FAILURES);
     }
 
     @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash)
             throws IOException {
-        int action = c.getInt(COMMENT_ACTION);
-        String thingId = c.getString(COMMENT_THING_ID);
-        String text = c.getString(COMMENT_TEXT);
+        int action = c.getInt(ACTION);
+        String thingId = c.getString(THING_ID);
+        String text = c.getString(TEXT);
         switch (action) {
             case CommentActions.ACTION_INSERT:
                 return RedditApi.comment(thingId, text, cookie, modhash);
@@ -90,7 +90,7 @@ class CommentSyncer implements Syncer {
 
     @Override
     public void addRemoveAction(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(COMMENT_ID);
+        long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
@@ -102,7 +102,7 @@ class CommentSyncer implements Syncer {
 
     @Override
     public void addSyncFailure(String accountName, Cursor c, Ops ops) {
-        long id = c.getLong(COMMENT_ID);
+        long id = c.getLong(ID);
         int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
