@@ -46,6 +46,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "ThingSyncAdapter";
 
+    private static final int MAX_FAILURES = 100;
+
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
@@ -89,7 +91,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult) {
+                              ContentProviderClient provider, SyncResult syncResult) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onPerformSync START account: " + account.name);
         }
@@ -101,7 +103,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void doSync(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult) {
+                        ContentProviderClient provider, SyncResult syncResult) {
         try {
             AccountManager manager = AccountManager.get(getContext());
 
@@ -170,8 +172,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void sync(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult, Syncer syncer,
-            RateLimiter limiter, String cookie, String modhash) {
+                      ContentProviderClient provider, SyncResult syncResult, Syncer syncer,
+                      RateLimiter limiter, String cookie, String modhash) {
         Cursor c = null;
         try {
             // Get all pending actions for this account that haven't been synced.
@@ -190,8 +192,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(syncer.getEstimatedOpCount(count));
+            Ops ops = new Ops(syncer.getEstimatedOpCount(count));
 
             // Process as many actions until we hit some rate limit.
             for (; c.moveToNext(); count--) {
@@ -199,7 +200,10 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Sync the local action to the server over the network.
                     Result result = syncer.sync(getContext(), c, cookie, modhash);
                     if (BuildConfig.DEBUG) {
-                        result.logAnyErrors(TAG);
+                        result.logAnyErrors(TAG, syncer.getTag());
+                        if (result.hasErrors()) {
+                            Log.i(TAG, syncer.getTag() + " failures: " + syncer.getSyncFailures(c));
+                        }
                     }
 
                     // Quit processing actions if we hit a rate limit.
@@ -209,8 +213,14 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                         break;
                     }
 
-                    syncer.addOps(account.name, c, ops);
-
+                    if (!result.hasErrors() || syncer.getSyncFailures(c) >= MAX_FAILURES) {
+                        syncer.addRemoveAction(account.name, c, ops);
+                        syncResult.stats.numEntries++;
+                    } else {
+                        syncer.addSyncFailure(account.name, c, ops);
+                        limiter.needExtraSync = true;
+                        syncResult.stats.numSkippedEntries++;
+                    }
                 } catch (IOException e) {
                     // If we had a network problem then increment the exception
                     // count to indicate a soft error. The sync manager will
@@ -222,7 +232,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if (!ops.isEmpty()) {
                 ContentProviderResult[] results = provider.applyBatch(ops);
-                syncer.tallyOpResults(results, syncResult);
+                syncResult.stats.numDeletes += ops.deletes;
+                syncResult.stats.numUpdates += ops.updates;
             }
 
         } catch (RemoteException e) {

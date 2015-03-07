@@ -40,11 +40,18 @@ class SaveSyncer implements Syncer {
             SaveActions._ID,
             SaveActions.COLUMN_ACTION,
             SaveActions.COLUMN_THING_ID,
+            SaveActions.COLUMN_SYNC_FAILURES,
     };
 
     private static final int SAVE_ID = 0;
     private static final int SAVE_ACTION = 1;
     private static final int SAVE_THING_ID = 2;
+    private static final int SAVE_SYNC_FAILURES = 3;
+
+    @Override
+    public String getTag() {
+        return "s";
+    }
 
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
@@ -56,6 +63,11 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
+    public int getSyncFailures(Cursor c) {
+        return c.getInt(SAVE_SYNC_FAILURES);
+    }
+
+    @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
         String thingId = c.getString(SAVE_THING_ID);
         int action = c.getInt(SAVE_ACTION);
@@ -64,24 +76,25 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
-    public int getEstimatedOpCount(int count) {
-        return count * 2;
-    }
-
-    @Override
-    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        // Delete the row corresponding to the pending save.
+    public void addRemoveAction(String accountName, Cursor c, Ops ops) {
         long id = c.getLong(SAVE_ID);
-        ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
+        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
     }
 
     @Override
-    public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
-        int count = results.length;
-        for (int i = 0; i < count;) {
-            syncResult.stats.numDeletes += results[i++].count;
-        }
+    public void addSyncFailure(String accountName, Cursor c, Ops ops) {
+        long id = c.getLong(SAVE_ID);
+        int failures = getSyncFailures(c) + 1;
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.SAVE_ACTIONS_URI)
+                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .withValue(SaveActions.COLUMN_SYNC_FAILURES, failures)
+                .build());
+    }
+
+    @Override
+    public int getEstimatedOpCount(int count) {
+        return count * 2;
     }
 }

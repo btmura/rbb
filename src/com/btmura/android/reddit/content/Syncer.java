@@ -37,18 +37,29 @@ import com.btmura.android.reddit.net.Result;
  */
 interface Syncer {
 
-    /** Query the provider for pending actions and return a Cursor of them. */
+    String getTag();
+
+    /**
+     * Query the provider for pending actions and return a Cursor of them.
+     */
     Cursor query(ContentProviderClient provider, String accountName) throws RemoteException;
 
-    /** Sync the action to the server over the network. */
-    Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException;
+    int getSyncFailures(Cursor c);
 
-    /** Return how many total db operations will be made to clean up. */
+    /**
+     * Return how many total db operations will be made to clean up.
+     */
     int getEstimatedOpCount(int count);
 
-    /** Add db operations for the current action to the list. */
-    void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops);
+    /**
+     * Sync the action to the server over the network.
+     */
+    Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException;
 
-    /** Tally up the results of the applied db operations. */
-    void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult);
+    /**
+     * Add db operations for the current action to the list.
+     */
+    void addRemoveAction(String accountName, Cursor c, Ops ops);
+
+    void addSyncFailure(String accountName, Cursor c, Ops ops);
 }

@@ -40,11 +40,18 @@ class ReadSyncer implements Syncer {
             ReadActions._ID,
             ReadActions.COLUMN_ACTION,
             ReadActions.COLUMN_THING_ID,
+            ReadActions.COLUMN_SYNC_FAILURES,
     };
 
     private static final int READ_ID = 0;
     private static final int READ_ACTION = 1;
     private static final int READ_THING_ID = 2;
+    private static final int READ_SYNC_FAILURES = 3;
+
+    @Override
+    public String getTag() {
+        return "r";
+    }
 
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
@@ -56,31 +63,38 @@ class ReadSyncer implements Syncer {
     }
 
     @Override
-    public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
+    public int getSyncFailures(Cursor c) {
+        return c.getInt(READ_SYNC_FAILURES);
+    }
+
+    @Override
+    public Result sync(Context context, Cursor c, String cookie, String modhash)
+            throws IOException {
         String thingId = c.getString(READ_THING_ID);
         boolean read = c.getInt(READ_ACTION) == ReadActions.ACTION_READ;
         return RedditApi.readMessage(thingId, read, cookie, modhash);
     }
 
     @Override
-    public int getEstimatedOpCount(int count) {
-        return count;
-    }
-
-    @Override
-    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        // Delete the row corresponding to the pending read.
+    public void addRemoveAction(String accountName, Cursor c, Ops ops) {
         long id = c.getLong(READ_ID);
-        ops.add(ContentProviderOperation.newDelete(ThingProvider.READ_ACTIONS_URI)
+        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
     }
 
     @Override
-    public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
-        int count = results.length;
-        for (int i = 0; i < count;) {
-            syncResult.stats.numDeletes += results[i++].count;
-        }
+    public void addSyncFailure(String accountName, Cursor c, Ops ops) {
+        long id = c.getLong(READ_ID);
+        int failures = getSyncFailures(c) + 1;
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.READ_ACTIONS_URI)
+                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .withValue(ReadActions.COLUMN_SYNC_FAILURES, failures)
+                .build());
+    }
+
+    @Override
+    public int getEstimatedOpCount(int count) {
+        return count;
     }
 }

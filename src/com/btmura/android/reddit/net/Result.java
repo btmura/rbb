@@ -99,11 +99,11 @@ public class Result {
         return false;
     }
 
-    public void logAnyErrors(String tag) {
+    public void logAnyErrors(String tag, CharSequence prefix) {
         if (!Array.isEmpty(errors)) {
             StringBuilder line = new StringBuilder();
             for (int i = 0; i < errors.length; i++) {
-                line.delete(0, line.length());
+                line.delete(0, line.length()).append(prefix).append(": ");
                 for (int j = 0; j < errors[i].length; j++) {
                     line.append(errors[i][j]);
                     if (j + 1 < errors[i].length) {

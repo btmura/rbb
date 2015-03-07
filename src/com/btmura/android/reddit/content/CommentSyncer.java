@@ -42,12 +42,19 @@ class CommentSyncer implements Syncer {
             CommentActions.COLUMN_ACTION,
             CommentActions.COLUMN_TEXT,
             CommentActions.COLUMN_THING_ID,
+            CommentActions.COLUMN_SYNC_FAILURES,
     };
 
     private static final int COMMENT_ID = 0;
     private static final int COMMENT_ACTION = 1;
     private static final int COMMENT_TEXT = 2;
     private static final int COMMENT_THING_ID = 3;
+    private static final int COMMENT_SYNC_FAILURES = 4;
+
+    @Override
+    public String getTag() {
+        return "c";
+    }
 
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
@@ -59,7 +66,13 @@ class CommentSyncer implements Syncer {
     }
 
     @Override
-    public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
+    public int getSyncFailures(Cursor c) {
+        return c.getInt(COMMENT_SYNC_FAILURES);
+    }
+
+    @Override
+    public Result sync(Context context, Cursor c, String cookie, String modhash)
+            throws IOException {
         int action = c.getInt(COMMENT_ACTION);
         String thingId = c.getString(COMMENT_THING_ID);
         String text = c.getString(COMMENT_TEXT);
@@ -79,28 +92,29 @@ class CommentSyncer implements Syncer {
     }
 
     @Override
-    public int getEstimatedOpCount(int count) {
-        return count * 2;
-    }
-
-    @Override
-    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
+    public void addRemoveAction(String accountName, Cursor c, Ops ops) {
         long id = c.getLong(COMMENT_ID);
-        ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
+        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
                 .withSelection(Comments.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
                 .withValue(Comments.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());
     }
 
     @Override
-    public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
-        int count = results.length;
-        for (int i = 0; i < count;) {
-            syncResult.stats.numDeletes += results[i++].count;
-            syncResult.stats.numUpdates += results[i++].count;
-        }
+    public void addSyncFailure(String accountName, Cursor c, Ops ops) {
+        long id = c.getLong(COMMENT_ID);
+        int failures = getSyncFailures(c) + 1;
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENT_ACTIONS_URI)
+                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .withValue(CommentActions.COLUMN_SYNC_FAILURES, failures)
+                .build());
+    }
+
+    @Override
+    public int getEstimatedOpCount(int count) {
+        return count * 2;
     }
 }
