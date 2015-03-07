@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -25,7 +24,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -192,7 +190,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            Ops ops = new Ops(syncer.getEstimatedOpCount(count));
+            Syncer.Ops ops = new Syncer.Ops(syncer.getEstimatedOpCount(count));
 
             // Process as many actions until we hit some rate limit.
             for (; c.moveToNext(); count--) {

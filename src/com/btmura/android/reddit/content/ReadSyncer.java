@@ -17,13 +17,10 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.Context;
-import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.RemoteException;
 
