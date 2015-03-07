@@ -38,6 +38,9 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     /** Unused long column for expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
+    /** Number of sync attempts. */
+    public static final String COLUMN_SYNC_ATTEMPTS = "syncAttempts";
+
     /** String ID of the thing that the user wants to save or unsave. */
     public static final String COLUMN_THING_ID = "thingId";
 
@@ -56,6 +59,26 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
             + " AND " + COLUMN_ACTION + "=" + ACTION_UNSAVE;
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
+
+    static void createTableV3(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_THING_ID + " TEXT NOT NULL,"
+                + COLUMN_ACTION + " INTEGER NOT NULL,"
+                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
+                + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0,"
+
+                // Create the base columns to display pending save items in the listing.
+                + CREATE_THING_COLUMNS_V2 + ","
+
+                // Add constraint to make it easy to replace actions.
+                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+    }
+
+    static void upgradeTableV3(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
+    }
 
     static void createTableV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
