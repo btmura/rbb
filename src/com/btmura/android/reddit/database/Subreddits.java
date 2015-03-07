@@ -80,7 +80,7 @@ public class Subreddits implements BaseColumns {
         return isFrontPage(subreddit) ? c.getString(R.string.front_page) : subreddit;
     }
 
-    static void createTableV2(SQLiteDatabase db) {
+    static void createV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT DEFAULT '',"
@@ -90,7 +90,7 @@ public class Subreddits implements BaseColumns {
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_NAME + "))");
     }
 
-    static void createTableV1(SQLiteDatabase db) {
+    static void createV1(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
@@ -99,7 +99,7 @@ public class Subreddits implements BaseColumns {
                 + COLUMN_NAME + " ASC)");
     }
 
-    static void insertDefaultSubreddits(SQLiteDatabase db) {
+    static void insertDefaults(SQLiteDatabase db) {
         String[] defaultSubreddits = {
                 "AdviceAnimals",
                 "announcements",
@@ -129,7 +129,7 @@ public class Subreddits implements BaseColumns {
         }
     }
 
-    static void upgradeSubredditsV2(SQLiteDatabase db) {
+    static void upgradeToV2(SQLiteDatabase db) {
         // 1. Back up the old subreddit rows into ContentValues.
         ArrayList<ContentValues> rows = getSubredditNames(db);
 
@@ -138,7 +138,7 @@ public class Subreddits implements BaseColumns {
         db.execSQL("DROP TABLE " + TABLE_NAME);
 
         // 3. Create the new table and import the backed up subreddits.
-        createTableV2(db);
+        createV2(db);
         int count = rows.size();
         for (int i = 0; i < count; i++) {
             db.insert(TABLE_NAME, null, rows.get(i));

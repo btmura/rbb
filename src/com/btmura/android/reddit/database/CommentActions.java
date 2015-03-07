@@ -67,7 +67,7 @@ public class CommentActions implements BaseColumns {
     /** Action meaning teh user has edited a self post or comment. */
     public static final int ACTION_EDIT = 2;
 
-    static void createTableV2(SQLiteDatabase db) {
+    static void createV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
@@ -79,11 +79,11 @@ public class CommentActions implements BaseColumns {
                 + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0)");
     }
 
-    static void upgradeTableV2(SQLiteDatabase db) {
+    static void upgradeToV2(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
     }
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"

@@ -69,7 +69,7 @@ public class Sessions implements BaseColumns {
     public static final String SELECT_BY_TYPE_AND_THING_ID = COLUMN_TYPE + "=? AND "
             + COLUMN_THING_ID + "=?";
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT NOT NULL,"

@@ -44,7 +44,7 @@ public class ReadActions implements BaseColumns {
     /** Action meaning the user has marked this message as unread. */
     public static final int ACTION_UNREAD = 1;
 
-    static void createTableV2(SQLiteDatabase db) {
+    static void createV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
@@ -57,11 +57,11 @@ public class ReadActions implements BaseColumns {
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
     }
 
-    static void upgradeTableV2(SQLiteDatabase db) {
+    static void upgradeToV2(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
     }
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"

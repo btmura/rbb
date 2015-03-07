@@ -54,7 +54,7 @@ public class MessageActions implements BaseColumns {
     /** Action meaning the user has deleted one of their own comments. */
     public static final int ACTION_DELETE = 1;
 
-    static void createTableV2(SQLiteDatabase db) {
+    static void createV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
@@ -66,11 +66,11 @@ public class MessageActions implements BaseColumns {
                 + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0)");
     }
 
-    static void upgradeTableV2(SQLiteDatabase db) {
+    static void upgradeToV2(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_ATTEMPTS + " INTEGER DEFAULT 0");
     }
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"

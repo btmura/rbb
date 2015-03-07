@@ -109,33 +109,33 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private static void createDatabaseV4(SQLiteDatabase db) {
-        Accounts.createTable(db);
-        Comments.createTable(db);
-        Messages.createTable(db);
-        Sessions.createTable(db);
-        Subreddits.createTableV2(db);
-        SubredditResults.createTable(db);
-        Things.createTable(db);
+        Accounts.create(db);
+        Comments.create(db);
+        Messages.create(db);
+        Sessions.create(db);
+        SubredditResults.create(db);
+        Things.create(db);
 
-        CommentActions.createTableV2(db);
-        HideActions.createTableV2(db);
-        MessageActions.createTableV2(db);
-        ReadActions.createTableV2(db);
+        CommentActions.createV2(db);
+        HideActions.createV2(db);
+        MessageActions.createV2(db);
+        ReadActions.createV2(db);
+        Subreddits.createV2(db);
 
-        SaveActions.createTableV3(db);
-        VoteActions.createTableV3(db);
+        SaveActions.createV3(db);
+        VoteActions.createV3(db);
 
-        Subreddits.insertDefaultSubreddits(db);
+        Subreddits.insertDefaults(db);
     }
 
     private static void upgradeToDatabaseV4(SQLiteDatabase db) {
-        CommentActions.upgradeTableV2(db);
-        HideActions.upgradeTableV2(db);
-        MessageActions.upgradeTableV2(db);
-        ReadActions.upgradeTableV2(db);
+        CommentActions.upgradeToV2(db);
+        HideActions.upgradeToV2(db);
+        MessageActions.upgradeToV2(db);
+        ReadActions.upgradeToV2(db);
 
-        SaveActions.upgradeTableV3(db);
-        VoteActions.upgradeTableV3(db);
+        SaveActions.upgradeToV3(db);
+        VoteActions.upgradeToV3(db);
     }
 
     /**
@@ -143,37 +143,37 @@ public class DbHelper extends SQLiteOpenHelper {
      * permanent tables. It also adds new tables for comments and hiding things.
      */
     private static void createDatabaseV3(SQLiteDatabase db) {
-        Accounts.createTable(db);
-        CommentActions.createTable(db);
-        Comments.createTable(db);
-        HideActions.createTable(db);
-        MessageActions.createTable(db);
-        Messages.createTable(db);
-        ReadActions.createTable(db);
-        Sessions.createTable(db);
-        SubredditResults.createTable(db);
-        Things.createTable(db);
+        Accounts.create(db);
+        CommentActions.create(db);
+        Comments.create(db);
+        HideActions.create(db);
+        MessageActions.create(db);
+        Messages.create(db);
+        ReadActions.create(db);
+        Sessions.create(db);
+        SubredditResults.create(db);
+        Things.create(db);
 
-        SaveActions.createTableV2(db);
-        Subreddits.createTableV2(db);
-        VoteActions.createTableV2(db);
+        SaveActions.createV2(db);
+        Subreddits.createV2(db);
+        VoteActions.createV2(db);
 
-        Subreddits.insertDefaultSubreddits(db);
+        Subreddits.insertDefaults(db);
     }
 
     /**
      * Upgrade database to version 3 from version 2.
      */
     private static void upgradeToDatabaseV3(SQLiteDatabase db) {
-        Comments.createTable(db);
-        HideActions.createTable(db);
-        Messages.createTable(db);
-        Sessions.createTable(db);
-        SubredditResults.createTable(db);
-        Things.createTable(db);
+        Comments.create(db);
+        HideActions.create(db);
+        Messages.create(db);
+        Sessions.create(db);
+        SubredditResults.create(db);
+        Things.create(db);
 
-        SaveActions.upgradeTableV2(db);
-        VoteActions.upgradeTableV2(db);
+        SaveActions.upgradeToV2(db);
+        VoteActions.upgradeToV2(db);
     }
 
     /**
@@ -182,36 +182,36 @@ public class DbHelper extends SQLiteOpenHelper {
      * {@link #onOpen(SQLiteDatabase)}.
      */
     private static void createDatabaseV2(SQLiteDatabase db) {
-        Accounts.createTable(db);
-        CommentActions.createTable(db);
-        MessageActions.createTable(db);
-        ReadActions.createTable(db);
-        SaveActions.createTableV1(db);
-        VoteActions.createTableV1(db);
+        Accounts.create(db);
+        CommentActions.create(db);
+        MessageActions.create(db);
+        ReadActions.create(db);
+        SaveActions.create(db);
+        VoteActions.create(db);
 
-        Subreddits.createTableV2(db);
-        Subreddits.insertDefaultSubreddits(db);
+        Subreddits.createV2(db);
+        Subreddits.insertDefaults(db);
     }
 
     /**
      * Upgrade database to version 2 from version 1.
      */
     private static void upgradeToDatabaseV2(SQLiteDatabase db) {
-        Accounts.createTable(db);
-        CommentActions.createTable(db);
-        MessageActions.createTable(db);
-        ReadActions.createTable(db);
-        SaveActions.createTableV1(db);
-        VoteActions.createTableV1(db);
+        Accounts.create(db);
+        CommentActions.create(db);
+        MessageActions.create(db);
+        ReadActions.create(db);
+        SaveActions.create(db);
+        VoteActions.create(db);
 
-        Subreddits.upgradeSubredditsV2(db);
+        Subreddits.upgradeToV2(db);
     }
 
     /**
      * Creates the tables for database version 1. It supports storing local subreddits.
      */
     private static void createDatabaseV1(SQLiteDatabase db) {
-        Subreddits.createTableV1(db);
-        Subreddits.insertDefaultSubreddits(db);
+        Subreddits.createV1(db);
+        Subreddits.insertDefaults(db);
     }
 }
