@@ -191,7 +191,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(syncer.getOpCount(count));
+                    new ArrayList<ContentProviderOperation>(syncer.getEstimatedOpCount(count));
 
             // Process as many actions until we hit some rate limit.
             for (; c.moveToNext(); count--) {

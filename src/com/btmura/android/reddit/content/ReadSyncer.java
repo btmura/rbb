@@ -63,7 +63,7 @@ class ReadSyncer implements Syncer {
     }
 
     @Override
-    public int getOpCount(int count) {
+    public int getEstimatedOpCount(int count) {
         return count;
     }
 

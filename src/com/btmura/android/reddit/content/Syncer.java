@@ -44,7 +44,7 @@ interface Syncer {
     Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException;
 
     /** Return how many total db operations will be made to clean up. */
-    int getOpCount(int count);
+    int getEstimatedOpCount(int count);
 
     /** Add db operations for the current action to the list. */
     void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops);
