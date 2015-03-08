@@ -96,7 +96,7 @@ class CommentSyncer implements Syncer {
     }
 
     @Override
-    public void addDeleteAction(String accountName, Cursor c, Ops ops) {
+    public void addDeleteAction(Cursor c, Ops ops) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
@@ -108,8 +108,7 @@ class CommentSyncer implements Syncer {
     }
 
     @Override
-    public void addUpdateAction(String accountName,
-                                Cursor c,
+    public void addUpdateAction(Cursor c,
                                 Ops ops,
                                 long expiration,
                                 int syncFailures,

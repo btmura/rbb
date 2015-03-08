@@ -53,11 +53,10 @@ interface Syncer {
     Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException;
 
     /** Add a DB action to remove the action because it succeeded or the retrie were exceeded. */
-    void addDeleteAction(String accountName, Cursor c, Ops ops);
+    void addDeleteAction(Cursor c, Ops ops);
 
     /** Add a DB action to increment the action's sync failures. */
-    void addUpdateAction(String accountName,
-                         Cursor c,
+    void addUpdateAction(Cursor c,
                          Ops ops,
                          long expiration,
                          int syncFailures,

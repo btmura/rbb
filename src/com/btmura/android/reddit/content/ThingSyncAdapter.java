@@ -220,7 +220,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // Remove the action if there were no errors and move on.
                     if (!result.hasErrors()) {
-                        syncer.addDeleteAction(account.name, c, ops);
+                        syncer.addDeleteAction(c, ops);
                         syncResult.stats.numEntries++;
                         continue;
                     }
@@ -236,11 +236,10 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // Remove the action if it has expired or update it with the new expiration.
                     if (now > expiration) {
-                        syncer.addDeleteAction(account.name, c, ops);
+                        syncer.addDeleteAction(c, ops);
                         syncResult.stats.numEntries++;
                     } else {
-                        syncer.addUpdateAction(account.name, c, ops, expiration, syncFailures + 1,
-                                syncStatus);
+                        syncer.addUpdateAction(c, ops, expiration, syncFailures + 1, syncStatus);
                         syncResult.stats.numSkippedEntries++;
                     }
                 } catch (IOException e) {
