@@ -48,10 +48,8 @@ class MessageThingMenuController implements MenuController {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
-        boolean showNewMessage = !hasThing;
-        boolean showRefresh = !hasThing;
-        menu.findItem(R.id.menu_new_message).setVisible(showNewMessage);
-        menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
+        menu.findItem(R.id.menu_new_message).setVisible(!hasThing);
+        menu.findItem(R.id.menu_refresh).setVisible(!hasThing);
     }
 
     @Override

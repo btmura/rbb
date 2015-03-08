@@ -47,7 +47,7 @@ class CommentMenuController implements MenuController {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_refresh:
+            case R.id.menu_refresh_comments:
                 handleRefresh();
                 return true;
 
