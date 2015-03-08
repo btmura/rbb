@@ -42,7 +42,7 @@ public class MessageActions implements BaseColumns {
     /** Text of the reply. */
     public static final String COLUMN_TEXT = "text";
 
-    /** Unused long column for expiration of this row. */
+    /** Expiration date that is set after the initial non-rate limit sync failure. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
     /** Number of sync failures excluding rate limits. */

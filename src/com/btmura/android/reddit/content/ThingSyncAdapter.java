@@ -39,12 +39,15 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.net.Result;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "ThingSyncAdapter";
 
-    private static final int MAX_FAILURES = 100;
+    private static final long EXPIRATION_DURATION_MS = TimeUnit.DAYS.toMillis(5);
+
+    private static final int MIN_FAILURES = 100;
 
     public static class Service extends android.app.Service {
         @Override
@@ -191,6 +194,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Ops ops = new Ops(syncer.getEstimatedOpCount(count));
+            long now = System.currentTimeMillis();
 
             // Process as many actions until we hit some rate limit.
             for (; c.moveToNext(); count--) {
@@ -214,12 +218,27 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                         break;
                     }
 
-                    if (!result.hasErrors() || syncer.getSyncFailures(c) >= MAX_FAILURES) {
-                        syncer.addRemoveAction(account.name, c, ops);
+                    // Remove the action if there were no errors and move on.
+                    if (!result.hasErrors()) {
+                        syncer.addDeleteAction(account.name, c, ops);
+                        syncResult.stats.numEntries++;
+                        continue;
+                    }
+
+                    long expiration = syncer.getExpiration(c);
+                    int syncFailures = syncer.getSyncFailures(c) + 1;
+
+                    // If no expiration or not enough attempts, extend the expiration.
+                    if (expiration == 0 || syncFailures < MIN_FAILURES) {
+                        expiration = now + EXPIRATION_DURATION_MS;
+                    }
+
+                    // Remove the action if it has expired or update it with the new expiration.
+                    if (now > expiration) {
+                        syncer.addDeleteAction(account.name, c, ops);
                         syncResult.stats.numEntries++;
                     } else {
-                        syncer.addSyncFailure(account.name, c, ops);
-                        limiter.needExtraSync = true;
+                        syncer.addUpdateAction(account.name, c, ops, expiration, syncFailures + 1);
                         syncResult.stats.numSkippedEntries++;
                     }
                 } catch (IOException e) {

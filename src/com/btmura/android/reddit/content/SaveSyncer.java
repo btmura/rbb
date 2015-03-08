@@ -36,14 +36,17 @@ class SaveSyncer implements Syncer {
     private static final String[] PROJECTION = {
             SaveActions._ID,
             SaveActions.COLUMN_ACTION,
-            SaveActions.COLUMN_THING_ID,
+            SaveActions.COLUMN_EXPIRATION,
             SaveActions.COLUMN_SYNC_FAILURES,
+            SaveActions.COLUMN_THING_ID,
+
     };
 
     private static final int ID = 0;
     private static final int ACTION = 1;
-    private static final int THING_ID = 2;
+    private static final int EXPIRATION = 2;
     private static final int SYNC_FAILURES = 3;
+    private static final int THING_ID = 4;
 
     @Override
     public String getTag() {
@@ -60,6 +63,11 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
+    public long getExpiration(Cursor c) {
+        return c.getLong(EXPIRATION);
+    }
+
+    @Override
     public int getSyncFailures(Cursor c) {
         return c.getInt(SYNC_FAILURES);
     }
@@ -73,7 +81,7 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
-    public void addRemoveAction(String accountName, Cursor c, Ops ops) {
+    public void addDeleteAction(String accountName, Cursor c, Ops ops) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
@@ -81,12 +89,16 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
-    public void addSyncFailure(String accountName, Cursor c, Ops ops) {
+    public void addUpdateAction(String accountName,
+                                Cursor c,
+                                Ops ops,
+                                long expiration,
+                                int syncFailures) {
         long id = c.getLong(ID);
-        int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.SAVE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(SaveActions.COLUMN_SYNC_FAILURES, failures)
+                .withValue(SaveActions.COLUMN_EXPIRATION, expiration)
+                .withValue(SaveActions.COLUMN_SYNC_FAILURES, syncFailures)
                 .build());
     }
 

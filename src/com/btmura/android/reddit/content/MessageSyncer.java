@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
@@ -33,21 +31,25 @@ import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+
 class MessageSyncer implements Syncer {
 
     private static final String[] PROJECTION = {
             MessageActions._ID,
             MessageActions.COLUMN_ACTION,
+            MessageActions.COLUMN_EXPIRATION,
+            MessageActions.COLUMN_SYNC_FAILURES,
             MessageActions.COLUMN_THING_ID,
             MessageActions.COLUMN_TEXT,
-            MessageActions.COLUMN_SYNC_FAILURES,
     };
 
     private static final int ID = 0;
     private static final int ACTION = 1;
-    private static final int THING_ID = 2;
-    private static final int TEXT = 3;
-    private static final int SYNC_FAILURES = 4;
+    private static final int EXPIRATION = 2;
+    private static final int SYNC_FAILURES = 3;
+    private static final int THING_ID = 4;
+    private static final int TEXT = 5;
 
     @Override
     public String getTag() {
@@ -61,6 +63,11 @@ class MessageSyncer implements Syncer {
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 SharedColumns.SORT_BY_ID);
+    }
+
+    @Override
+    public long getExpiration(Cursor c) {
+        return c.getLong(EXPIRATION);
     }
 
     @Override
@@ -88,7 +95,7 @@ class MessageSyncer implements Syncer {
     }
 
     @Override
-    public void addRemoveAction(String accountName, Cursor c, Ops ops) {
+    public void addDeleteAction(String accountName, Cursor c, Ops ops) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
@@ -100,12 +107,16 @@ class MessageSyncer implements Syncer {
     }
 
     @Override
-    public void addSyncFailure(String accountName, Cursor c, Ops ops) {
+    public void addUpdateAction(String accountName,
+                                Cursor c,
+                                Ops ops,
+                                long expiration,
+                                int syncFailures) {
         long id = c.getLong(ID);
-        int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(MessageActions.COLUMN_SYNC_FAILURES, failures)
+                .withValue(MessageActions.COLUMN_EXPIRATION, expiration)
+                .withValue(MessageActions.COLUMN_SYNC_FAILURES, syncFailures)
                 .build());
     }
 

@@ -35,7 +35,7 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     /** Integer column indicating action whether to save or unsave. */
     public static final String COLUMN_ACTION = "action";
 
-    /** Unused long column for expiration. */
+    /** Expiration date that is set after the initial non-rate limit sync failure. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
     /** Number of sync failures excluding rate limits. */

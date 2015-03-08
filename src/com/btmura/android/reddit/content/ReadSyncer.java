@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
@@ -31,19 +29,23 @@ import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+
 class ReadSyncer implements Syncer {
 
     private static final String[] PROJECTION = {
             ReadActions._ID,
             ReadActions.COLUMN_ACTION,
-            ReadActions.COLUMN_THING_ID,
+            ReadActions.COLUMN_EXPIRATION,
             ReadActions.COLUMN_SYNC_FAILURES,
+            ReadActions.COLUMN_THING_ID,
     };
 
     private static final int ID = 0;
     private static final int ACTION = 1;
-    private static final int THING_ID = 2;
+    private static final int EXPIRATION = 2;
     private static final int SYNC_FAILURES = 3;
+    private static final int THING_ID = 4;
 
     @Override
     public String getTag() {
@@ -60,6 +62,11 @@ class ReadSyncer implements Syncer {
     }
 
     @Override
+    public long getExpiration(Cursor c) {
+        return c.getLong(EXPIRATION);
+    }
+
+    @Override
     public int getSyncFailures(Cursor c) {
         return c.getInt(SYNC_FAILURES);
     }
@@ -73,7 +80,7 @@ class ReadSyncer implements Syncer {
     }
 
     @Override
-    public void addRemoveAction(String accountName, Cursor c, Ops ops) {
+    public void addDeleteAction(String accountName, Cursor c, Ops ops) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
@@ -81,12 +88,16 @@ class ReadSyncer implements Syncer {
     }
 
     @Override
-    public void addSyncFailure(String accountName, Cursor c, Ops ops) {
+    public void addUpdateAction(String accountName,
+                                Cursor c,
+                                Ops ops,
+                                long expiration,
+                                int syncFailures) {
         long id = c.getLong(ID);
-        int failures = getSyncFailures(c) + 1;
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(ReadActions.COLUMN_SYNC_FAILURES, failures)
+                .withValue(ReadActions.COLUMN_EXPIRATION, expiration)
+                .withValue(ReadActions.COLUMN_SYNC_FAILURES, syncFailures)
                 .build());
     }
 
