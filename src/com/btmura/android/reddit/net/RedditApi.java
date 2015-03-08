@@ -218,7 +218,6 @@ public class RedditApi {
         InputStream in = null;
         try {
             conn = connect(url, cookie, true, true);
-            conn.connect();
             writeFormData(conn, data);
             in = conn.getInputStream();
             if (LOG_RESPONSES) {
