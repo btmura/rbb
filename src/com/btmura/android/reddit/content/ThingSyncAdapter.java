@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
@@ -39,6 +37,8 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.net.Result;
+
+import java.io.IOException;
 
 public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -200,7 +200,10 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     if (BuildConfig.DEBUG) {
                         result.logAnyErrors(TAG, syncer.getTag());
                         if (result.hasErrors()) {
-                            Log.i(TAG, syncer.getTag() + " failures: " + syncer.getSyncFailures(c));
+                            Log.i(TAG, syncer.getTag()
+                                    + " c: " + cookie.length()
+                                    + " m: " + modhash.length()
+                                    + " f: " + syncer.getSyncFailures(c));
                         }
                     }
 
