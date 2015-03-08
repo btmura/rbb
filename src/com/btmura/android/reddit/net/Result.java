@@ -28,11 +28,11 @@ import com.btmura.android.reddit.util.Array;
 
 public class Result {
 
+    /** Error for too much user activity. */
+    public static final String ERROR_RATELIMIT = "RATELIMIT";
+
     /** Error for missing or incorrect captcha guess. */
     private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
-
-    /** Error for too much user activity. */
-    private static final String ERROR_RATELIMIT = "RATELIMIT";
 
     public double rateLimit;
 
@@ -76,7 +76,7 @@ public class Result {
         return context.getString(R.string.reddit_error, b);
     }
 
-    public CharSequence getErrorCodeListMessage() {
+    public CharSequence getErrorCodeMessage() {
         if (Array.isEmpty(errors)) {
             return "";
         }

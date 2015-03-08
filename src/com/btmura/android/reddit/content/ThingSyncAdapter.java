@@ -207,6 +207,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                             Log.i(TAG, syncer.getTag()
                                     + " c: " + cookie.length()
                                     + " m: " + modhash.length()
+                                    + " e: " + syncer.getExpiration(c)
                                     + " f: " + syncer.getSyncFailures(c));
                         }
                     }
@@ -215,6 +216,10 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     if (result.hasRateLimitError()) {
                         limiter.updateLimit(result, count > 0);
                         syncResult.stats.numSkippedEntries += count;
+                        // Mark the other actions as rate limited and reset expiration and failures.
+                        do {
+                            syncer.addUpdateAction(c, ops, 0, 0, Result.ERROR_RATELIMIT);
+                        } while (c.moveToNext());
                         break;
                     }
 
@@ -227,7 +232,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     long expiration = syncer.getExpiration(c);
                     int syncFailures = syncer.getSyncFailures(c);
-                    CharSequence syncStatus = result.getErrorCodeListMessage();
+                    CharSequence syncStatus = result.getErrorCodeMessage();
 
                     // If no expiration or not enough attempts, extend the expiration.
                     if (expiration == 0 || syncFailures + 1 < MIN_FAILURES) {
@@ -239,7 +244,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                         syncer.addDeleteAction(c, ops);
                         syncResult.stats.numEntries++;
                     } else {
-                        syncer.addUpdateAction(c, ops, expiration, syncFailures + 1, syncStatus);
+                        syncer.addUpdateAction(c, ops, expiration, syncFailures + 1,
+                                result.getErrorCodeMessage());
                         syncResult.stats.numSkippedEntries++;
                     }
                 } catch (IOException e) {
