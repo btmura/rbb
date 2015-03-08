@@ -92,12 +92,14 @@ class VoteSyncer implements Syncer {
                                 Cursor c,
                                 Ops ops,
                                 long expiration,
-                                int syncFailures) {
+                                int syncFailures,
+                                CharSequence syncStatus) {
         long id = c.getLong(ID);
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.VOTE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .withValue(VoteActions.COLUMN_EXPIRATION, expiration)
                 .withValue(VoteActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(VoteActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());
     }
 

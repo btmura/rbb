@@ -226,10 +226,11 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
 
                     long expiration = syncer.getExpiration(c);
-                    int syncFailures = syncer.getSyncFailures(c) + 1;
+                    int syncFailures = syncer.getSyncFailures(c);
+                    CharSequence syncStatus = result.getErrorCodeListMessage();
 
                     // If no expiration or not enough attempts, extend the expiration.
-                    if (expiration == 0 || syncFailures < MIN_FAILURES) {
+                    if (expiration == 0 || syncFailures + 1 < MIN_FAILURES) {
                         expiration = now + EXPIRATION_DURATION_MS;
                     }
 
@@ -238,7 +239,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                         syncer.addDeleteAction(account.name, c, ops);
                         syncResult.stats.numEntries++;
                     } else {
-                        syncer.addUpdateAction(account.name, c, ops, expiration, syncFailures + 1);
+                        syncer.addUpdateAction(account.name, c, ops, expiration, syncFailures + 1,
+                                syncStatus);
                         syncResult.stats.numSkippedEntries++;
                     }
                 } catch (IOException e) {

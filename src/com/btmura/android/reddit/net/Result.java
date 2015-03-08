@@ -76,6 +76,20 @@ public class Result {
         return context.getString(R.string.reddit_error, b);
     }
 
+    public CharSequence getErrorCodeListMessage() {
+        if (Array.isEmpty(errors)) {
+            return "";
+        }
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < errors.length; i++) {
+            b.append(errors[i][0]);
+            if (i + 1 < errors.length) {
+                b.append(",");
+            }
+        }
+        return b;
+    }
+
     public boolean hasErrors() {
         return !Array.isEmpty(errors);
     }

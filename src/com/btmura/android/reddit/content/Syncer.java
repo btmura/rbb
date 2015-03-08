@@ -16,9 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
@@ -26,6 +23,9 @@ import android.database.Cursor;
 import android.os.RemoteException;
 
 import com.btmura.android.reddit.net.Result;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * {@link Syncer} is an internal interface to extract the behavioral pattern of querying for actions
@@ -56,7 +56,12 @@ interface Syncer {
     void addDeleteAction(String accountName, Cursor c, Ops ops);
 
     /** Add a DB action to increment the action's sync failures. */
-    void addUpdateAction(String accountName, Cursor c, Ops ops, long expiration, int syncFailures);
+    void addUpdateAction(String accountName,
+                         Cursor c,
+                         Ops ops,
+                         long expiration,
+                         int syncFailures,
+                         CharSequence syncStatus);
 }
 
 /** Container of {@link android.content.ContentProviderOperation}s with some counters. */

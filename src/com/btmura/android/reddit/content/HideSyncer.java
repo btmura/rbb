@@ -92,12 +92,14 @@ class HideSyncer implements Syncer {
                                 Cursor c,
                                 Ops ops,
                                 long expiration,
-                                int syncFailures) {
+                                int syncFailures,
+                                CharSequence syncStatus) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newUpdate(ThingProvider.HIDE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .withValue(HideActions.COLUMN_EXPIRATION, expiration)
                 .withValue(HideActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(HideActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());
     }
 

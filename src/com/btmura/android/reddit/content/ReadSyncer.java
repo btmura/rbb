@@ -92,12 +92,14 @@ class ReadSyncer implements Syncer {
                                 Cursor c,
                                 Ops ops,
                                 long expiration,
-                                int syncFailures) {
+                                int syncFailures,
+                                CharSequence syncStatus) {
         long id = c.getLong(ID);
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .withValue(ReadActions.COLUMN_EXPIRATION, expiration)
                 .withValue(ReadActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(ReadActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());
     }
 

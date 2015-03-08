@@ -93,12 +93,14 @@ class SaveSyncer implements Syncer {
                                 Cursor c,
                                 Ops ops,
                                 long expiration,
-                                int syncFailures) {
+                                int syncFailures,
+                                CharSequence syncStatus) {
         long id = c.getLong(ID);
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.SAVE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .withValue(SaveActions.COLUMN_EXPIRATION, expiration)
                 .withValue(SaveActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(SaveActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());
     }
 
