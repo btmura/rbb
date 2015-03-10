@@ -37,7 +37,11 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Strings;
+
+import java.net.URL;
+import java.net.URLEncoder;
 
 public class LinkFragment extends Fragment implements OnLongClickListener {
 
@@ -117,7 +121,11 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
     }
 
     private String getUrl() {
-        return Strings.toString(getArguments().getCharSequence(ARG_URL));
+        String url = Strings.toString(getArguments().getCharSequence(ARG_URL));
+        if (url != null && url.endsWith(".pdf")) {
+            return "http://docs.google.com/gview?embedded=true&url=" + Urls.encode(url);
+        }
+        return url;
     }
 
     @Override

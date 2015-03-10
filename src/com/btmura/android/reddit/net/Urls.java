@@ -542,7 +542,7 @@ public class Urls {
         return b;
     }
 
-    private static String encode(String param) {
+    public static String encode(String param) {
         try {
             return URLEncoder.encode(param, "UTF-8");
         } catch (UnsupportedEncodingException e) {
