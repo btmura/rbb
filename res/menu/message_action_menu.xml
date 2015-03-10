@@ -17,14 +17,14 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_copy_url"
-        android:showAsAction="never"
-        android:title="@string/menu_copy_url" />
-    <item
         android:id="@+id/menu_share_thing"
         android:icon="?attr/menu_share_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_share" />
+    <item
+        android:id="@+id/menu_copy_url"
+        android:showAsAction="never"
+        android:title="@string/menu_copy_url" />
     <item
         android:id="@+id/menu_author"
         android:icon="?attr/menu_profile_icon"
