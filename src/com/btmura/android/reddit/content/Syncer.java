@@ -60,7 +60,7 @@ interface Syncer {
                          Ops ops,
                          long expiration,
                          int syncFailures,
-                         CharSequence syncStatus);
+                         String syncStatus);
 }
 
 /** Container of {@link android.content.ContentProviderOperation}s with some counters. */

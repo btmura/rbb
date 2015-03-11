@@ -245,7 +245,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                         syncResult.stats.numEntries++;
                     } else {
                         syncer.addUpdateAction(c, ops, expiration, syncFailures + 1,
-                                result.getErrorCodeMessage());
+                                result.getErrorCodeMessage().toString());
                         syncResult.stats.numSkippedEntries++;
                     }
                 } catch (IOException e) {

@@ -92,7 +92,7 @@ class ReadSyncer implements Syncer {
                                 Ops ops,
                                 long expiration,
                                 int syncFailures,
-                                CharSequence syncStatus) {
+                                String syncStatus) {
         long id = c.getLong(ID);
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.READ_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))

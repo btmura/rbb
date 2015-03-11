@@ -92,7 +92,7 @@ class HideSyncer implements Syncer {
                                 Ops ops,
                                 long expiration,
                                 int syncFailures,
-                                CharSequence syncStatus) {
+                                String syncStatus) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newUpdate(ThingProvider.HIDE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
