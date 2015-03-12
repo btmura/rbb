@@ -90,7 +90,7 @@ public class Subreddits implements BaseColumns {
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_NAME + "))");
     }
 
-    static void createV1(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_NAME + " TEXT UNIQUE NOT NULL)");

@@ -109,22 +109,21 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private static void createDatabaseV4(SQLiteDatabase db) {
-        Accounts.createV2(db);
         Comments.create(db);
+        HideActions.createV2(db);
         Messages.create(db);
         Sessions.create(db);
         SubredditResults.create(db);
         Things.create(db);
 
+        Accounts.createV2(db);
         CommentActions.createV2(db);
-        HideActions.createV2(db);
         MessageActions.createV2(db);
         ReadActions.createV2(db);
-        Subreddits.createV2(db);
-
         SaveActions.createV3(db);
         VoteActions.createV3(db);
 
+        Subreddits.createV2(db);
         Subreddits.insertDefaults(db);
     }
 
@@ -134,7 +133,6 @@ public class DbHelper extends SQLiteOpenHelper {
         HideActions.upgradeToV2(db);
         MessageActions.upgradeToV2(db);
         ReadActions.upgradeToV2(db);
-
         SaveActions.upgradeToV3(db);
         VoteActions.upgradeToV3(db);
     }
@@ -144,21 +142,21 @@ public class DbHelper extends SQLiteOpenHelper {
      * permanent tables. It also adds new tables for comments and hiding things.
      */
     private static void createDatabaseV3(SQLiteDatabase db) {
-        Accounts.create(db);
-        CommentActions.create(db);
         Comments.create(db);
         HideActions.create(db);
-        MessageActions.create(db);
         Messages.create(db);
-        ReadActions.create(db);
         Sessions.create(db);
         SubredditResults.create(db);
         Things.create(db);
 
+        Accounts.create(db);
+        CommentActions.create(db);
+        MessageActions.create(db);
+        ReadActions.create(db);
         SaveActions.createV2(db);
-        Subreddits.createV2(db);
         VoteActions.createV2(db);
 
+        Subreddits.createV2(db);
         Subreddits.insertDefaults(db);
     }
 
@@ -212,7 +210,7 @@ public class DbHelper extends SQLiteOpenHelper {
      * Creates the tables for database version 1. It supports storing local subreddits.
      */
     private static void createDatabaseV1(SQLiteDatabase db) {
-        Subreddits.createV1(db);
+        Subreddits.create(db);
         Subreddits.insertDefaults(db);
     }
 }
