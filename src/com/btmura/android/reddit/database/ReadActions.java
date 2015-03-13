@@ -48,17 +48,8 @@ public class ReadActions implements BaseColumns {
     public static final int ACTION_UNREAD = 1;
 
     static void createV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_STATUS + " TEXT,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-
-                // Add constraint to make it easy to replace actions.
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+        create(db);
+        upgradeToV2(db);
     }
 
     static void upgradeToV2(SQLiteDatabase db) {

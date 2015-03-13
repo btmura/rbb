@@ -64,20 +64,8 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 
     static void createV3(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_STATUS + " TEXT,"
-
-                // Create the base columns to display pending save items in the listing.
-                + CREATE_THING_COLUMNS_V2 + ","
-
-                // Add constraint to make it easy to replace actions.
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+        createV2(db);
+        upgradeToV3(db);
     }
 
     static void upgradeToV3(SQLiteDatabase db) {
@@ -86,18 +74,8 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     }
 
     static void createV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-
-                // Create the base columns to display pending save items in the listing.
-                + CREATE_THING_COLUMNS_V2 + ","
-
-                // Add constraint to make it easy to replace actions.
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+        create(db);
+        upgradeToV2(db);
     }
 
     static void upgradeToV2(SQLiteDatabase db) {

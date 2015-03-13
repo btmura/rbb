@@ -71,16 +71,8 @@ public class CommentActions implements BaseColumns {
     public static final int ACTION_EDIT = 2;
 
     static void createV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_PARENT_THING_ID + " TEXT,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-                + COLUMN_TEXT + " TEXT,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_STATUS + " TEXT)");
+        create(db);
+        upgradeToV2(db);
     }
 
     static void upgradeToV2(SQLiteDatabase db) {

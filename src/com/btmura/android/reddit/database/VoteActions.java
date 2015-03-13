@@ -69,45 +69,18 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 
     static void createV3(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SHOW_IN_LISTING + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0,"
-                + COLUMN_SYNC_STATUS + " TEXT,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-
-                // Create thing columns to store enough info needed to display a
-                // fake item in certain listing.
-                + CREATE_THING_COLUMNS_V2 + ","
-
-                // Add constraint to make it easy to replace actions.
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+        createV2(db);
+        upgradeToV3(db);
     }
 
     static void upgradeToV3(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
-
     }
 
     static void createV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SHOW_IN_LISTING + " INTEGER DEFAULT 0,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-
-                // Create thing columns to store enough info needed to display a
-                // fake item in certain listing.
-                + CREATE_THING_COLUMNS_V2 + ","
-
-                // Add constraint to make it easy to replace actions.
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+        create(db);
+        upgradeToV2(db);
     }
 
     static void upgradeToV2(SQLiteDatabase db) {
