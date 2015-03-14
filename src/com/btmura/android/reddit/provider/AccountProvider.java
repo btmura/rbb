@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,9 +53,19 @@ public class AccountProvider extends BaseProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.accounts";
 
     static final String PATH_ACCOUNTS = "accounts";
+    static final String PATH_ACCOUNT_ACTIONS = "actions/accounts";
 
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     public static final Uri ACCOUNTS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNTS);
+    public static final Uri ACCOUNT_ACTIONS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNT_ACTIONS);
+
+    private static final UriMatcher MATCHER = new UriMatcher(0);
+    private static final int MATCH_ACCOUNTS = 1;
+    private static final int MATCH_ACCOUNT_ACTIONS = 2;
+    static {
+        MATCHER.addURI(AUTHORITY, PATH_ACCOUNTS, MATCH_ACCOUNTS);
+        MATCHER.addURI(AUTHORITY, PATH_ACCOUNT_ACTIONS, MATCH_ACCOUNT_ACTIONS);
+    }
 
     private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
     private static final String METHOD_CLEAR_MESSAGES = "clearMessages";
@@ -68,7 +79,16 @@ public class AccountProvider extends BaseProvider {
 
     @Override
     protected String getTable(Uri uri) {
-        return Accounts.TABLE_NAME;
+        switch (MATCHER.match(uri)) {
+            case MATCH_ACCOUNTS:
+                return Accounts.TABLE_NAME;
+
+            case MATCH_ACCOUNT_ACTIONS:
+                return AccountActions.TABLE_NAME;
+
+            default:
+                throw new IllegalArgumentException("uri: " + uri);
+        }
     }
 
     /**
