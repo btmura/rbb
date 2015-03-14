@@ -76,7 +76,7 @@ class VoteSyncer implements Syncer {
             throws IOException {
         String thingId = c.getString(THING_ID);
         int action = c.getInt(ACTION);
-        return RedditApi.vote(context, thingId, action, cookie, modhash);
+        return RedditApi.vote(thingId, action, cookie, modhash);
     }
 
     @Override

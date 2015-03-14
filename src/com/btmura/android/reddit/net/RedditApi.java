@@ -155,8 +155,7 @@ public class RedditApi {
         return postData(Urls.hide(hide), Urls.hideQuery(thingId, modhash), cookie);
     }
 
-    public static LoginResult login(Context context, String login, String password)
-            throws IOException {
+    public static LoginResult login(String login, String password) throws IOException {
         HttpsURLConnection conn = null;
         InputStream in = null;
         try {
@@ -203,7 +202,7 @@ public class RedditApi {
     }
 
     public static Result subscribe(String subreddit, boolean subscribe, String cookie,
-            String modhash) throws IOException {
+String modhash) throws IOException {
         return postData(Urls.subscribe(), Urls.subscribeQuery(subreddit, subscribe, modhash),
                 cookie);
     }
@@ -221,8 +220,8 @@ public class RedditApi {
                 captchaGuess, modhash), cookie);
     }
 
-    public static Result vote(Context context, String thingId, int vote, String cookie,
-            String modhash) throws IOException {
+    public static Result vote(String thingId, int vote, String cookie, String modhash)
+            throws IOException {
         return postData(Urls.vote(), Urls.voteQuery(thingId, vote, modhash), cookie);
     }
 
