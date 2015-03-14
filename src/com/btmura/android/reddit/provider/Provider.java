@@ -141,12 +141,12 @@ public class Provider {
         });
     }
 
-    public static void clearMessagesAsync(Context context, final String accountName) {
+    public static void markMessagesReadAsync(Context context, final String accountName) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                AccountProvider.clearMessages(appContext, accountName);
+                AccountProvider.markMessagesRead(appContext, accountName);
             }
         });
     }

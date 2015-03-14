@@ -19,7 +19,6 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -68,7 +67,7 @@ public class AccountProvider extends BaseProvider {
     }
 
     private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
-    private static final String METHOD_CLEAR_MESSAGES = "clearMessages";
+    private static final String METHOD_MARK_MESSAGES_READ = "markMessagesRead";
 
     /** String extra containing the cookie for an account. */
     private static final String EXTRA_COOKIE = "cookie";
@@ -91,29 +90,26 @@ public class AccountProvider extends BaseProvider {
         }
     }
 
-    /**
-     * Initializes a new account by importing subreddits and returns true on success.
-     */
+    /** Return true if account was initialized successfully with subreddits. */
     public static boolean initializeAccount(Context context, String accountName, String cookie) {
         Bundle args = new Bundle(1);
         args.putString(EXTRA_COOKIE, cookie);
-        return Provider.call(context,
-                ACCOUNTS_URI,
-                METHOD_INITIALIZE_ACCOUNT,
-                accountName,
-                args) != null;
+        return Provider.call(context, ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT, accountName, args)
+                != null;
     }
 
-    public static void clearMessages(Context context, String accountName) {
-        Provider.call(context, ACCOUNTS_URI, METHOD_CLEAR_MESSAGES, accountName, null);
+    /** Returns true if the account's messages were marked as read. */
+    public static boolean markMessagesRead(Context context, String accountName) {
+        return Provider.call(context, ACCOUNTS_URI, METHOD_MARK_MESSAGES_READ, accountName, null)
+                != null;
     }
 
     @Override
     public Bundle call(String method, String accountName, Bundle extras) {
         if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
             return initializeAccount(accountName, extras);
-        } else if (METHOD_CLEAR_MESSAGES.equals(method)) {
-            return clearMessages(accountName);
+        } else if (METHOD_MARK_MESSAGES_READ.equals(method)) {
+            return markMessagesRead(accountName);
         }
         return null;
     }
@@ -152,7 +148,7 @@ public class AccountProvider extends BaseProvider {
         };
 
         String selection = SharedColumns.SELECT_BY_ACCOUNT;
-        String[] selectionArgs = Array.of(accountName);
+        String[] args = Array.of(accountName);
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
@@ -160,7 +156,7 @@ public class AccountProvider extends BaseProvider {
             int tableCount = tables.length;
             int deleted = 0;
             for (int i = 0; i < tableCount; i++) {
-                deleted += db.delete(tables[i], selection, selectionArgs);
+                deleted += db.delete(tables[i], selection, args);
             }
 
             ContentValues values = new ContentValues(3);
@@ -185,22 +181,24 @@ public class AccountProvider extends BaseProvider {
         }
     }
 
-    // TODO(btmura): rename to mark messages read.
-    private Bundle clearMessages(String accountName) {
+    private Bundle markMessagesRead(String accountName) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            // Update the account row which may or may not exist.
+            String[] args = Array.of(accountName);
+
+            // Update the account row which may or may not exist. SyncAdapter will make one later.
             ContentValues v = new ContentValues(2);
             v.put(Accounts.COLUMN_HAS_MAIL, false);
-            db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
-
-            // Schedule an action to mark messages read.
-            v.clear();
-            v.put(AccountActions.COLUMN_ACCOUNT, accountName);
-            v.put(AccountActions.COLUMN_ACTION, AccountActions.ACTION_MARK_MESSAGES_READ);
-            if (db.insert(AccountActions.TABLE_NAME, null, v) == -1) {
-                return Bundle.EMPTY;
+            if (db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT, args) > 0) {
+                // Schedule an action to mark messages read if there is an account row to update.
+                v.clear();
+                v.put(AccountActions.COLUMN_ACCOUNT, accountName);
+                v.put(AccountActions.COLUMN_ACTION, AccountActions.ACTION_MARK_MESSAGES_READ);
+                if (db.update(AccountActions.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT, args) == 0
+                        && db.insert(AccountActions.TABLE_NAME, null, v) == -1) {
+                    return null;
+                }
             }
 
             db.setTransactionSuccessful();
