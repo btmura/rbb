@@ -62,11 +62,6 @@ class VoteSyncer implements Syncer {
     }
 
     @Override
-    public long getExpiration(Cursor c) {
-        return c.getLong(EXPIRATION);
-    }
-
-    @Override
     public int getSyncFailures(Cursor c) {
         return c.getInt(SYNC_FAILURES);
     }
@@ -88,15 +83,10 @@ class VoteSyncer implements Syncer {
     }
 
     @Override
-    public void addUpdateAction(Cursor c,
-                                Ops ops,
-                                long expiration,
-                                int syncFailures,
-                                String syncStatus) {
+    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
         long id = c.getLong(ID);
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.VOTE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(VoteActions.COLUMN_EXPIRATION, expiration)
                 .withValue(VoteActions.COLUMN_SYNC_FAILURES, syncFailures)
                 .withValue(VoteActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());

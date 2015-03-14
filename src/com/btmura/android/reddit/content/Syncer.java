@@ -40,9 +40,6 @@ interface Syncer {
     /** Query the provider for pending actions and return a Cursor of them. */
     Cursor query(ContentProviderClient provider, String accountName) throws RemoteException;
 
-    /** Returns the expiration date in ms of the action. */
-    long getExpiration(Cursor c);
-
     /** Return the number of sync failures excluding rate limiting of this action. */
     int getSyncFailures(Cursor c);
 
@@ -56,11 +53,7 @@ interface Syncer {
     void addDeleteAction(Cursor c, Ops ops);
 
     /** Add a DB action to increment the action's sync failures. */
-    void addUpdateAction(Cursor c,
-                         Ops ops,
-                         long expiration,
-                         int syncFailures,
-                         String syncStatus);
+    void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus);
 }
 
 /** Container of {@link android.content.ContentProviderOperation}s with some counters. */

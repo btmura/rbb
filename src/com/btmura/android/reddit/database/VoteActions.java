@@ -33,13 +33,13 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     /** Integer column indicating either an upvote or downvote. */
     public static final String COLUMN_ACTION = "action";
 
-    /** Expiration date that is set after the initial non-rate limit sync failure. */
+    /** Unused long column with expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
     /** Boolean column indicating whether to show this in the liked listing. */
     public static final String COLUMN_SHOW_IN_LISTING = "showInListing";
 
-    /** Number of sync failures excluding rate limits. */
+    /** Number of sync failures. */
     public static final String COLUMN_SYNC_FAILURES = "syncFailures";
 
     /** Unused string column with sync status. */

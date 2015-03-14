@@ -29,10 +29,10 @@ public class ReadActions implements BaseColumns {
     /** Action this row represents like adding or deleting. */
     public static final String COLUMN_ACTION = "action";
 
-    /** Expiration date that is set after the initial non-rate limit sync failure. */
+    /** Unused long column with expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    /** Number of sync failures excluding rate limits. */
+    /** Number of sync failures. */
     public static final String COLUMN_SYNC_FAILURES = "syncFailures";
 
     /** Unused string column with sync status. */

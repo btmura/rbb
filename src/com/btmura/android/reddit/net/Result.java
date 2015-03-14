@@ -29,10 +29,13 @@ import com.btmura.android.reddit.util.Array;
 public class Result {
 
     /** Error for too much user activity. */
-    public static final String ERROR_RATELIMIT = "RATELIMIT";
+    private static final String ERROR_RATELIMIT = "RATELIMIT";
 
     /** Error for missing or incorrect captcha guess. */
     private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
+
+    /** Error when necessary credentials are missing from a request. */
+    private static final String ERROR_USER_REQUIRED = "USER_REQUIRED";
 
     public double rateLimit;
 
@@ -100,6 +103,10 @@ public class Result {
 
     public boolean hasBadCaptchaError() {
         return hasError(ERROR_BAD_CAPTCHA);
+    }
+
+    public boolean hasUserRequiredError() {
+        return hasError(ERROR_USER_REQUIRED);
     }
 
     private boolean hasError(String errorCode) {

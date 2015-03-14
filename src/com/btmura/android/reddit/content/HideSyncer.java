@@ -36,16 +36,14 @@ class HideSyncer implements Syncer {
     private static final String[] HIDE_PROJECTION = {
             HideActions._ID,
             HideActions.COLUMN_ACTION,
-            HideActions.COLUMN_EXPIRATION,
             HideActions.COLUMN_SYNC_FAILURES,
             HideActions.COLUMN_THING_ID,
     };
 
     private static final int ID = 0;
     private static final int ACTION = 1;
-    private static final int EXPIRATION = 2;
-    private static final int SYNC_FAILURES = 3;
-    private static final int THING_ID = 4;
+    private static final int SYNC_FAILURES = 2;
+    private static final int THING_ID = 3;
 
     @Override
     public String getTag() {
@@ -59,11 +57,6 @@ class HideSyncer implements Syncer {
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 null);
-    }
-
-    @Override
-    public long getExpiration(Cursor c) {
-        return c.getLong(EXPIRATION);
     }
 
     @Override
@@ -88,15 +81,10 @@ class HideSyncer implements Syncer {
     }
 
     @Override
-    public void addUpdateAction(Cursor c,
-                                Ops ops,
-                                long expiration,
-                                int syncFailures,
-                                String syncStatus) {
+    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
         long id = c.getLong(ID);
         ops.addDelete(ContentProviderOperation.newUpdate(ThingProvider.HIDE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(HideActions.COLUMN_EXPIRATION, expiration)
                 .withValue(HideActions.COLUMN_SYNC_FAILURES, syncFailures)
                 .withValue(HideActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());

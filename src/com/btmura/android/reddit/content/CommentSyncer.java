@@ -37,7 +37,6 @@ class CommentSyncer implements Syncer {
     private static final String[] PROJECTION = {
             CommentActions._ID,
             CommentActions.COLUMN_ACTION,
-            CommentActions.COLUMN_EXPIRATION,
             CommentActions.COLUMN_SYNC_FAILURES,
             CommentActions.COLUMN_TEXT,
             CommentActions.COLUMN_THING_ID,
@@ -45,10 +44,9 @@ class CommentSyncer implements Syncer {
 
     private static final int ID = 0;
     private static final int ACTION = 1;
-    private static final int EXPIRATION = 2;
-    private static final int SYNC_FAILURES = 3;
-    private static final int TEXT = 4;
-    private static final int THING_ID = 5;
+    private static final int SYNC_FAILURES = 2;
+    private static final int TEXT = 3;
+    private static final int THING_ID = 4;
 
     @Override
     public String getTag() {
@@ -62,11 +60,6 @@ class CommentSyncer implements Syncer {
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 SharedColumns.SORT_BY_ID);
-    }
-
-    @Override
-    public long getExpiration(Cursor c) {
-        return c.getLong(EXPIRATION);
     }
 
     @Override
@@ -108,15 +101,10 @@ class CommentSyncer implements Syncer {
     }
 
     @Override
-    public void addUpdateAction(Cursor c,
-                                Ops ops,
-                                long expiration,
-                                int syncFailures,
-                                String syncStatus) {
+    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
         long id = c.getLong(ID);
         ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(CommentActions.COLUMN_EXPIRATION, expiration)
                 .withValue(CommentActions.COLUMN_SYNC_FAILURES, syncFailures)
                 .withValue(CommentActions.COLUMN_SYNC_STATUS, syncStatus)
                 .build());

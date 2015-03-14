@@ -22,7 +22,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -39,15 +38,10 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.net.Result;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "ThingSyncAdapter";
-
-    private static final long EXPIRATION_DURATION_MS = TimeUnit.DAYS.toMillis(5);
-
-    private static final int MIN_FAILURES = 100;
 
     public static class Service extends android.app.Service {
         @Override
@@ -198,53 +192,30 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
                     // Sync the local action to the server over the network.
                     Result result = syncer.sync(getContext(), c, cookie, modhash);
+                    int syncFailures = syncer.getSyncFailures(c);
+                    CharSequence syncStatus = result.getErrorCodeMessage();
+
                     if (BuildConfig.DEBUG) {
                         result.logAnyErrors(TAG, syncer.getTag());
                         if (result.hasErrors()) {
                             Log.i(TAG, syncer.getTag()
                                     + " c: " + cookie.length()
                                     + " m: " + modhash.length()
-                                    + " e: " + syncer.getExpiration(c)
-                                    + " f: " + syncer.getSyncFailures(c));
+                                    + " f: " + syncFailures
+                                    + " s: " + syncStatus);
                         }
                     }
 
                     // Quit processing actions if we hit a rate limit.
-                    if (result.hasRateLimitError()) {
+                    if (result.hasRateLimitError() || result.hasUserRequiredError()) {
                         limiter.updateLimit(result, count > 0);
-                        syncResult.stats.numSkippedEntries += count;
-                        // Mark the other actions as rate limited and reset expiration and failures.
-                        do {
-                            syncer.addUpdateAction(c, ops, 0, 0, Result.ERROR_RATELIMIT);
-                        } while (c.moveToNext());
+                        syncer.addUpdateAction(c, ops, syncFailures + 1, syncStatus.toString());
+                        syncResult.stats.numSkippedEntries++;
                         break;
                     }
 
-                    // Remove the action if there were no errors and move on.
-                    if (!result.hasErrors()) {
-                        syncer.addDeleteAction(c, ops);
-                        syncResult.stats.numEntries++;
-                        continue;
-                    }
-
-                    long expiration = syncer.getExpiration(c);
-                    int syncFailures = syncer.getSyncFailures(c);
-                    CharSequence syncStatus = result.getErrorCodeMessage();
-
-                    // If no expiration or not enough attempts, extend the expiration.
-                    if (expiration == 0 || syncFailures + 1 < MIN_FAILURES) {
-                        expiration = now + EXPIRATION_DURATION_MS;
-                    }
-
-                    // Remove the action if it has expired or update it with the new expiration.
-                    if (now > expiration) {
-                        syncer.addDeleteAction(c, ops);
-                        syncResult.stats.numEntries++;
-                    } else {
-                        syncer.addUpdateAction(c, ops, expiration, syncFailures + 1,
-                                result.getErrorCodeMessage().toString());
-                        syncResult.stats.numSkippedEntries++;
-                    }
+                    syncer.addDeleteAction(c, ops);
+                    syncResult.stats.numEntries++;
                 } catch (IOException e) {
                     // If we had a network problem then increment the exception
                     // count to indicate a soft error. The sync manager will
@@ -255,7 +226,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             if (!ops.isEmpty()) {
-                ContentProviderResult[] results = provider.applyBatch(ops);
+                provider.applyBatch(ops);
                 syncResult.stats.numDeletes += ops.deletes;
                 syncResult.stats.numUpdates += ops.updates;
             }
