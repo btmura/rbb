@@ -56,6 +56,7 @@ public class ContentUriListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new ArrayAdapter<Uri>(getActivity(), R.layout.content_uri_row);
+        adapter.add(AccountProvider.ACCOUNT_ACTIONS_URI);
         adapter.add(AccountProvider.ACCOUNTS_URI);
         adapter.add(SubredditProvider.SUBREDDITS_URI);
         adapter.add(ThingProvider.THINGS_URI);
