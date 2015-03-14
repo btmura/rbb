@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
@@ -100,7 +101,7 @@ public class AccountProvider extends BaseProvider {
     /**
      * Returns a non-null empty bundle on successfully creating an account. Otherwise, it returns
      * null on failure whether from getting the user's subreddits or encountering database issues.
-     * 
+     *
      * This method touches many tables that are not the responsibility of AccountProvider, but
      * somebody with access to the database must do this job to assure everything is done in a
      * single transaction.
@@ -164,28 +165,30 @@ public class AccountProvider extends BaseProvider {
         }
     }
 
+    // TODO(btmura): rename to mark messages read.
     private Bundle clearMessages(String accountName) {
-        int changed = 0;
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            // Update the existing row. If there isn't such a row, it will be created upon sync,
-            // where it will have the proper value.
-            ContentValues values = new ContentValues(1);
-            values.put(Accounts.COLUMN_HAS_MAIL, false);
-            changed += db.update(Accounts.TABLE_NAME,
-                    values,
-                    Accounts.SELECT_BY_ACCOUNT,
-                    Array.of(accountName));
+            // Update the account row which may or may not exist.
+            ContentValues v = new ContentValues(2);
+            v.put(Accounts.COLUMN_HAS_MAIL, false);
+            db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
+
+            // Schedule an action to mark messages read.
+            v.clear();
+            v.put(AccountActions.COLUMN_ACCOUNT, accountName);
+            v.put(AccountActions.COLUMN_ACTION, AccountActions.ACTION_MARK_MESSAGES_READ);
+            if (db.insert(AccountActions.TABLE_NAME, null, v) == -1) {
+                return Bundle.EMPTY;
+            }
+
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
 
-        ContentResolver cr = getContext().getContentResolver();
-        if (changed > 0) {
-            cr.notifyChange(ACCOUNTS_URI, null, SYNC);
-        }
+        getContext().getContentResolver().notifyChange(ACCOUNTS_URI, null, SYNC);
         return Bundle.EMPTY;
     }
 }
