@@ -251,7 +251,7 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence message(int filter, String more, boolean mark) {
+    public static CharSequence message(int filter, String more, boolean mark, int apiType) {
         StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
         switch (filter) {
             case Filter.MESSAGE_INBOX:
@@ -269,7 +269,9 @@ public class Urls {
             default:
                 throw new IllegalArgumentException(Integer.toString(filter));
         }
-        b.append("/.json");
+        if (apiType == TYPE_JSON) {
+            b.append("/.json");
+        }
         if (more != null || mark) {
             b.append("?");
         }

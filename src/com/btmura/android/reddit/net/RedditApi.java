@@ -37,6 +37,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 
@@ -168,6 +169,19 @@ public class RedditApi {
             writeFormData(conn, Urls.loginQuery(login, password));
             in = conn.getInputStream();
             return LoginResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static void markMessagesRead(String cookie) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            CharSequence url = Urls.message(Filter.MESSAGE_UNREAD, null, true, Urls.TYPE_HTML);
+            conn = connect(url, cookie, true, false);
+            in = conn.getInputStream();
+            in.read();
         } finally {
             close(in, conn);
         }
