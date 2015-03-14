@@ -17,6 +17,8 @@
 package com.btmura.android.reddit.util;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Array {
 
@@ -70,5 +72,12 @@ public class Array {
             original = Arrays.copyOf(original, capacity);
         }
         return original;
+    }
+
+    public static <T> List<T> asList(T[] array) {
+        if (array != null) {
+            return Arrays.asList(array);
+        }
+        return Collections.emptyList();
     }
 }
