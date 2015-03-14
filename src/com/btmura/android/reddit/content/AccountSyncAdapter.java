@@ -120,11 +120,11 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
                         case AccountActions.ACTION_MARK_MESSAGES_READ:
                             if (!markRead) {
                                 RedditApi.markMessagesRead(cookie);
-                                int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,
-                                        AccountActions.SELECT_BY_ID, Array.of(ID));
-                                syncResult.stats.numDeletes += deleted;
                                 markRead = true;
                             }
+                            int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,
+                                    AccountActions.SELECT_BY_ID, Array.of(c.getInt(ID)));
+                            syncResult.stats.numDeletes += deleted;
                             break;
                     }
                 }
