@@ -68,7 +68,21 @@ public class DbHelperTest extends AndroidTestCase {
             HideActions.TABLE_NAME,
     };
 
-    private static final String[] TABLES_V4 = TABLES_V3;
+    private static final String[] TABLES_V4 = {
+            Accounts.TABLE_NAME,
+            Sessions.TABLE_NAME,
+            Subreddits.TABLE_NAME,
+            Things.TABLE_NAME,
+            Comments.TABLE_NAME,
+            CommentActions.TABLE_NAME,
+            VoteActions.TABLE_NAME,
+            SaveActions.TABLE_NAME,
+            Messages.TABLE_NAME,
+            MessageActions.TABLE_NAME,
+            ReadActions.TABLE_NAME,
+            HideActions.TABLE_NAME,
+            AccountActions.TABLE_NAME,
+    };
 
     @Override
     protected void setUp() throws Exception {

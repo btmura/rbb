@@ -109,6 +109,8 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private static void createDatabaseV4(SQLiteDatabase db) {
+        AccountActions.create(db);
+
         Comments.create(db);
         HideActions.createV2(db);
         Messages.create(db);
@@ -128,6 +130,8 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private static void upgradeToDatabaseV4(SQLiteDatabase db) {
+        AccountActions.create(db);
+
         Accounts.upgradeToV2(db);
         CommentActions.upgradeToV2(db);
         HideActions.upgradeToV2(db);
