@@ -36,6 +36,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
@@ -71,7 +72,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider,
             SyncResult syncResult) {
         // Extra method just allows us to always print out sync stats after.
-        doSync(account, extras, authority, provider, syncResult);
+        doSync(account, provider, syncResult);
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
@@ -82,50 +83,70 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
         syncResult.delayUntil = System.currentTimeMillis() / 1000 + SYNC_DELAY_SECONDS;
     }
 
-    private static final String[] PROJECTION = {
+    private static final String[] ACTION_PROJECTION = {
+            AccountActions._ID,
+            AccountActions.COLUMN_ACTION,
+    };
+
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+
+    private static final String[] ACCOUNT_PROJECTION = {
             Accounts._ID,
             Accounts.COLUMN_LINK_KARMA,
             Accounts.COLUMN_COMMENT_KARMA,
             Accounts.COLUMN_HAS_MAIL,
     };
 
-    private static final int INDEX_LINK_KARMA = 1;
-    private static final int INDEX_COMMENT_KARMA = 2;
-    private static final int INDEX_HAS_MAIL = 3;
+    private static final int LINK_KARMA = 1;
+    private static final int COMMENT_KARMA = 2;
+    private static final int HAS_MAIL = 3;
 
-    private void doSync(Account account,
-            Bundle extras, String authority,
-            ContentProviderClient provider,
-            SyncResult syncResult) {
+    private void doSync(Account account, ContentProviderClient provider, SyncResult syncResult) {
         try {
-            // Get the necessary account credentials or bail out.
             String cookie = AccountUtils.getCookie(getContext(), account);
             if (cookie == null) {
                 syncResult.stats.numAuthExceptions++;
                 return;
             }
 
-            // Get the account information.
-            AccountInfoResult result = RedditApi.aboutMe(cookie);
-
-            // Only update the database if it's missing or different.
-            Cursor c = provider.query(AccountProvider.ACCOUNTS_URI,
-                    PROJECTION,
-                    Accounts.SELECT_BY_ACCOUNT,
-                    Array.of(account.name),
-                    null);
+            // Mark the account's messages as read if requested.
+            boolean markRead = false;
+            Cursor c = provider.query(AccountProvider.ACCOUNT_ACTIONS_URI, ACTION_PROJECTION,
+                    AccountActions.SELECT_BY_ACCOUNT, Array.of(account.name), null);
             try {
+                markRead = c.moveToFirst()
+                        && c.getInt(ACTION) == AccountActions.ACTION_MARK_MESSAGES_READ;
+                if (markRead) {
+                    RedditApi.markMessagesRead(cookie);
+                    int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,
+                            AccountActions.SELECT_BY_ID, Array.of(ID));
+                    syncResult.stats.numDeletes += deleted;
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            // Update the account row with the latest information if it has changed.
+            AccountInfoResult result = RedditApi.aboutMe(cookie);
+            boolean newHasMail = result.hasMail && !markRead;
+            c = provider.query(AccountProvider.ACCOUNTS_URI, ACCOUNT_PROJECTION,
+                    Accounts.SELECT_BY_ACCOUNT, Array.of(account.name), null);
+            try {
+                // Only update the database if it's missing or different.
                 if (!c.moveToNext()
-                        || result.linkKarma != c.getInt(INDEX_LINK_KARMA)
-                        || result.commentKarma != c.getInt(INDEX_COMMENT_KARMA)
-                        || result.hasMail != (c.getInt(INDEX_HAS_MAIL) != 0)) {
+                        || result.linkKarma != c.getInt(LINK_KARMA)
+                        || result.commentKarma != c.getInt(COMMENT_KARMA)
+                        || newHasMail != (c.getInt(HAS_MAIL) == 1)) {
                     // Insert or replace the existing row and notify loaders.
-                    ContentValues values = new ContentValues(4);
-                    values.put(Accounts.COLUMN_ACCOUNT, account.name);
-                    values.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
-                    values.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
-                    values.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
-                    provider.insert(AccountProvider.ACCOUNTS_URI, values);
+                    ContentValues v = new ContentValues(4);
+                    v.put(Accounts.COLUMN_ACCOUNT, account.name);
+                    v.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
+                    v.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
+                    v.put(Accounts.COLUMN_HAS_MAIL, newHasMail);
+                    provider.insert(AccountProvider.ACCOUNTS_URI, v);
                     syncResult.stats.numInserts++;
                 }
             } finally {
@@ -142,7 +163,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             syncResult.stats.numAuthExceptions++;
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numAuthExceptions++;
+            syncResult.stats.numIoExceptions++;
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
