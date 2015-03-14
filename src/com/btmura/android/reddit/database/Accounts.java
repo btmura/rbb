@@ -45,24 +45,12 @@ public class Accounts implements BaseColumns {
     /** Integer either 0 or 1 indicating whether the account has mail. */
     public static final String COLUMN_HAS_MAIL = "hasMail";
 
-    /** Integer either 0 or 1 indicating whether mail should be marked. */
-    public static final String COLUMN_MARK = "mark";
-
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
     public static String getTitle(Context context, String accountName) {
         return !AccountUtils.isAccount(accountName)
                 ? context.getString(R.string.account_app_storage)
                 : accountName;
-    }
-
-    static void createV2(SQLiteDatabase db) {
-        create(db);
-        upgradeToV2(db);
-    }
-
-    static void upgradeToV2(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_MARK + " INTEGER DEFAULT 0");
     }
 
     static void create(SQLiteDatabase db) {

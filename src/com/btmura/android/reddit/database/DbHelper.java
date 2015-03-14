@@ -118,7 +118,7 @@ public class DbHelper extends SQLiteOpenHelper {
         SubredditResults.create(db);
         Things.create(db);
 
-        Accounts.createV2(db);
+        Accounts.create(db);
         CommentActions.createV2(db);
         MessageActions.createV2(db);
         ReadActions.createV2(db);
@@ -132,7 +132,6 @@ public class DbHelper extends SQLiteOpenHelper {
     private static void upgradeToDatabaseV4(SQLiteDatabase db) {
         AccountActions.create(db);
 
-        Accounts.upgradeToV2(db);
         CommentActions.upgradeToV2(db);
         HideActions.upgradeToV2(db);
         MessageActions.upgradeToV2(db);
