@@ -200,37 +200,4 @@ abstract class BaseProvider extends ContentProvider {
             db.endTransaction();
         }
     }
-
-    static int getIntParameter(Uri uri, String key, int defValue) {
-        String value = uri.getQueryParameter(key);
-        return !TextUtils.isEmpty(value) ? Integer.parseInt(value) : defValue;
-    }
-
-    static long getLongParameter(Uri uri, String key, long defValue) {
-        String value = uri.getQueryParameter(key);
-        return !TextUtils.isEmpty(value) ? Long.parseLong(value) : defValue;
-    }
-
-    static String appendSelection(String selection, String clause) {
-        if (TextUtils.isEmpty(selection)) {
-            return clause;
-        }
-        return selection + " AND " + clause;
-    }
-
-    static String[] appendSelectionArg(String[] selectionArgs, String arg) {
-        return Array.append(selectionArgs, arg);
-    }
-
-    static String toString(boolean value) {
-        return Boolean.toString(value);
-    }
-
-    static String toString(long value) {
-        return Long.toString(value);
-    }
-
-    static String toString(int value) {
-        return Integer.toString(value);
-    }
 }
