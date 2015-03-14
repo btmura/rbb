@@ -202,7 +202,7 @@ public class RedditApi {
     }
 
     public static Result subscribe(String subreddit, boolean subscribe, String cookie,
-String modhash) throws IOException {
+            String modhash) throws IOException {
         return postData(Urls.subscribe(), Urls.subscribeQuery(subreddit, subscribe, modhash),
                 cookie);
     }

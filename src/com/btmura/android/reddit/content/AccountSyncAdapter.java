@@ -115,13 +115,18 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             Cursor c = provider.query(AccountProvider.ACCOUNT_ACTIONS_URI, ACTION_PROJECTION,
                     AccountActions.SELECT_BY_ACCOUNT, Array.of(account.name), null);
             try {
-                markRead = c.moveToFirst()
-                        && c.getInt(ACTION) == AccountActions.ACTION_MARK_MESSAGES_READ;
-                if (markRead) {
-                    RedditApi.markMessagesRead(cookie);
-                    int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,
-                            AccountActions.SELECT_BY_ID, Array.of(ID));
-                    syncResult.stats.numDeletes += deleted;
+                while (c.moveToNext()) {
+                    switch (c.getInt(ACTION)) {
+                        case AccountActions.ACTION_MARK_MESSAGES_READ:
+                            if (!markRead) {
+                                RedditApi.markMessagesRead(cookie);
+                                int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,
+                                        AccountActions.SELECT_BY_ID, Array.of(ID));
+                                syncResult.stats.numDeletes += deleted;
+                                markRead = true;
+                            }
+                            break;
+                    }
                 }
             } finally {
                 if (c != null) {
