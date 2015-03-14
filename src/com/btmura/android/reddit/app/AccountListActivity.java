@@ -51,7 +51,6 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
     public static final String TAG = "AccountListActivity";
 
     private Button addAccount;
-    private View cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,7 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
             addAccount.setText(R.string.add_account);
             addAccount.setOnClickListener(this);
 
-            cancel = findViewById(R.id.cancel);
+            View cancel = findViewById(R.id.cancel);
             cancel.setOnClickListener(this);
         }
 

@@ -20,10 +20,7 @@ import java.io.IOException;
 
 import android.util.JsonReader;
 
-/**
- * {@link LoginResult} is the result of calling the
- * {@link RedditApi#login(android.content.Context, String, String)} method.
- */
+/** Result of calling the {@link RedditApi#login(String, String)} method. */
 public class LoginResult {
 
     public String cookie;

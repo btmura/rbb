@@ -28,7 +28,7 @@ public class MessageDialogFragment extends DialogFragment {
 
     private static final String ARG_MESSAGE = "m";
 
-    public static final MessageDialogFragment showMessage(FragmentManager fm, CharSequence message) {
+    public static MessageDialogFragment showMessage(FragmentManager fm, CharSequence message) {
         Bundle args = new Bundle(1);
         args.putCharSequence(ARG_MESSAGE, message);
         MessageDialogFragment frag = new MessageDialogFragment();

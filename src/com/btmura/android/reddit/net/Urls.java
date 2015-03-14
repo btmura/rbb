@@ -16,17 +16,17 @@
 
 package com.btmura.android.reddit.net;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-
 import android.text.TextUtils;
 
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
+
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 
 public class Urls {
 
@@ -91,13 +91,16 @@ public class Urls {
         return new StringBuilder(BASE_USER_JSON_URL).append(user).append("/about.json");
     }
 
-    public static CharSequence authorize(CharSequence clientId, CharSequence state, CharSequence redirectUri) {
+    public static CharSequence authorize(CharSequence clientId,
+                                         CharSequence state,
+                                         CharSequence redirectUri) {
         return new StringBuilder(API_AUTHORIZE_URL)
                 .append("?client_id=").append(clientId)
                 .append("&response_type=code&state=").append(state)
                 .append("&redirect_uri=").append(redirectUri)
                 .append("&duration=permanent&scope=read");
     }
+
     public static CharSequence captcha(String id) {
         return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
@@ -106,7 +109,7 @@ public class Urls {
         return API_COMMENTS_URL;
     }
 
-    public static String commentsQuery(String thingId, String text, String modhash) {
+    public static CharSequence commentsQuery(String thingId, String text, String modhash) {
         return thingTextQuery(thingId, text, modhash);
     }
 
@@ -114,24 +117,23 @@ public class Urls {
         return API_EDIT_URL;
     }
 
-    public static String editQuery(String thingId, String text, String modhash) {
+    public static CharSequence editQuery(String thingId, String text, String modhash) {
         return thingTextQuery(thingId, text, modhash);
     }
 
-    private static String thingTextQuery(String thingId, String text, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("thing_id=").append(encode(thingId));
-        b.append("&text=").append(encode(text));
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b.toString();
+    private static CharSequence thingTextQuery(String thingId, String text, String modhash) {
+        return new StringBuilder()
+                .append("thing_id=").append(encode(thingId))
+                .append("&text=").append(encode(text))
+                .append("&uh=").append(encode(modhash))
+                .append("&api_type=json");
     }
 
     public static CharSequence commentListing(String id,
-            String linkId,
-            int filter,
-            int numComments,
-            int apiType) {
+                                              String linkId,
+                                              int filter,
+                                              int numComments,
+                                              int apiType) {
         boolean hasLinkId = !TextUtils.isEmpty(linkId);
         boolean hasLimit = numComments != -1;
         id = ThingIds.removeTag(id);
@@ -186,7 +188,7 @@ public class Urls {
     }
 
     public static String composeQuery(String to, String subject, String text, String captchaId,
-            String captchaGuess, String modhash) {
+                                      String captchaGuess, String modhash) {
         StringBuilder b = new StringBuilder();
         b.append("to=").append(encode(to));
         b.append("&subject=").append(encode(subject));
@@ -313,7 +315,7 @@ public class Urls {
     }
 
     public static CharSequence subscribeQuery(String subreddit, boolean subscribe,
-            String modhash) {
+                                              String modhash) {
         StringBuilder b = new StringBuilder();
         b.append("action=").append(subscribe ? "sub" : "unsub");
         b.append("&uh=").append(encode(modhash));
@@ -339,7 +341,7 @@ public class Urls {
             StringBuilder b = new StringBuilder(BASE_SUBREDDIT_URL);
             b.append(encode(subreddit));
             b.append(BASE_SEARCH_QUERY);
-            return newSearchUrl(b.toString(), query, filter, more, true);
+            return newSearchUrl(b, query, filter, more, true);
         } else {
             return newSearchUrl(BASE_SEARCH_URL, query, filter, more, false);
         }
@@ -353,8 +355,13 @@ public class Urls {
         return API_SUBMIT_URL;
     }
 
-    public static CharSequence submitQuery(String subreddit, String title, String text,
-            boolean link, String captchaId, String captchaGuess, String modhash) {
+    public static CharSequence submitQuery(String subreddit,
+                                           String title,
+                                           String text,
+                                           boolean link,
+                                           String captchaId,
+                                           String captchaGuess,
+                                           String modhash) {
         StringBuilder b = new StringBuilder();
         b.append(link ? "kind=link" : "kind=self");
         b.append("&uh=").append(encode(modhash));
@@ -375,7 +382,10 @@ public class Urls {
         return subredditMore(subreddit, filter, null, apiType);
     }
 
-    public static CharSequence subredditMore(String subreddit, int filter, String more, int apiType) {
+    public static CharSequence subredditMore(String subreddit,
+                                             int filter,
+                                             String more,
+                                             int apiType) {
         StringBuilder b = new StringBuilder(BASE_URL);
 
         if (!Subreddits.isFrontPage(subreddit)) {
@@ -508,8 +518,8 @@ public class Urls {
         return b;
     }
 
-    private static CharSequence newSearchUrl(String base, String query, int filter, String more,
-            boolean restrict) {
+    private static CharSequence newSearchUrl(CharSequence base, String query, int filter,
+                                             String more, boolean restrict) {
         StringBuilder b = new StringBuilder(base).append(encode(query));
         switch (filter) {
             case Filter.SEARCH_RELEVANCE:

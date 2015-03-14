@@ -52,7 +52,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private final int version;
 
     /**
-     * Test constructor. Use {@link #getInstance(Context, String, int)}.
+     * Test constructor. Use {@link #getInstance(Context)}.
      */
     public DbHelper(Context context, String name, int version) {
         super(context, name, null, version);

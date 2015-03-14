@@ -432,8 +432,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     private boolean isLoadingMore(ContentValues v) {
-        Integer type = (Integer) v.get(Comments.COLUMN_KIND);
-        return type.intValue() == Kinds.KIND_MORE;
+        return ((Integer) v.get(Comments.COLUMN_KIND)) == Kinds.KIND_MORE;
     }
 
     private void applySequenceNumber(ContentValues v, int sequence) {
@@ -448,18 +447,18 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public long getCommentId(int position) {
         // Cast to avoid auto-boxing in the getAsLong method.
-        return ((Long) values.get(position).get(Comments._ID)).longValue();
+        return ((Long) values.get(position).get(Comments._ID));
     }
 
     @Override
     public int getCommentNesting(int position) {
         // Cast to avoid auto-boxing in the getAsInteger method.
-        return ((Integer) values.get(position).get(Comments.COLUMN_NESTING)).intValue();
+        return ((Integer) values.get(position).get(Comments.COLUMN_NESTING));
     }
 
     @Override
     public int getCommentSequence(int position) {
         // Cast to avoid auto-boxing in the getAsInteger method.
-        return ((Integer) values.get(position).get(Comments.COLUMN_SEQUENCE)).intValue();
+        return ((Integer) values.get(position).get(Comments.COLUMN_SEQUENCE));
     }
 }

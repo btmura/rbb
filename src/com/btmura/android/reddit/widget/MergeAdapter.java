@@ -24,11 +24,12 @@ import android.widget.ListAdapter;
 
 public class MergeAdapter extends BaseAdapter {
 
-    private final AdapterObserver observer = new AdapterObserver();
     private final ListAdapter[] adapters;
 
     public MergeAdapter(ListAdapter... adapters) {
         this.adapters = adapters;
+
+        AdapterObserver observer = new AdapterObserver();
         for (int i = 0; i < adapters.length; i++) {
             adapters[i].registerDataSetObserver(observer);
         }

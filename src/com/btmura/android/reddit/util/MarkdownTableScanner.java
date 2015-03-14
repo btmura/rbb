@@ -16,19 +16,19 @@
 
 package com.btmura.android.reddit.util;
 
-import java.util.Scanner;
-
 import android.text.TextUtils;
 import android.util.SparseIntArray;
 import android.view.Gravity;
 
 import com.btmura.android.reddit.util.MarkdownTableScanner.OnTableScanListener.Cell;
 
+import java.util.Scanner;
+
 public class MarkdownTableScanner {
 
     public interface OnTableScanListener<R> {
 
-        public static class Cell implements Cloneable {
+        public static class Cell {
             public String contents;
             public int column;
             public int gravity;
@@ -41,8 +41,7 @@ public class MarkdownTableScanner {
                 this.isHeader = isHeader;
             }
 
-            @Override
-            public Cell clone() throws CloneNotSupportedException {
+            public Cell copy() {
                 Cell cell = new Cell();
                 cell.set(contents, column, gravity, isHeader);
                 return cell;

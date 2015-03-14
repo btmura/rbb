@@ -31,14 +31,14 @@ import android.view.ViewGroup;
 
 /**
  * A version of FragmentStatePagerAdapter that supports reorderable fragments.
- * 
+ *
  * Copied from the support library and merged with modifications describe from the following issue
  * to support reordering of fragments:
- * 
+ *
  * http://code.google.com/p/android/issues/detail?id=37990
  */
 public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
-    private static final String TAG = "FragmentStateItemPagerAdapter";
+    private static final String TAG = "FSIPagerAdapter";
     private static final boolean DEBUG = false;
 
     private final FragmentManager mFragmentManager;

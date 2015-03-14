@@ -142,11 +142,7 @@ public class MarkdownTableScannerTest extends TestCase {
 
         @Override
         public void onCell(List<Cell> rowObject, Cell cell) {
-            try {
-                rowObject.add(cell.clone());
-            } catch (CloneNotSupportedException e) {
-                fail();
-            }
+            rowObject.add(cell.copy());
         }
 
         @Override

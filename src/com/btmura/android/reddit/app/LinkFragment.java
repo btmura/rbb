@@ -40,9 +40,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Strings;
 
-import java.net.URL;
-import java.net.URLEncoder;
-
 public class LinkFragment extends Fragment implements OnLongClickListener {
 
     public static final String TAG = "LinkFragment";
@@ -62,7 +59,7 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.link, container, false);
         webView = (WebView) view.findViewById(R.id.link);
         progress = (ProgressBar) view.findViewById(R.id.progress);

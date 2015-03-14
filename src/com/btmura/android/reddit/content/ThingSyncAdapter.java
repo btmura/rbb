@@ -156,19 +156,16 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             // Hard error so the sync manager won't retry.
             Log.e(TAG, e.getMessage(), e);
             syncResult.stats.numAuthExceptions++;
-            return;
         } catch (AuthenticatorException e) {
             // Exception thrown from getting cookie or modhash.
             // Hard error so the sync manager won't retry.
             Log.e(TAG, e.getMessage(), e);
             syncResult.stats.numAuthExceptions++;
-            return;
         } catch (IOException e) {
             // Exception thrown when requesting cookie or modhash on network.
             // Soft exception that sync manager will retry.
             Log.e(TAG, e.getMessage(), e);
             syncResult.stats.numIoExceptions++;
-            return;
         }
     }
 
