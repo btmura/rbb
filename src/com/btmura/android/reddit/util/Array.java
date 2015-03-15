@@ -54,21 +54,8 @@ public class Array {
         return array;
     }
 
-    /**
-     * Returns true if the array is null or empty
-     */
     public static <T> boolean isEmpty(T[] array) {
         return array == null || array.length == 0;
-    }
-
-    public static String[] append(String[] original, String element) {
-        if (original == null) {
-            return new String[] {element};
-        } else {
-            original = ensureLength(original, original.length + 1);
-            original[original.length - 1] = element;
-            return original;
-        }
     }
 
     public static <T> T[] ensureLength(T[] original, int capacity) {
