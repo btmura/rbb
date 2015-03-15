@@ -218,7 +218,7 @@ public class AddAccountFragment extends Fragment implements
         @Override
         protected Bundle doInBackground(Void... params) {
             try {
-                LoginResult result = RedditApi.login(context, login, password);
+                LoginResult result = RedditApi.login(login, password);
                 if (result.error != null) {
                     return errorBundle(R.string.reddit_error, result.error);
                 }

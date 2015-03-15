@@ -32,9 +32,7 @@ public final class Kinds {
     public static final int KIND_MESSAGE = 4;
     public static final int KIND_SUBREDDIT = 5;
 
-    /**
-     * {@link parseKind} converts a kind string to an integer constant.
-     */
+    /** Converts a kind string to an integer constant. */
     public static int parseKind(String kind) {
         if ("t1".equals(kind)) {
             return KIND_COMMENT;

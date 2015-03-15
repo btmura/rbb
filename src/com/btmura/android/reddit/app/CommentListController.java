@@ -205,6 +205,10 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
         Provider.saveAsync(context, accountName, thingId, thingBundle, save);
     }
 
+    public void share(int position) {
+        MenuHelper.share(context, getCommentLabel(position), getCommentUrl(position));
+    }
+
     public void vote(int action, int position) {
         // Store additional information when the user votes on the header comment which represents
         // the overall thing so that it appears in the liked and disliked listing when the vote is
@@ -283,11 +287,6 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     private void prepareShareActionItem(Menu menu, ListView listView, int position) {
         MenuItem item = menu.findItem(R.id.menu_share_comment);
         item.setVisible(isCheckedCount(listView, 1) && hasThingId(position));
-        if (item.isVisible()) {
-            MenuHelper.setShareProvider(item,
-                    Strings.toString(getCommentLabel(position)),
-                    getCommentUrl(position));
-        }
     }
 
     // More complicated getters.

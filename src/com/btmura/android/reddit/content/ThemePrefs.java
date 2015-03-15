@@ -26,30 +26,30 @@ public class ThemePrefs extends Prefs {
     private static final int THEME_LIGHT = 0;
     private static final int THEME_DARK = 1;
 
-    public static final int getTheme(Context context) {
+    public static int getTheme(Context context) {
         return pick(context, R.style.Theme_Light, R.style.Theme_Dark);
     }
 
-    public static final int getDialogTheme(Context context) {
+    public static int getDialogTheme(Context context) {
         return pick(context, R.style.Theme_Light_Dialog, R.style.Theme_Dark_Dialog);
     }
 
-    public static final int getDialogWhenLargeTheme(Context context) {
+    public static int getDialogWhenLargeTheme(Context context) {
         return pick(context, R.style.Theme_Light_DialogWhenLarge,
                 R.style.Theme_Dark_DialogWhenLarge);
     }
 
-    public static final int getDrawerIcon(Context context) {
+    public static int getDrawerIcon(Context context) {
         return pick(context, R.drawable.ic_drawer_light,
                 R.drawable.ic_drawer_dark);
     }
 
-    public static final void switchTheme(Context context) {
+    public static void switchTheme(Context context) {
         int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);
         getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();
     }
 
-    private static final int pick(Context context, int lightValue, int darkValue) {
+    private static int pick(Context context, int lightValue, int darkValue) {
         return getPrefsInstance(context).getInt(PREF_THEME, THEME_DARK) == THEME_LIGHT ?
                 lightValue : darkValue;
     }

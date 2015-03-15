@@ -29,11 +29,16 @@ import com.btmura.android.reddit.content.AccountPrefs;
 class SearchThingMenuController implements MenuController, OnClickListener {
 
     private final Context context;
+    private final ThingHolder thingHolder;
     private final Refreshable refreshable;
     private final Filterable filterable;
 
-    SearchThingMenuController(Context context, Refreshable refreshable, Filterable filterable) {
+    SearchThingMenuController(Context context,
+                              ThingHolder thingHolder,
+                              Refreshable refreshable,
+                              Filterable filterable) {
         this.context = context;
+        this.thingHolder = thingHolder;
         this.refreshable = refreshable;
         this.filterable = filterable;
     }
@@ -45,6 +50,9 @@ class SearchThingMenuController implements MenuController, OnClickListener {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
+        menu.findItem(R.id.menu_refresh).setVisible(!hasThing);
+        menu.findItem(R.id.menu_sort_results).setVisible(!hasThing);
     }
 
     @Override

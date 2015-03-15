@@ -90,94 +90,93 @@ class SubredditActionModeController implements ActionModeController {
         prepareAddItem(menu);
         prepareAboutItem(menu, listView, aboutItemVisible);
         prepareDeleteItem(menu);
-        prepareShareItems(menu, listView, shareItemsVisible);
+        prepareShareItems(menu, shareItemsVisible);
         return true;
     }
 
-    private void prepareMode(int checkedCount) {
+    private void prepareMode(int checked) {
         actionMode.setTitle(context.getResources().getQuantityString(R.plurals.subreddits,
-                checkedCount, checkedCount));
+                checked, checked));
     }
 
     private void prepareAddItem(Menu menu) {
         AccountResult result = accountResultHolder.getAccountResult();
-        MenuItem addItem = menu.findItem(R.id.menu_add_subreddit);
-        addItem.setVisible(result != null && result.accountNames.length > 1);
+        MenuItem item = menu.findItem(R.id.menu_add_subreddit);
+        item.setVisible(result != null && result.accountNames.length > 1);
     }
 
-    private void prepareAboutItem(Menu menu, ListView listView, boolean visible) {
-        MenuItem aboutItem = menu.findItem(R.id.menu_subreddit);
-        aboutItem.setVisible(visible);
+    private void prepareAboutItem(Menu menu, ListView lv, boolean visible) {
+        MenuItem item = menu.findItem(R.id.menu_subreddit);
+        item.setVisible(visible);
         if (visible) {
-            aboutItem.setTitle(context.getString(R.string.menu_subreddit,
-                    getFirstCheckedSubreddit(listView)));
+            item.setTitle(context.getString(R.string.menu_subreddit, getFirstCheckedSubreddit(lv)));
         }
-    }
-
-    private String getFirstCheckedSubreddit(ListView listView) {
-        int position = Views.getCheckedPosition(listView);
-        return adapter.getName(position);
     }
 
     private void prepareDeleteItem(Menu menu) {
         menu.findItem(R.id.menu_delete).setVisible(false);
     }
 
-    private void prepareShareItems(Menu menu, ListView listView, boolean visible) {
-        MenuItem shareItem = menu.findItem(R.id.menu_share);
-        shareItem.setVisible(visible);
-        if (visible) {
-            MenuHelper.setShareProvider(shareItem, getClipLabel(listView), getClipText(listView));
-        }
-
-        MenuItem copyUrlItem = menu.findItem(R.id.menu_copy_url);
-        copyUrlItem.setVisible(visible);
-    }
-
-    private String getClipLabel(ListView listView) {
-        return getFirstCheckedSubreddit(listView);
-    }
-
-    private CharSequence getClipText(ListView listView) {
-        return Urls.subreddit(getFirstCheckedSubreddit(listView), -1, null, Urls.TYPE_HTML);
+    private void prepareShareItems(Menu menu, boolean visible) {
+        menu.findItem(R.id.menu_share).setVisible(visible);
+        menu.findItem(R.id.menu_copy_url).setVisible(visible);
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-            boolean checked) {
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView) {
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView lv) {
         switch (item.getItemId()) {
             case R.id.menu_add_subreddit:
-                handleAddSubreddit(listView);
+                handleAddSubreddit(lv);
                 mode.finish();
                 return true;
 
             case R.id.menu_subreddit:
-                handleSubreddit(listView);
+                handleSubreddit(lv);
+                mode.finish();
+                return true;
+
+            case R.id.menu_share:
+                handleShare(lv);
                 mode.finish();
                 return true;
 
             case R.id.menu_copy_url:
-                handleCopyUrl(listView);
+                handleCopyUrl(lv);
                 mode.finish();
                 return true;
         }
         return false;
     }
 
-    private void handleAddSubreddit(ListView listView) {
-        MenuHelper.showAddSubredditDialog(fragmentManager, getCheckedSubreddits(listView));
+    private void handleAddSubreddit(ListView lv) {
+        MenuHelper.showAddSubredditDialog(fragmentManager, getCheckedSubreddits(lv));
     }
 
-    private String[] getCheckedSubreddits(ListView listView) {
-        int checkedCount = listView.getCheckedItemCount();
-        String[] subreddits = new String[checkedCount];
+    private void handleSubreddit(ListView lv) {
+        MenuHelper.startSidebarActivity(context, getFirstCheckedSubreddit(lv));
+    }
 
-        SparseBooleanArray checked = listView.getCheckedItemPositions();
+    private void handleShare(ListView lv) {
+        MenuHelper.share(context, getClipLabel(lv), getClipText(lv));
+    }
+
+    private void handleCopyUrl(ListView lv) {
+        MenuHelper.copyUrl(context, getClipLabel(lv), getClipText(lv));
+    }
+
+    private String getFirstCheckedSubreddit(ListView lv) {
+        return adapter.getName(Views.getCheckedPosition(lv));
+    }
+
+    private String[] getCheckedSubreddits(ListView lv) {
+        SparseBooleanArray checked = lv.getCheckedItemPositions();
+        String[] subreddits = new String[lv.getCheckedItemCount()];
+
         int size = checked.size();
         int j = 0;
         for (int i = 0; i < size; i++) {
@@ -186,15 +185,16 @@ class SubredditActionModeController implements ActionModeController {
                 subreddits[j++] = adapter.getName(position);
             }
         }
+
         return subreddits;
     }
 
-    private void handleSubreddit(ListView listView) {
-        MenuHelper.startSidebarActivity(context, getFirstCheckedSubreddit(listView));
+    private String getClipLabel(ListView lv) {
+        return getFirstCheckedSubreddit(lv);
     }
 
-    private void handleCopyUrl(ListView listView) {
-        MenuHelper.copyUrl(context, getClipLabel(listView), getClipText(listView));
+    private CharSequence getClipText(ListView lv) {
+        return Urls.subreddit(getFirstCheckedSubreddit(lv), -1, Urls.TYPE_HTML);
     }
 
     @Override

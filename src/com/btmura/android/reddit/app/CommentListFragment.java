@@ -39,6 +39,7 @@ public class CommentListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener,
         OnThingViewClickListener,
+        Refreshable,
         Filterable {
 
     public static final String TAG = "CommentListFragment";
@@ -62,7 +63,7 @@ public class CommentListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = new CommentListController(getActivity(), getArguments(), this);
-        menuController = new CommentMenuController(getActivity(), this);
+        menuController = new CommentMenuController(getActivity(), this, this);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
         }
@@ -118,6 +119,15 @@ public class CommentListFragment extends ListFragment implements
         controller.vote(action, position);
     }
 
+
+    @Override
+    public void refresh() {
+        controller.swapCursor(null);
+        setListAdapter(controller.getAdapter());
+        setListShown(false);
+        getLoaderManager().restartLoader(0, null, this);
+    }
+
     @Override
     public int getFilter() {
         return controller.getFilter();
@@ -127,10 +137,7 @@ public class CommentListFragment extends ListFragment implements
     public void setFilter(int filter) {
         if (filter != controller.getFilter()) {
             controller.setFilter(filter);
-            controller.swapCursor(null);
-            setListAdapter(controller.getAdapter());
-            setListShown(false);
-            getLoaderManager().restartLoader(0, null, this);
+            refresh();
         }
     }
 
@@ -200,6 +207,11 @@ public class CommentListFragment extends ListFragment implements
 
             case R.id.menu_author:
                 controller.author(position);
+                mode.finish();
+                return true;
+
+            case R.id.menu_share_comment:
+                controller.share(position);
                 mode.finish();
                 return true;
 

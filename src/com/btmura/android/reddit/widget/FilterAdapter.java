@@ -33,7 +33,7 @@ public class FilterAdapter extends BaseFilterAdapter {
     private final ArrayList<String> names = new ArrayList<String>(7);
     private final ArrayList<Integer> values = new ArrayList<Integer>(7);
     private CharSequence title;
-    private CharSequence subtitle;;
+    private CharSequence subtitle;
 
     public FilterAdapter(Context context) {
         inflater = LayoutInflater.from(context);

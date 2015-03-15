@@ -16,14 +16,9 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.Context;
-import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.RemoteException;
 
@@ -36,34 +31,51 @@ import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+
 class MessageSyncer implements Syncer {
 
-    private static final String[] MESSAGE_PROJECTION = {
+    private static final String[] PROJECTION = {
             MessageActions._ID,
             MessageActions.COLUMN_ACTION,
+            MessageActions.COLUMN_EXPIRATION,
+            MessageActions.COLUMN_SYNC_FAILURES,
             MessageActions.COLUMN_THING_ID,
             MessageActions.COLUMN_TEXT,
     };
 
-    private static final int MESSAGE_ID = 0;
-    private static final int MESSAGE_ACTION = 1;
-    private static final int MESSAGE_THING_ID = 2;
-    private static final int MESSAGE_TEXT = 3;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int EXPIRATION = 2;
+    private static final int SYNC_FAILURES = 3;
+    private static final int THING_ID = 4;
+    private static final int TEXT = 5;
+
+    @Override
+    public String getTag() {
+        return "m";
+    }
 
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.MESSAGE_ACTIONS_URI,
-                MESSAGE_PROJECTION,
+                PROJECTION,
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 SharedColumns.SORT_BY_ID);
     }
 
     @Override
-    public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
-        int action = c.getInt(MESSAGE_ACTION);
-        String thingId = c.getString(MESSAGE_THING_ID);
-        String text = c.getString(MESSAGE_TEXT);
+    public int getSyncFailures(Cursor c) {
+        return c.getInt(SYNC_FAILURES);
+    }
+
+    @Override
+    public Result sync(Context context, Cursor c, String cookie, String modhash)
+            throws IOException {
+        int action = c.getInt(ACTION);
+        String thingId = c.getString(THING_ID);
+        String text = c.getString(TEXT);
 
         switch (action) {
             case MessageActions.ACTION_INSERT:
@@ -78,28 +90,29 @@ class MessageSyncer implements Syncer {
     }
 
     @Override
-    public int getOpCount(int count) {
-        return count * 2;
-    }
-
-    @Override
-    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        long id = c.getLong(MESSAGE_ID);
-        ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
+    public void addDeleteAction(Cursor c, Ops ops) {
+        long id = c.getLong(ID);
+        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.MESSAGES_URI)
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.MESSAGES_URI)
                 .withSelection(Messages.SELECT_BY_MESSAGE_ACTION_ID, Array.of(id))
                 .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());
     }
 
     @Override
-    public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
-        int count = results.length;
-        for (int i = 0; i < count;) {
-            syncResult.stats.numDeletes += results[i++].count;
-            syncResult.stats.numUpdates += results[i++].count;
-        }
+    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
+        long id = c.getLong(ID);
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.MESSAGE_ACTIONS_URI)
+                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .withValue(MessageActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(MessageActions.COLUMN_SYNC_STATUS, syncStatus)
+                .build());
+    }
+
+    @Override
+    public int getEstimatedOpCount(int count) {
+        return count * 2;
     }
 }

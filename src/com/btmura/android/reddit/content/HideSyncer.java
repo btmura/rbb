@@ -16,14 +16,9 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.Context;
-import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.RemoteException;
 
@@ -34,17 +29,26 @@ import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+
 class HideSyncer implements Syncer {
 
     private static final String[] HIDE_PROJECTION = {
             HideActions._ID,
             HideActions.COLUMN_ACTION,
+            HideActions.COLUMN_SYNC_FAILURES,
             HideActions.COLUMN_THING_ID,
     };
 
-    private static final int HIDE_ID = 0;
-    private static final int HIDE_ACTION = 1;
-    private static final int HIDE_THING_ID = 2;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int SYNC_FAILURES = 2;
+    private static final int THING_ID = 3;
+
+    @Override
+    public String getTag() {
+        return "h";
+    }
 
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
@@ -56,31 +60,38 @@ class HideSyncer implements Syncer {
     }
 
     @Override
-    public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
-        String thingId = c.getString(HIDE_THING_ID);
-        boolean hide = c.getInt(HIDE_ACTION) == HideActions.ACTION_HIDE;
+    public int getSyncFailures(Cursor c) {
+        return c.getInt(SYNC_FAILURES);
+    }
+
+    @Override
+    public Result sync(Context context, Cursor c, String cookie, String modhash)
+            throws IOException {
+        String thingId = c.getString(THING_ID);
+        boolean hide = c.getInt(ACTION) == HideActions.ACTION_HIDE;
         return RedditApi.hide(thingId, hide, cookie, modhash);
     }
 
     @Override
-    public int getOpCount(int count) {
-        return count;
-    }
-
-    @Override
-    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        // Delete the row corresponding to the pending hide.
-        long id = c.getLong(HIDE_ID);
-        ops.add(ContentProviderOperation.newDelete(ThingProvider.HIDE_ACTIONS_URI)
+    public void addDeleteAction(Cursor c, Ops ops) {
+        long id = c.getLong(ID);
+        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.HIDE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
     }
 
     @Override
-    public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
-        int count = results.length;
-        for (int i = 0; i < count;) {
-            syncResult.stats.numDeletes += results[i++].count;
-        }
+    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
+        long id = c.getLong(ID);
+        ops.addDelete(ContentProviderOperation.newUpdate(ThingProvider.HIDE_ACTIONS_URI)
+                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .withValue(HideActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(HideActions.COLUMN_SYNC_STATUS, syncStatus)
+                .build());
+    }
+
+    @Override
+    public int getEstimatedOpCount(int count) {
+        return count;
     }
 }

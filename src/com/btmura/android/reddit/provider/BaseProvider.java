@@ -16,9 +16,6 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -29,12 +26,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.DbHelper;
 import com.btmura.android.reddit.util.Array;
+
+import java.util.ArrayList;
 
 abstract class BaseProvider extends ContentProvider {
 
@@ -63,11 +61,11 @@ abstract class BaseProvider extends ContentProvider {
         return uri.buildUpon().appendQueryParameter(PARAM_SYNC, TRUE).build();
     }
 
-    protected String logTag;
+    protected String tag;
     protected DbHelper helper;
 
-    BaseProvider(String logTag) {
-        this.logTag = logTag;
+    BaseProvider(String tag) {
+        this.tag = tag;
     }
 
     @Override
@@ -77,20 +75,15 @@ abstract class BaseProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
-        if (BuildConfig.DEBUG) {
-            Log.d(logTag, "query uri: " + uri + " selection: " + selection + " selectionArgs: "
-                    + (selectionArgs != null ? Arrays.asList(selectionArgs) : "[]"));
-        }
-
+    public Cursor query(Uri uri, String[] projection, String selection, String[] args,
+                        String sortOrder) {
+        String table = getTable(uri);
         SQLiteDatabase db = helper.getWritableDatabase();
 
-        String table = getTable(uri);
         Cursor c = null;
         db.beginTransaction();
         try {
-            c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
+            c = db.query(table, projection, selection, args, null, null, sortOrder);
             if (c != null) {
                 c.setNotificationUri(getContext().getContentResolver(), uri);
             }
@@ -98,6 +91,11 @@ abstract class BaseProvider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
+
+        if (BuildConfig.DEBUG) {
+            Log.d(tag, "q t: " + table + " s: " + selection + " a: " + Array.asList(args));
+        }
+
         return c;
     }
 
@@ -116,7 +114,7 @@ abstract class BaseProvider extends ContentProvider {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(logTag, "insert table: " + table + " id: " + id);
+            Log.d(tag, "i t: " + table + " i: " + id);
         }
         if (id != -1) {
             notifyChange(uri);
@@ -126,21 +124,22 @@ abstract class BaseProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection, String[] args) {
         String table = getTable(uri);
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
 
         db.beginTransaction();
         try {
-            count = db.update(table, values, selection, selectionArgs);
+            count = db.update(table, values, selection, args);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(logTag, "update table: " + table + " count: " + count);
+            Log.d(tag, "u t: " + table + " c: " + count
+                    + " s: " + selection + " a: " + Array.asList(args));
         }
         if (count > 0) {
             notifyChange(uri);
@@ -149,21 +148,22 @@ abstract class BaseProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(Uri uri, String selection, String[] args) {
         String table = getTable(uri);
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
 
         db.beginTransaction();
         try {
-            count = db.delete(table, selection, selectionArgs);
+            count = db.delete(table, selection, args);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(logTag, "delete table: " + table + " count: " + count);
+            Log.d(tag, "d t: " + table + " c: " + count
+                    + " s: " + selection + " a: " + Array.asList(args));
         }
         if (count > 0) {
             notifyChange(uri);
@@ -197,38 +197,5 @@ abstract class BaseProvider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
-    }
-
-    static int getIntParameter(Uri uri, String key, int defValue) {
-        String value = uri.getQueryParameter(key);
-        return !TextUtils.isEmpty(value) ? Integer.parseInt(value) : defValue;
-    }
-
-    static long getLongParameter(Uri uri, String key, long defValue) {
-        String value = uri.getQueryParameter(key);
-        return !TextUtils.isEmpty(value) ? Long.parseLong(value) : defValue;
-    }
-
-    static String appendSelection(String selection, String clause) {
-        if (TextUtils.isEmpty(selection)) {
-            return clause;
-        }
-        return selection + " AND " + clause;
-    }
-
-    static String[] appendSelectionArg(String[] selectionArgs, String arg) {
-        return Array.append(selectionArgs, arg);
-    }
-
-    static String toString(boolean value) {
-        return Boolean.toString(value);
-    }
-
-    static String toString(long value) {
-        return Long.toString(value);
-    }
-
-    static String toString(int value) {
-        return Integer.toString(value);
     }
 }

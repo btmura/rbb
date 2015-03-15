@@ -39,7 +39,6 @@ public class SidebarResult extends JsonParser {
     public CharSequence description;
     public int subscribers;
 
-    /** {@link Bitmap} of the header. Call {@link #fetchHeaderImage()} to get it. */
     public Bitmap headerImageBitmap;
 
     private final MarkdownFormatter formatter = new MarkdownFormatter();

@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
@@ -38,11 +36,14 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
 import com.btmura.android.reddit.content.SelectAccountBroadcast;
 import com.btmura.android.reddit.content.ThemePrefs;
+
+import java.io.IOException;
 
 public class AccountListActivity extends FragmentActivity implements OnAccountEventListener,
         OnClickListener {
@@ -50,7 +51,6 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
     public static final String TAG = "AccountListActivity";
 
     private Button addAccount;
-    private View cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,7 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
             addAccount.setText(R.string.add_account);
             addAccount.setOnClickListener(this);
 
-            cancel = findViewById(R.id.cancel);
+            View cancel = findViewById(R.id.cancel);
             cancel.setOnClickListener(this);
         }
 
@@ -144,6 +144,13 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_add_oauth_account).setVisible(BuildConfig.DEBUG);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -154,6 +161,10 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
                 handleAddAccount();
                 return true;
 
+            case R.id.menu_add_oauth_account:
+                handleAddOAuthAccount();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -161,5 +172,9 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
 
     private void handleAddAccount() {
         MenuHelper.startAddAccountActivity(this);
+    }
+
+    private void handleAddOAuthAccount() {
+        MenuHelper.openAuthorizeUrl(this);
     }
 }

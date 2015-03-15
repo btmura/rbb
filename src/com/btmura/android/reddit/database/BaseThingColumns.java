@@ -91,24 +91,7 @@ public interface BaseThingColumns {
             + COLUMN_UPS + " INTEGER DEFAULT 0,"
             + COLUMN_URL + " TEXT";
 
-    static final String CREATE_THING_COLUMNS_V2 = ""
-            // The following columns are for storing enough information so
-            // we can show the user we're going to save their item.
-            + COLUMN_AUTHOR + " TEXT,"
-            + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
-            + COLUMN_DOMAIN + " TEXT,"
-            + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
-            + COLUMN_LIKES + " INTEGER DEFAULT 0,"
+    static final String CREATE_THING_COLUMNS_V2 = CREATE_THING_COLUMNS + ","
             + COLUMN_HIDDEN + " INTEGER DEFAULT 0,"
-            + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
-            + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
-            + COLUMN_PERMA_LINK + " TEXT,"
-            + COLUMN_SAVED + " INTEGER DEFAULT 0,"
-            + COLUMN_SCORE + " INTEGER DEFAULT 0,"
-            + COLUMN_SELF + " INTEGER DEFAULT 0,"
-            + COLUMN_SUBREDDIT + " TEXT,"
-            + COLUMN_TITLE + " TEXT,"
-            + COLUMN_THUMBNAIL_URL + " TEXT,"
-            + COLUMN_UPS + " INTEGER DEFAULT 0,"
-            + COLUMN_URL + " TEXT";
+            + COLUMN_SAVED + " INTEGER DEFAULT 0";
 }

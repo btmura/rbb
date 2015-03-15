@@ -26,7 +26,7 @@ public class RedditApiTest extends AndroidTestCase {
     }
 
     private String getExpectedUserAgent() throws NameNotFoundException {
-        return String.format("reddit by brian v%s by /u/btmura", getVersionName());
+        return String.format("falling for reddit v%s by /u/btmura", getVersionName());
     }
 
     private String getVersionName() throws NameNotFoundException {

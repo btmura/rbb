@@ -196,9 +196,6 @@ public class ThingFragment extends Fragment implements
         openItem.setVisible(hasTitleAndUrl);
         copyUrlItem.setVisible(hasTitleAndUrl);
         shareItem.setVisible(hasTitleAndUrl);
-        if (shareItem.isVisible()) {
-            MenuHelper.setShareProvider(shareItem, title, url);
-        }
 
         String user = thingData.parent.getAuthor();
         userItem.setVisible(!TextUtils.isEmpty(user));
@@ -218,8 +215,12 @@ public class ThingFragment extends Fragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_new_comment:
+                handleNewComment();
+                return true;
+
             case R.id.menu_link:
-                handleLinkItem();
+                handleLink();
                 return true;
 
             case R.id.menu_comments:
@@ -234,8 +235,8 @@ public class ThingFragment extends Fragment implements
                 handleUnsaved();
                 return true;
 
-            case R.id.menu_new_comment:
-                handleNewComment();
+            case R.id.menu_share:
+                handleShare();
                 return true;
 
             case R.id.menu_open:
@@ -263,7 +264,22 @@ public class ThingFragment extends Fragment implements
         }
     }
 
-    private void handleLinkItem() {
+    private void handleNewComment() {
+        switch (thingData.parent.getKind()) {
+            case Kinds.KIND_LINK:
+                handleNewLinkComment();
+                break;
+
+            case Kinds.KIND_MESSAGE:
+                handleNewMessageComment();
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void handleLink() {
         setCurrentPageType(ThingPagerAdapter.PAGE_LINK, true);
     }
 
@@ -285,21 +301,6 @@ public class ThingFragment extends Fragment implements
                 thingData.parent.getThingId(),
                 thingData.parent,
                 true);
-    }
-
-    private void handleNewComment() {
-        switch (thingData.parent.getKind()) {
-            case Kinds.KIND_LINK:
-                handleNewLinkComment();
-                break;
-
-            case Kinds.KIND_MESSAGE:
-                handleNewMessageComment();
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
     }
 
     private void handleNewLinkComment() {
@@ -330,6 +331,10 @@ public class ThingFragment extends Fragment implements
     // TODO: Put the code to format title in a common class and remove duplication.
     private String getFormattedTitle() {
         return Strings.toString(Strings.ellipsize(thingData.parent.getTitle(), 50));
+    }
+
+    private void handleShare() {
+        MenuHelper.share(getActivity(), thingData.parent.getTitle(), getUrl());
     }
 
     private void handleOpen() {

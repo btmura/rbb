@@ -38,7 +38,7 @@ public class SubredditResults implements BaseColumns {
 
     public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "

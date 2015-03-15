@@ -42,8 +42,14 @@ public class MessageActions implements BaseColumns {
     /** Text of the reply. */
     public static final String COLUMN_TEXT = "text";
 
-    /** Unused long column for expiration of this row. */
+    /** Unused long column with expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
+
+    /** Number of sync failures. */
+    public static final String COLUMN_SYNC_FAILURES = "syncFailures";
+
+    /** Unused string column with sync status. */
+    public static final String COLUMN_SYNC_STATUS = "syncStatus";
 
     /** Action meaning the user has responded to another comment. */
     public static final int ACTION_INSERT = 0;
@@ -51,14 +57,24 @@ public class MessageActions implements BaseColumns {
     /** Action meaning the user has deleted one of their own comments. */
     public static final int ACTION_DELETE = 1;
 
-    static void createTable(SQLiteDatabase db) {
+    static void createV2(SQLiteDatabase db) {
+        create(db);
+        upgradeToV2(db);
+    }
+
+    static void upgradeToV2(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
+    }
+
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_ACTION + " INTEGER NOT NULL, "
-                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
-                + COLUMN_PARENT_THING_ID + " TEXT, "
-                + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_TEXT + " TEXT, "
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACTION + " INTEGER NOT NULL,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_PARENT_THING_ID + " TEXT,"
+                + COLUMN_THING_ID + " TEXT NOT NULL,"
+                + COLUMN_TEXT + " TEXT,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
     }
 }

@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
@@ -26,25 +27,23 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.view.MenuItem;
-import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.util.Array;
 
 public class MenuHelper {
-
-    private static final String[] AUTHORITIES = {
-            SubredditProvider.AUTHORITY,
-    };
 
     /**
      * Sets a plain text {@link ClipData} with the provided label and text to the clipboard and
@@ -68,12 +67,28 @@ public class MenuHelper {
         manager.enqueue(request);
     }
 
+    public static void openAuthorizeUrl(Context context) {
+        String clientId = context.getString(R.string.key_reddit_client_id);
+        StringBuilder state = new StringBuilder("rbb_").append(System.currentTimeMillis());
+        CharSequence url = Urls.authorize(clientId, state, Urls.OAUTH_REDIRECT_URL);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url.toString()));
+        Contexts.startActivity(context, intent);
+    }
+
     public static void openUrl(Context context, CharSequence url) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url.toString()));
-        Contexts.startActivity(
-                context,
-                Intent.createChooser(intent, context.getString(R.string.menu_open)));
+        Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_open));
+    }
+
+    public static void share(Context context, CharSequence subject, CharSequence text) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        Contexts.startActivity(context, makeChooser(context, intent, R.string.menu_share));
     }
 
     public static void shareImageUrl(Context context, String url) {
@@ -93,15 +108,6 @@ public class MenuHelper {
 
     public static boolean isUserItemVisible(String user) {
         return !TextUtils.isEmpty(user) && !Things.DELETED_AUTHOR.equals(user);
-    }
-
-    public static void setShareProvider(MenuItem shareItem, String label, CharSequence text) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, label);
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        ShareActionProvider provider = (ShareActionProvider) shareItem.getActionProvider();
-        provider.setShareIntent(intent);
     }
 
     public static void showAddSubredditDialog(FragmentManager fm, String subreddit) {
@@ -144,7 +150,11 @@ public class MenuHelper {
 
     public static void startAddAccountActivity(Context context) {
         Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, Array.of(AccountProvider.AUTHORITY));
+        if (Build.VERSION.SDK_INT >= 18) {
+            intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES,
+                    Array.of(AccountAuthenticator.getAccountType(context)));
+        }
         context.startActivity(intent);
     }
 
@@ -167,7 +177,7 @@ public class MenuHelper {
     public static void startSubredditActivity(Context context, String subreddit) {
         // TODO: Remove duplication with SubredditSpan.
         Intent intent = new Intent(context, BrowserActivity.class);
-        intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML).toString()));
+        intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, Urls.TYPE_HTML).toString()));
         context.startActivity(intent);
     }
 
@@ -303,4 +313,7 @@ public class MenuHelper {
         context.startActivity(intent);
     }
 
+    private static Intent makeChooser(Context context, Intent intent, int titleResId) {
+        return Intent.createChooser(intent, context.getString(titleResId));
+    }
 }

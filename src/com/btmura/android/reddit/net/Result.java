@@ -28,11 +28,14 @@ import com.btmura.android.reddit.util.Array;
 
 public class Result {
 
+    /** Error for too much user activity. */
+    private static final String ERROR_RATELIMIT = "RATELIMIT";
+
     /** Error for missing or incorrect captcha guess. */
     private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
 
-    /** Error for too much user activity. */
-    private static final String ERROR_RATELIMIT = "RATELIMIT";
+    /** Error when necessary credentials are missing from a request. */
+    private static final String ERROR_USER_REQUIRED = "USER_REQUIRED";
 
     public double rateLimit;
 
@@ -76,6 +79,20 @@ public class Result {
         return context.getString(R.string.reddit_error, b);
     }
 
+    public CharSequence getErrorCodeMessage() {
+        if (Array.isEmpty(errors)) {
+            return "";
+        }
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < errors.length; i++) {
+            b.append(errors[i][0]);
+            if (i + 1 < errors.length) {
+                b.append(",");
+            }
+        }
+        return b;
+    }
+
     public boolean hasErrors() {
         return !Array.isEmpty(errors);
     }
@@ -86,6 +103,10 @@ public class Result {
 
     public boolean hasBadCaptchaError() {
         return hasError(ERROR_BAD_CAPTCHA);
+    }
+
+    public boolean hasUserRequiredError() {
+        return hasError(ERROR_USER_REQUIRED);
     }
 
     private boolean hasError(String errorCode) {
@@ -99,11 +120,11 @@ public class Result {
         return false;
     }
 
-    public void logAnyErrors(String tag) {
+    public void logAnyErrors(String tag, CharSequence prefix) {
         if (!Array.isEmpty(errors)) {
             StringBuilder line = new StringBuilder();
             for (int i = 0; i < errors.length; i++) {
-                line.delete(0, line.length());
+                line.delete(0, line.length()).append(prefix).append(": ");
                 for (int j = 0; j < errors[i].length; j++) {
                     line.append(errors[i][j]);
                     if (j + 1 < errors[i].length) {

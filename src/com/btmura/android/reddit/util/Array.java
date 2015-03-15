@@ -17,6 +17,8 @@
 package com.btmura.android.reddit.util;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Array {
 
@@ -30,6 +32,10 @@ public class Array {
 
     public static String[] of(int oneInt, String element) {
         return new String[] {Integer.toString(oneInt), element};
+    }
+
+    public static String[] of(String oneString) {
+        return new String[] {oneString};
     }
 
     public static String[] of(String... elements) {
@@ -48,21 +54,8 @@ public class Array {
         return array;
     }
 
-    /**
-     * Returns true if the array is null or empty
-     */
     public static <T> boolean isEmpty(T[] array) {
         return array == null || array.length == 0;
-    }
-
-    public static String[] append(String[] original, String element) {
-        if (original == null) {
-            return new String[] {element};
-        } else {
-            original = ensureLength(original, original.length + 1);
-            original[original.length - 1] = element;
-            return original;
-        }
     }
 
     public static <T> T[] ensureLength(T[] original, int capacity) {
@@ -70,5 +63,12 @@ public class Array {
             original = Arrays.copyOf(original, capacity);
         }
         return original;
+    }
+
+    public static <T> List<T> asList(T[] array) {
+        if (array != null) {
+            return Arrays.asList(array);
+        }
+        return Collections.emptyList();
     }
 }

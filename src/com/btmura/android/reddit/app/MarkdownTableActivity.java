@@ -40,7 +40,7 @@ public class MarkdownTableActivity extends FragmentActivity {
     private void setFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, MarkdownTableFragment.newInstance(getTableData()));
+            ft.replace(android.R.id.content, MarkdownTableFragment.newInstance(getTableData()));
             ft.commit();
         }
     }

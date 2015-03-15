@@ -300,11 +300,11 @@ class ThingListing extends JsonParser implements Listing {
     private CharSequence getUrl() {
         if (!TextUtils.isEmpty(profileUser)) {
             return Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
-        } else if (!TextUtils.isEmpty(query)) {
-            return Urls.search(subreddit, query, filter, more);
-        } else {
-            return Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
         }
+        if (!TextUtils.isEmpty(query)) {
+            return Urls.search(subreddit, query, filter, more);
+        }
+        return Urls.subredditMore(subreddit, filter, more, Urls.TYPE_JSON);
     }
 
     @Override

@@ -84,7 +84,7 @@ public class Things implements BaseColumns {
 
     public static final String SORT_BY_SESSION_ID = COLUMN_SESSION_ID + " DESC";
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT,"

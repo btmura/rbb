@@ -39,8 +39,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
-import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingView;
 

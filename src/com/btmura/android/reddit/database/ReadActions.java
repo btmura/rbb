@@ -29,8 +29,14 @@ public class ReadActions implements BaseColumns {
     /** Action this row represents like adding or deleting. */
     public static final String COLUMN_ACTION = "action";
 
-    /** Unused long column for expiration of this row. */
+    /** Unused long column with expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
+
+    /** Number of sync failures. */
+    public static final String COLUMN_SYNC_FAILURES = "syncFailures";
+
+    /** Unused string column with sync status. */
+    public static final String COLUMN_SYNC_STATUS = "syncStatus";
 
     /** ID of the thing that we are marking as read or unread. */
     public static final String COLUMN_THING_ID = "thingId";
@@ -41,11 +47,21 @@ public class ReadActions implements BaseColumns {
     /** Action meaning the user has marked this message as unread. */
     public static final int ACTION_UNREAD = 1;
 
-    static void createTable(SQLiteDatabase db) {
+    static void createV2(SQLiteDatabase db) {
+        create(db);
+        upgradeToV2(db);
+    }
+
+    static void upgradeToV2(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
+    }
+
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_ACTION + " INTEGER NOT NULL, "
-                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACTION + " INTEGER NOT NULL,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
 

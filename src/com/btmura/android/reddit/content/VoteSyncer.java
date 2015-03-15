@@ -16,14 +16,9 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.Context;
-import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.RemoteException;
 
@@ -34,53 +29,71 @@ import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+
 class VoteSyncer implements Syncer {
 
-    private static final String[] VOTE_PROJECTION = {
+    private static final String[] PROJECTION = {
             VoteActions._ID,
             VoteActions.COLUMN_ACTION,
+            VoteActions.COLUMN_EXPIRATION,
+            VoteActions.COLUMN_SYNC_FAILURES,
             VoteActions.COLUMN_THING_ID,
     };
 
-    private static final int VOTE_ID = 0;
-    private static final int VOTE_ACTION = 1;
-    private static final int VOTE_THING_ID = 2;
+    private static final int ID = 0;
+    private static final int ACTION = 1;
+    private static final int EXPIRATION = 2;
+    private static final int SYNC_FAILURES = 3;
+    private static final int THING_ID = 4;
+
+    @Override
+    public String getTag() {
+        return "v";
+    }
 
     @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.VOTE_ACTIONS_URI,
-                VOTE_PROJECTION,
+                PROJECTION,
                 SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 null);
     }
 
     @Override
-    public int getOpCount(int count) {
-        return count;
+    public int getSyncFailures(Cursor c) {
+        return c.getInt(SYNC_FAILURES);
     }
 
     @Override
-    public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
-        String thingId = c.getString(VOTE_THING_ID);
-        int action = c.getInt(VOTE_ACTION);
-        return RedditApi.vote(context, thingId, action, cookie, modhash);
+    public Result sync(Context context, Cursor c, String cookie, String modhash)
+            throws IOException {
+        String thingId = c.getString(THING_ID);
+        int action = c.getInt(ACTION);
+        return RedditApi.vote(thingId, action, cookie, modhash);
     }
 
     @Override
-    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        // Delete the row corresponding to the pending vote.
-        long id = c.getLong(VOTE_ID);
-        ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
+    public void addDeleteAction(Cursor c, Ops ops) {
+        long id = c.getLong(ID);
+        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
     }
 
     @Override
-    public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
-        int count = results.length;
-        for (int i = 0; i < count;) {
-            syncResult.stats.numDeletes += results[i++].count;
-        }
+    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
+        long id = c.getLong(ID);
+        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.VOTE_ACTIONS_URI)
+                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .withValue(VoteActions.COLUMN_SYNC_FAILURES, syncFailures)
+                .withValue(VoteActions.COLUMN_SYNC_STATUS, syncStatus)
+                .build());
+    }
+
+    @Override
+    public int getEstimatedOpCount(int count) {
+        return count;
     }
 }

@@ -33,11 +33,17 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     /** Integer column indicating either an upvote or downvote. */
     public static final String COLUMN_ACTION = "action";
 
-    /** Unused long column for expiration. */
+    /** Unused long column with expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
     /** Boolean column indicating whether to show this in the liked listing. */
     public static final String COLUMN_SHOW_IN_LISTING = "showInListing";
+
+    /** Number of sync failures. */
+    public static final String COLUMN_SYNC_FAILURES = "syncFailures";
+
+    /** Unused string column with sync status. */
+    public static final String COLUMN_SYNC_STATUS = "syncStatus";
 
     /** String ID of the thing that the user wants to vote on. */
     public static final String COLUMN_THING_ID = "thingId";
@@ -62,29 +68,27 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 
-    static void createTableV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + COLUMN_SHOW_IN_LISTING + " INTEGER DEFAULT 0,"
-                + COLUMN_THING_ID + " TEXT NOT NULL,"
-
-                // Create thing columns to store enough info needed to display a
-                // fake item in certain listing.
-                + CREATE_THING_COLUMNS_V2 + ","
-
-                // Add constraint to make it easy to replace actions.
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+    static void createV3(SQLiteDatabase db) {
+        createV2(db);
+        upgradeToV3(db);
     }
 
-    static void upgradeTableV2(SQLiteDatabase db) {
+    static void upgradeToV3(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_FAILURES + " INTEGER DEFAULT 0");
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SYNC_STATUS + " TEXT");
+    }
+
+    static void createV2(SQLiteDatabase db) {
+        create(db);
+        upgradeToV2(db);
+    }
+
+    static void upgradeToV2(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_HIDDEN + " INTEGER DEFAULT 0");
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SAVED + " INTEGER DEFAULT 0");
     }
 
-    static void createTableV1(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT NOT NULL,"

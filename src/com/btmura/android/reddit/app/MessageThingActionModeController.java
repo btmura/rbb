@@ -20,7 +20,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 
@@ -50,119 +49,103 @@ public class MessageThingActionModeController implements ThingActionModeControll
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView) {
+    public boolean onCreateActionMode(ActionMode mode, Menu menu, ListView lv) {
         if (adapter.getCursor() == null) {
-            listView.clearChoices();
+            lv.clearChoices();
             return false;
         }
         actionMode = mode;
-
-        MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.message_action_menu, menu);
+        mode.getMenuInflater().inflate(R.menu.message_action_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
-        int count = listView.getCheckedItemCount();
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView lv) {
+        int count = lv.getCheckedItemCount();
         mode.setTitle(context.getResources().getQuantityString(R.plurals.things, count, count));
 
-        int position = Views.getCheckedPosition(listView);
-        prepareAuthorActionItem(menu, listView, position);
-        prepareShareActionItem(menu, listView, position);
-        prepareSubredditActionItem(menu, listView, position);
+        int pos = Views.getCheckedPosition(lv);
+        prepareShare(menu, lv);
+        prepareCopyUrl(menu, lv);
+        prepareAuthor(menu, lv, pos);
+        prepareSubreddit(menu, lv, pos);
         return true;
     }
 
-    private void prepareAuthorActionItem(Menu menu, ListView listView, int position) {
-        String author = getAuthor(position);
+    private void prepareAuthor(Menu menu, ListView lv, int pos) {
+        String author = getAuthor(pos);
         MenuItem item = menu.findItem(R.id.menu_author);
-        item.setVisible(isCheckedCount(listView, 1) && MenuHelper.isUserItemVisible(author));
+        item.setVisible(isCheckedCount(lv, 1) && MenuHelper.isUserItemVisible(author));
         if (item.isVisible()) {
             item.setTitle(MenuHelper.getUserTitle(context, author));
         }
     }
 
-    private void prepareShareActionItem(Menu menu, ListView listView, int position) {
-        MenuItem item = menu.findItem(R.id.menu_share_thing);
-        item.setVisible(isCheckedCount(listView, 1));
-        if (item.isVisible()) {
-            String title = getMessageTitle(position);
-            CharSequence url = getMessageUrl(position);
-            MenuHelper.setShareProvider(item, title, url);
-        }
+    private void prepareCopyUrl(Menu menu, ListView lv) {
+        menu.findItem(R.id.menu_copy_url).setVisible(isCheckedCount(lv, 1));
     }
 
-    private String getMessageTitle(int position) {
-        // Comment reply messages just have "comment reply" as subject so try to use the link title.
-        String linkTitle = getLinkTitle(position);
-        if (!TextUtils.isEmpty(linkTitle)) {
-            return linkTitle;
-        }
-
-        // Assume this is a message with a subject.
-        return getSubject(position);
+    private void prepareShare(Menu menu, ListView lv) {
+        menu.findItem(R.id.menu_share_thing).setVisible(isCheckedCount(lv, 1));
     }
 
-    private CharSequence getMessageUrl(int position) {
-        // Comment reply messages have a context url we can use.
-        String context = getContext(position);
-        if (!TextUtils.isEmpty(context)) {
-            return Urls.perma(context, null);
-        }
-
-        // Assume this is a raw message.
-        return Urls.messageThread(getThingId(position), Urls.TYPE_HTML);
-    }
-
-    private void prepareSubredditActionItem(Menu menu, ListView listView, int position) {
-        String subreddit = getSubreddit(position);
+    private void prepareSubreddit(Menu menu, ListView lv, int pos) {
+        String subreddit = getSubreddit(pos);
         MenuItem item = menu.findItem(R.id.menu_subreddit);
-        item.setVisible(isCheckedCount(listView, 1) && Subreddits.hasSidebar(subreddit));
+        item.setVisible(isCheckedCount(lv, 1) && Subreddits.hasSidebar(subreddit));
         if (item.isVisible()) {
             item.setTitle(MenuHelper.getSubredditTitle(context, subreddit));
         }
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView) {
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView lv) {
         switch (item.getItemId()) {
+            case R.id.menu_share_thing:
+                handleShare(lv);
+                mode.finish();
+                return true;
+
             case R.id.menu_copy_url:
-                handleCopyUrl(listView);
+                handleCopyUrl(lv);
                 mode.finish();
                 return true;
 
             case R.id.menu_author:
-                handleAuthor(listView);
+                handleAuthor(lv);
                 mode.finish();
                 return true;
 
             case R.id.menu_subreddit:
-                handleSubreddit(listView);
+                handleSubreddit(lv);
                 mode.finish();
                 return true;
         }
         return false;
     }
 
-    private void handleCopyUrl(ListView listView) {
-        int position = Views.getCheckedPosition(listView);
-        MenuHelper.copyUrl(context, getMessageTitle(position), getMessageUrl(position));
+    private void handleShare(ListView lv) {
+        int pos = Views.getCheckedPosition(lv);
+        MenuHelper.share(context, getMessageTitle(pos), getMessageUrl(pos));
     }
 
-    private void handleAuthor(ListView listView) {
-        int position = Views.getCheckedPosition(listView);
-        MenuHelper.startProfileActivity(context, getAuthor(position), -1);
+    private void handleCopyUrl(ListView lv) {
+        int pos = Views.getCheckedPosition(lv);
+        MenuHelper.copyUrl(context, getMessageTitle(pos), getMessageUrl(pos));
     }
 
-    private void handleSubreddit(ListView listView) {
-        int position = Views.getCheckedPosition(listView);
-        MenuHelper.startSidebarActivity(context, getSubreddit(position));
+    private void handleAuthor(ListView lv) {
+        int pos = Views.getCheckedPosition(lv);
+        MenuHelper.startProfileActivity(context, getAuthor(pos), -1);
+    }
+
+    private void handleSubreddit(ListView lv) {
+        int pos = Views.getCheckedPosition(lv);
+        MenuHelper.startSidebarActivity(context, getSubreddit(pos));
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-            boolean checked) {
+    public void onItemCheckedStateChanged(ActionMode mode, int pos, long id, boolean checked) {
         mode.invalidate();
     }
 
@@ -177,14 +160,36 @@ public class MessageThingActionModeController implements ThingActionModeControll
     }
 
     @Override
-    public void swipe(int position) {
+    public void swipe(int pos) {
     }
 
     @Override
-    public void vote(int position, int action) {
+    public void vote(int pos, int action) {
     }
 
     // Utility methods
+
+    private String getMessageTitle(int position) {
+        // Comment reply messages just have "comment reply" as subject so try to use the link title.
+        String title = getLinkTitle(position);
+        if (!TextUtils.isEmpty(title)) {
+            return title;
+        }
+
+        // Assume this is a message with a subject.
+        return getSubject(position);
+    }
+
+    private CharSequence getMessageUrl(int pos) {
+        // Comment reply messages have a context url we can use.
+        String context = getContext(pos);
+        if (!TextUtils.isEmpty(context)) {
+            return Urls.perma(context, null);
+        }
+
+        // Assume this is a raw message.
+        return Urls.messageThread(getThingId(pos), Urls.TYPE_HTML);
+    }
 
     private boolean isCheckedCount(ListView listView, int checkedItemCount) {
         return listView.getCheckedItemCount() == checkedItemCount;
@@ -192,27 +197,27 @@ public class MessageThingActionModeController implements ThingActionModeControll
 
     // Getters for message attributes
 
-    private String getAuthor(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_AUTHOR);
+    private String getAuthor(int pos) {
+        return adapter.getString(pos, MessageThingLoader.INDEX_AUTHOR);
     }
 
-    private String getContext(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_CONTEXT);
+    private String getContext(int pos) {
+        return adapter.getString(pos, MessageThingLoader.INDEX_CONTEXT);
     }
 
-    private String getLinkTitle(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_LINK_TITLE);
+    private String getLinkTitle(int pos) {
+        return adapter.getString(pos, MessageThingLoader.INDEX_LINK_TITLE);
     }
 
-    private String getSubject(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_SUBJECT);
+    private String getSubject(int pos) {
+        return adapter.getString(pos, MessageThingLoader.INDEX_SUBJECT);
     }
 
-    private String getSubreddit(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_SUBREDDIT);
+    private String getSubreddit(int pos) {
+        return adapter.getString(pos, MessageThingLoader.INDEX_SUBREDDIT);
     }
 
-    private String getThingId(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_THING_ID);
+    private String getThingId(int pos) {
+        return adapter.getString(pos, MessageThingLoader.INDEX_THING_ID);
     }
 }

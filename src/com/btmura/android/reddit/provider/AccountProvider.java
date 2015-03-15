@@ -19,15 +19,16 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
@@ -51,12 +52,22 @@ public class AccountProvider extends BaseProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.accounts";
 
     static final String PATH_ACCOUNTS = "accounts";
+    static final String PATH_ACCOUNT_ACTIONS = "actions/accounts";
 
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     public static final Uri ACCOUNTS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNTS);
+    public static final Uri ACCOUNT_ACTIONS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNT_ACTIONS);
+
+    private static final UriMatcher MATCHER = new UriMatcher(0);
+    private static final int MATCH_ACCOUNTS = 1;
+    private static final int MATCH_ACCOUNT_ACTIONS = 2;
+    static {
+        MATCHER.addURI(AUTHORITY, PATH_ACCOUNTS, MATCH_ACCOUNTS);
+        MATCHER.addURI(AUTHORITY, PATH_ACCOUNT_ACTIONS, MATCH_ACCOUNT_ACTIONS);
+    }
 
     private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
-    private static final String METHOD_CLEAR_MESSAGES = "clearMessages";
+    private static final String METHOD_MARK_MESSAGES_READ = "markMessagesRead";
 
     /** String extra containing the cookie for an account. */
     private static final String EXTRA_COOKIE = "cookie";
@@ -67,32 +78,38 @@ public class AccountProvider extends BaseProvider {
 
     @Override
     protected String getTable(Uri uri) {
-        return Accounts.TABLE_NAME;
+        switch (MATCHER.match(uri)) {
+            case MATCH_ACCOUNTS:
+                return Accounts.TABLE_NAME;
+
+            case MATCH_ACCOUNT_ACTIONS:
+                return AccountActions.TABLE_NAME;
+
+            default:
+                throw new IllegalArgumentException("uri: " + uri);
+        }
     }
 
-    /**
-     * Initializes a new account by importing subreddits and returns true on success.
-     */
+    /** Return true if account was initialized successfully with subreddits. */
     public static boolean initializeAccount(Context context, String accountName, String cookie) {
         Bundle args = new Bundle(1);
         args.putString(EXTRA_COOKIE, cookie);
-        return Provider.call(context,
-                ACCOUNTS_URI,
-                METHOD_INITIALIZE_ACCOUNT,
-                accountName,
-                args) != null;
+        return Provider.call(context, ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT, accountName, args)
+                != null;
     }
 
-    public static void clearMessages(Context context, String accountName) {
-        Provider.call(context, ACCOUNTS_URI, METHOD_CLEAR_MESSAGES, accountName, null);
+    /** Returns true if the account's messages were marked as read. */
+    public static boolean markMessagesRead(Context context, String accountName) {
+        return Provider.call(context, ACCOUNTS_URI, METHOD_MARK_MESSAGES_READ, accountName, null)
+                != null;
     }
 
     @Override
     public Bundle call(String method, String accountName, Bundle extras) {
         if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
             return initializeAccount(accountName, extras);
-        } else if (METHOD_CLEAR_MESSAGES.equals(method)) {
-            return clearMessages(accountName);
+        } else if (METHOD_MARK_MESSAGES_READ.equals(method)) {
+            return markMessagesRead(accountName);
         }
         return null;
     }
@@ -100,7 +117,7 @@ public class AccountProvider extends BaseProvider {
     /**
      * Returns a non-null empty bundle on successfully creating an account. Otherwise, it returns
      * null on failure whether from getting the user's subreddits or encountering database issues.
-     * 
+     *
      * This method touches many tables that are not the responsibility of AccountProvider, but
      * somebody with access to the database must do this job to assure everything is done in a
      * single transaction.
@@ -131,7 +148,7 @@ public class AccountProvider extends BaseProvider {
         };
 
         String selection = SharedColumns.SELECT_BY_ACCOUNT;
-        String[] selectionArgs = Array.of(accountName);
+        String[] args = Array.of(accountName);
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
@@ -139,7 +156,7 @@ public class AccountProvider extends BaseProvider {
             int tableCount = tables.length;
             int deleted = 0;
             for (int i = 0; i < tableCount; i++) {
-                deleted += db.delete(tables[i], selection, selectionArgs);
+                deleted += db.delete(tables[i], selection, args);
             }
 
             ContentValues values = new ContentValues(3);
@@ -164,28 +181,32 @@ public class AccountProvider extends BaseProvider {
         }
     }
 
-    private Bundle clearMessages(String accountName) {
-        int changed = 0;
+    private Bundle markMessagesRead(String accountName) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            // Update the existing row. If there isn't such a row, it will be created upon sync,
-            // where it will have the proper value.
-            ContentValues values = new ContentValues(1);
-            values.put(Accounts.COLUMN_HAS_MAIL, false);
-            changed += db.update(Accounts.TABLE_NAME,
-                    values,
-                    Accounts.SELECT_BY_ACCOUNT,
-                    Array.of(accountName));
+            String[] args = Array.of(accountName);
+
+            // Update the account row which may or may not exist. SyncAdapter will make one later.
+            ContentValues v = new ContentValues(2);
+            v.put(Accounts.COLUMN_HAS_MAIL, false);
+            if (db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT, args) > 0) {
+                // Schedule an action to mark messages read if there is an account row to update.
+                v.clear();
+                v.put(AccountActions.COLUMN_ACCOUNT, accountName);
+                v.put(AccountActions.COLUMN_ACTION, AccountActions.ACTION_MARK_MESSAGES_READ);
+                if (db.update(AccountActions.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT, args) == 0
+                        && db.insert(AccountActions.TABLE_NAME, null, v) == -1) {
+                    return null;
+                }
+            }
+
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
 
-        ContentResolver cr = getContext().getContentResolver();
-        if (changed > 0) {
-            cr.notifyChange(ACCOUNTS_URI, null, SYNC);
-        }
+        getContext().getContentResolver().notifyChange(ACCOUNTS_URI, null, SYNC);
         return Bundle.EMPTY;
     }
 }

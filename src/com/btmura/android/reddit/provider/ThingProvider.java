@@ -59,7 +59,7 @@ import com.btmura.android.reddit.util.Objects;
 
 /**
  * URI MATCHING PATTERNS:
- * 
+ *
  * <pre>
  * /things
  * /comments
@@ -253,7 +253,7 @@ public class ThingProvider extends BaseProvider {
         }
     }
 
-    public static final Bundle getSubredditSession(Context context,
+    public static Bundle getSubredditSession(Context context,
             String accountName,
             String subreddit,
             int filter,
@@ -268,7 +268,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getProfileSession(Context context,
+    public static Bundle getProfileSession(Context context,
             String accountName,
             String profileUser,
             int filter,
@@ -283,7 +283,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getCommentsSession(Context context,
+    public static Bundle getCommentsSession(Context context,
             String accountName,
             String thingId,
             String linkId,
@@ -300,7 +300,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getThingSearchSession(Context context,
+    public static Bundle getThingSearchSession(Context context,
             String accountName,
             String subreddit,
             String query,
@@ -317,7 +317,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getSubredditSearchSession(Context context,
+    public static Bundle getSubredditSearchSession(Context context,
             String accountName,
             String query,
             Bundle sessionData) {
@@ -328,7 +328,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getMessageSession(Context context,
+    public static Bundle getMessageSession(Context context,
             String accountName,
             int filter,
             Bundle sessionData,
@@ -345,7 +345,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getMessageThreadSession(Context context,
+    public static Bundle getMessageThreadSession(Context context,
             String accountName,
             String thingId,
             Bundle sessionData) {
@@ -356,27 +356,27 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    static final Bundle cleanSessions(Context context, int sessionType) {
+    static Bundle cleanSessions(Context context, int sessionType) {
         Bundle extras = new Bundle(1);
         extras.putInt(EXTRA_SESSION_TYPE, sessionType);
         return Provider.call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, extras);
     }
 
-    static final Bundle expandComment(Context context, long id, long sessionId) {
+    static Bundle expandComment(Context context, long id, long sessionId) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
         return Provider.call(context, COMMENTS_URI, METHOD_EXPAND_COMMENT, null, extras);
     }
 
-    static final Bundle collapseComment(Context context, long id, long[] childIds) {
+    static Bundle collapseComment(Context context, long id, long[] childIds) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
         extras.putLongArray(EXTRA_ID_ARRAY, childIds);
         return Provider.call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
-    static final Bundle insertComment(Context context,
+    static Bundle insertComment(Context context,
             String accountName,
             String body,
             String parentThingId,
@@ -392,7 +392,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    static final Bundle editComment(Context context,
+    static Bundle editComment(Context context,
             String accountName,
             String body,
             String parentThingId,
@@ -408,7 +408,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    static final Bundle deleteComment(Context context,
+    static Bundle deleteComment(Context context,
             String accountName,
             boolean[] hasChildren,
             long[] ids,
@@ -426,7 +426,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    static final Bundle insertMessage(Context context,
+    static Bundle insertMessage(Context context,
             String accountName,
             String body,
             String parentThingId,
@@ -442,7 +442,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    static final Bundle readMessage(Context context,
+    static Bundle readMessage(Context context,
             String accountName,
             int action,
             String thingId) {
@@ -452,7 +452,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, READ_ACTIONS_URI, METHOD_READ_MESSAGE, accountName, extras);
     }
 
-    static final Bundle hide(Context context,
+    static Bundle hide(Context context,
             String accountName,
             int action,
             String thingId,
@@ -464,7 +464,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, HIDE_ACTIONS_URI, METHOD_HIDE, accountName, extras);
     }
 
-    static final Bundle save(Context context,
+    static Bundle save(Context context,
             String accountName,
             int action,
             String thingId,
@@ -476,7 +476,7 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, SAVE_ACTIONS_URI, METHOD_SAVE, accountName, extras);
     }
 
-    static final Bundle vote(Context context,
+    static Bundle vote(Context context,
             String accountName,
             int action,
             String thingId,

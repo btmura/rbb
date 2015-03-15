@@ -5,23 +5,23 @@
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
-  
+
           http://www.apache.org/licenses/LICENSE-2.0
-  
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <string name="account_app_storage">App storage</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="add_subreddits">Add subreddits</string>
-    <string name="app_name">reddit by brian</string>
+    <string name="app_name">falling for reddit</string>
     <string name="authority_accounts">com.btmura.android.reddit.provider.accounts</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
@@ -111,6 +111,7 @@
     <string name="menu_new_post">New post</string>
     <string name="menu_open">Open</string>
     <string name="menu_refresh">Refresh</string>
+    <string name="menu_refresh_comments">Refresh comments</string>
     <string name="menu_reply">Reply</string>
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>

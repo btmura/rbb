@@ -37,6 +37,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 
@@ -44,10 +45,9 @@ public class RedditApi {
 
     public static final String TAG = "RedditApi";
 
-    private static final String CHARSET = "UTF-8";
-    private static final String CONTENT_TYPE =
-            "application/x-www-form-urlencoded;charset=" + CHARSET;
-    static final String USER_AGENT = "reddit by brian v3.3 by /u/btmura";
+    static final String CHARSET = "UTF-8";
+    static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset=" + CHARSET;
+    static final String USER_AGENT = "falling for reddit v3.4 by /u/btmura";
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
@@ -155,8 +155,7 @@ public class RedditApi {
         return postData(Urls.hide(hide), Urls.hideQuery(thingId, modhash), cookie);
     }
 
-    public static LoginResult login(Context context, String login, String password)
-            throws IOException {
+    public static LoginResult login(String login, String password) throws IOException {
         HttpsURLConnection conn = null;
         InputStream in = null;
         try {
@@ -169,6 +168,19 @@ public class RedditApi {
             writeFormData(conn, Urls.loginQuery(login, password));
             in = conn.getInputStream();
             return LoginResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static void markMessagesRead(String cookie) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            CharSequence url = Urls.message(Filter.MESSAGE_UNREAD, null, true, Urls.TYPE_HTML);
+            conn = connect(url, cookie, true, false);
+            in = conn.getInputStream();
+            in.read();
         } finally {
             close(in, conn);
         }
@@ -208,8 +220,8 @@ public class RedditApi {
                 captchaGuess, modhash), cookie);
     }
 
-    public static Result vote(Context context, String thingId, int vote, String cookie,
-            String modhash) throws IOException {
+    public static Result vote(String thingId, int vote, String cookie, String modhash)
+            throws IOException {
         return postData(Urls.vote(), Urls.voteQuery(thingId, vote, modhash), cookie);
     }
 
@@ -219,7 +231,6 @@ public class RedditApi {
         InputStream in = null;
         try {
             conn = connect(url, cookie, true, true);
-            conn.connect();
             writeFormData(conn, data);
             in = conn.getInputStream();
             if (LOG_RESPONSES) {
@@ -273,7 +284,7 @@ public class RedditApi {
      * Logs entire response and returns a fresh InputStream as if nothing happened. Make sure to
      * delete all usages of this method, since it is only for debugging.
      */
-    private static InputStream logResponse(InputStream in) throws IOException {
+    static InputStream logResponse(InputStream in) throws IOException {
         // Make a copy of the InputStream.
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];

@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.btmura.android.reddit"
-    android:versionCode="10"
-    android:versionName="3.3" >
+    android:versionCode="11"
+    android:versionName="3.4" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -41,6 +41,17 @@
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
             android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity android:name=".accounts.OAuthActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="oauth"
+                    android:pathPrefix="/"
+                    android:scheme="rbb" />
+            </intent-filter>
+        </activity>
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"

@@ -53,7 +53,7 @@ public class Accounts implements BaseColumns {
                 : accountName;
     }
 
-    static void createTable(SQLiteDatabase db) {
+    static void create(SQLiteDatabase db) {
         // Account is a unique column.
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"

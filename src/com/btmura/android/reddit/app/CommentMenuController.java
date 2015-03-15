@@ -26,10 +26,12 @@ import com.btmura.android.reddit.R;
 class CommentMenuController implements MenuController {
 
     private final Context context;
+    private final Refreshable refreshable;
     private final Filterable filterable;
 
-    CommentMenuController(Context context, Filterable filterable) {
+    CommentMenuController(Context context, Refreshable refreshable, Filterable filterable) {
         this.context = context;
+        this.refreshable = refreshable;
         this.filterable = filterable;
     }
 
@@ -45,6 +47,10 @@ class CommentMenuController implements MenuController {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_refresh_comments:
+                handleRefresh();
+                return true;
+
             case R.id.menu_sort_comments:
                 handleSort();
                 return true;
@@ -52,6 +58,10 @@ class CommentMenuController implements MenuController {
             default:
                 return false;
         }
+    }
+
+    private void handleRefresh() {
+        refreshable.refresh();
     }
 
     private void handleSort() {
