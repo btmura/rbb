@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
@@ -26,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
@@ -33,16 +35,15 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.util.Array;
 
 public class MenuHelper {
-
-    private static final String[] AUTHORITIES = {
-            SubredditProvider.AUTHORITY,
-    };
 
     /**
      * Sets a plain text {@link ClipData} with the provided label and text to the clipboard and
@@ -149,7 +150,11 @@ public class MenuHelper {
 
     public static void startAddAccountActivity(Context context) {
         Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, Array.of(AccountProvider.AUTHORITY));
+        if (Build.VERSION.SDK_INT >= 18) {
+            intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES,
+                    Array.of(AccountAuthenticator.getAccountType(context)));
+        }
         context.startActivity(intent);
     }
 

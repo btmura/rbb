@@ -34,6 +34,10 @@ public class Array {
         return new String[] {Integer.toString(oneInt), element};
     }
 
+    public static String[] of(String oneString) {
+        return new String[] {oneString};
+    }
+
     public static String[] of(String... elements) {
         return elements;
     }
