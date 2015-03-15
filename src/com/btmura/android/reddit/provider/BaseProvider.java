@@ -93,8 +93,7 @@ abstract class BaseProvider extends ContentProvider {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(tag, "query table: " + table
-                    + " selection: " + selection + " args: " + Array.asList(args));
+            Log.d(tag, "q t: " + table + " s: " + selection + " a: " + Array.asList(args));
         }
 
         return c;
@@ -115,7 +114,7 @@ abstract class BaseProvider extends ContentProvider {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(tag, "insert table: " + table + " id: " + id);
+            Log.d(tag, "i t: " + table + " i: " + id);
         }
         if (id != -1) {
             notifyChange(uri);
@@ -139,8 +138,8 @@ abstract class BaseProvider extends ContentProvider {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(tag, "update table: " + table + " count: " + count
-                    + " selection: " + selection + " args: " + Array.asList(args));
+            Log.d(tag, "u t: " + table + " c: " + count
+                    + " s: " + selection + " a: " + Array.asList(args));
         }
         if (count > 0) {
             notifyChange(uri);
@@ -163,8 +162,8 @@ abstract class BaseProvider extends ContentProvider {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(tag, "delete table: " + table + " count: " + count
-                    + " selection: " + selection + " args: " + Array.asList(args));
+            Log.d(tag, "d t: " + table + " c: " + count
+                    + " s: " + selection + " a: " + Array.asList(args));
         }
         if (count > 0) {
             notifyChange(uri);

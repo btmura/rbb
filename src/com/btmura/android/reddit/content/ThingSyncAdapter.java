@@ -88,12 +88,11 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onPerformSync START account: " + account.name);
+            Log.d(TAG, "onPerformSync START a: " + account.name);
         }
         doSync(account, extras, authority, provider, syncResult);
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onPerformSync FINISH account: " + account.name
-                    + " syncResult: " + syncResult.toString());
+            Log.d(TAG, "onPerformSync FINISH a: " + account.name + " sr: " + syncResult.toString());
         }
     }
 
@@ -199,6 +198,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                         result.logAnyErrors(TAG, syncer.getTag());
                         if (result.hasErrors()) {
                             Log.i(TAG, syncer.getTag()
+                                    + "[" + c.getPosition() + "/" + c.getCount() + "] "
                                     + " c: " + cookie.length()
                                     + " m: " + modhash.length()
                                     + " f: " + syncFailures
