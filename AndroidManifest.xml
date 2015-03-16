@@ -5,9 +5,9 @@
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
-  
+
           http://www.apache.org/licenses/LICENSE-2.0
-  
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,190 +15,186 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.btmura.android.reddit"
-    android:versionCode="11"
-    android:versionName="3.4" >
+          package="com.btmura.android.reddit"
+          android:versionCode="11"
+          android:versionName="3.4">
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="18"/>
 
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
 
     <application
         android:allowBackup="true"
         android:backupAgent=".app.backup.BackupAgent"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Transition" >
+        android:theme="@style/Theme.Transition">
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
-            android:theme="@android:style/Theme.Holo.Dialog" />
+            android:theme="@android:style/Theme.Holo.Dialog"/>
         <activity android:name=".accounts.OAuthActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
                 <data
                     android:host="oauth"
                     android:pathPrefix="/"
-                    android:scheme="rbb" />
+                    android:scheme="rbb"/>
             </intent-filter>
         </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
-            android:label="@string/label_accounts"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:label="@string/label_accounts">
         </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
-            android:uiOptions="splitActionBarWhenNarrow"
-            tools:ignore="ExportedActivity" >
+            android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
                     android:host="reddit.com"
                     android:pathPrefix="/r"
-                    android:scheme="http" />
+                    android:scheme="http"/>
+                <data
+                    android:host="reddit.com"
+                    android:pathPrefix="/r"
+                    android:scheme="https"/>
                 <data
                     android:host="www.reddit.com"
                     android:pathPrefix="/r"
-                    android:scheme="http" />
+                    android:scheme="http"/>
+                <data
+                    android:host="www.reddit.com"
+                    android:pathPrefix="/r"
+                    android:scheme="https"/>
             </intent-filter>
         </activity>
-        <!-- Ignore exported activity warning. We want to be exposed to share things. -->
         <activity
-            android:name=".app.ComposeActivity"
-            tools:ignore="ExportedActivity" >
+            android:name=".app.ComposeActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="text/plain" />
+                <action android:name="android.intent.action.SEND"/>
+                <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".app.ContentBrowserActivity"
-            android:label="@string/content_browser" />
+            android:label="@string/content_browser"/>
         <activity
             android:name=".app.MarkdownTableActivity"
-            android:theme="@style/Theme.Transition.DialogWhenLarge" >
+            android:theme="@style/Theme.Transition.DialogWhenLarge">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SearchActivity"
-            android:launchMode="singleTop"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:launchMode="singleTop">
         </activity>
         <activity
             android:name=".app.SearchThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.btmura.android.reddit.app.SearchActivity"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.btmura.android.reddit.app.SearchActivity" />
+                android:value="com.btmura.android.reddit.app.SearchActivity"/>
         </activity>
         <activity
             android:name=".app.SidebarActivity"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".app.SidebarThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.btmura.android.reddit.app.SidebarActivity"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.btmura.android.reddit.app.SidebarActivity" />
+                android:value="com.btmura.android.reddit.app.SidebarActivity"/>
         </activity>
         <activity
             android:name=".app.ThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.btmura.android.reddit.app.BrowserActivity"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.btmura.android.reddit.app.BrowserActivity" />
+                android:value="com.btmura.android.reddit.app.BrowserActivity"/>
         </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.UserProfileActivity"
-            android:uiOptions="splitActionBarWhenNarrow"
-            tools:ignore="ExportedActivity" >
+            android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
                     android:host="reddit.com"
                     android:pathPrefix="/u"
-                    android:scheme="http" />
+                    android:scheme="http"/>
+                <data
+                    android:host="reddit.com"
+                    android:pathPrefix="/u"
+                    android:scheme="https"/>
                 <data
                     android:host="www.reddit.com"
                     android:pathPrefix="/u"
-                    android:scheme="http" />
+                    android:scheme="http"/>
+                <data
+                    android:host="www.reddit.com"
+                    android:pathPrefix="/u"
+                    android:scheme="https"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".app.UserProfileThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.btmura.android.reddit.app.UserProfileThingActivity"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.btmura.android.reddit.app.UserProfileThingActivity" />
+                android:value="com.btmura.android.reddit.app.UserProfileThingActivity"/>
         </activity>
 
         <activity-alias
             android:name=".MainActivity"
-            android:targetActivity=".app.BrowserActivity" >
+            android:targetActivity=".app.BrowserActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity-alias>
 
@@ -206,71 +202,71 @@
             android:name=".provider.AccountProvider"
             android:authorities="@string/authority_accounts"
             android:exported="false"
-            android:label="@string/provider_accounts" />
+            android:label="@string/provider_accounts"/>
         <provider
             android:name=".provider.SubredditProvider"
             android:authorities="@string/authority_subreddits"
             android:exported="false"
-            android:label="@string/provider_subreddits" />
+            android:label="@string/provider_subreddits"/>
         <provider
             android:name=".provider.ThingProvider"
             android:authorities="@string/authority_things"
             android:exported="false"
-            android:label="@string/provider_things" />
+            android:label="@string/provider_things"/>
 
         <service
             android:name=".accounts.AccountAuthenticatorService"
             android:exported="true"
-            android:permission="com.btmura.android.reddit.permission.AUTHENTICATE_ACCOUNTS" >
+            android:permission="com.btmura.android.reddit.permission.AUTHENTICATE_ACCOUNTS">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
+                <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                android:resource="@xml/authenticator"/>
         </service>
         <service
             android:name=".content.AccountSyncAdapter$Service"
             android:exported="true"
-            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
+                <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/account_sync_adapter" />
+                android:resource="@xml/account_sync_adapter"/>
         </service>
         <service
             android:name=".content.SubredditSyncAdapter$Service"
             android:exported="true"
-            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
+                <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/subreddit_sync_adapter" />
+                android:resource="@xml/subreddit_sync_adapter"/>
         </service>
         <service
             android:name=".content.ThingSyncAdapter$Service"
             android:exported="true"
-            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
+                <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/thing_sync_adapter" />
+                android:resource="@xml/thing_sync_adapter"/>
         </service>
-        <service android:name=".provider.SessionCleanerService" />
+        <service android:name=".provider.SessionCleanerService"/>
 
         <meta-data
             android:name="com.google.android.backup.api_key"
-            android:value="AEdPqrEAAAAIf8pv0IsWSzrukJzjvXlDsBcXRwRCEFXVEjeQZw" />
+            android:value="AEdPqrEAAAAIf8pv0IsWSzrukJzjvXlDsBcXRwRCEFXVEjeQZw"/>
     </application>
 
 </manifest>
