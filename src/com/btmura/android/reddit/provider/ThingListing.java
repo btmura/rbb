@@ -278,7 +278,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public List<ContentValues> getValues() throws IOException {
-        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
+        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, false);
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());

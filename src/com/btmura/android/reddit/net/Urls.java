@@ -38,13 +38,12 @@ public class Urls {
 
     public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
-    public static final String BASE_URL = "http://www.reddit.com";
-    public static final String BASE_SECURE_URL = "https://www.reddit.com";
-    public static final String BASE_SSL_URL = "https://ssl.reddit.com";
+    public static final String BASE_URL = "https://www.reddit.com";
+    private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
-    public static final String API_ACCESS_TOKEN_URL = BASE_SECURE_URL + "/api/v1/access_token";
+    public static final String API_ACCESS_TOKEN_URL = BASE_URL + "/api/v1/access_token";
 
-    private static final String API_AUTHORIZE_URL = BASE_SECURE_URL + "/api/v1/authorize";
+    private static final String API_AUTHORIZE_URL = BASE_URL + "/api/v1/authorize";
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
     private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";

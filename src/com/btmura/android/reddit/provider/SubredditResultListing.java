@@ -67,7 +67,7 @@ class SubredditResultListing extends JsonParser implements Listing {
     @Override
     public ArrayList<ContentValues> getValues() throws IOException {
         CharSequence url = Urls.subredditSearch(query, null);
-        HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
+        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());
