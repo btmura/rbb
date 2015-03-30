@@ -1,7 +1,7 @@
-reddit by brian
+falling for reddit
 ===============
 
-reddit by brian (rbb) is a fast and simple Reddit client for Android.
+falling for reddit (ffr) is a fast and simple Reddit client for Android.
 
 * [Google Play](https://play.google.com/store/apps/details?id=com.btmura.android.reddit)
 * [GitHub](https://github.com/btmura/rbb)
