@@ -28,14 +28,14 @@
         android:visibility="invisible" />
 
     <EditText
-        android:id="@+id/login"
+        android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/progress"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginBottom="@dimen/padding"
-        android:hint="@string/hint_login"
+        android:hint="@string/hint_username"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
@@ -44,7 +44,7 @@
         android:id="@+id/ok_button_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/login"
+        android:layout_below="@+id/username"
         layout="@layout/ok_button_bar" />
 
 </RelativeLayout>

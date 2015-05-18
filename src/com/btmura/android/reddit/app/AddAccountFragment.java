@@ -49,7 +49,7 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
 
-    private static final String ARG_LOGIN = "login";
+    private static final String ARG_LOGIN = "username";
 
     public interface OnAccountAddedListener {
         void onAccountAdded(Bundle result);
@@ -60,7 +60,7 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     private OnAccountAddedListener listener;
     private LoginTask task;
 
-    private EditText login;
+    private EditText username;
     private ProgressBar progress;
     private Button ok;
     private Button cancel;
@@ -93,9 +93,9 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.add_account, container, false);
 
-        login = (EditText) v.findViewById(R.id.login);
-        login.setFilters(InputFilters.NO_SPACE_FILTERS);
-        login.setText(getArguments().getString(ARG_LOGIN));
+        username = (EditText) v.findViewById(R.id.username);
+        username.setFilters(InputFilters.NO_SPACE_FILTERS);
+        username.setText(getArguments().getString(ARG_LOGIN));
 
         progress = (ProgressBar) v.findViewById(R.id.progress);
 
@@ -122,14 +122,14 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
     private void showProgress() {
         progress.setVisibility(View.VISIBLE);
-        login.setEnabled(false);
+        username.setEnabled(false);
         cancel.setEnabled(false);
         ok.setEnabled(false);
     }
 
     private void hideProgress() {
         progress.setVisibility(View.INVISIBLE);
-        login.setEnabled(true);
+        username.setEnabled(true);
         cancel.setEnabled(true);
         ok.setEnabled(true);
     }
@@ -150,15 +150,15 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     }
 
     private void handleAdd() {
-        if (login.getText().length() <= 0) {
-            login.setError(getString(R.string.error_blank_field));
+        if (username.getText().length() <= 0) {
+            username.setError(getString(R.string.error_blank_field));
             return;
         }
-        if (login.getError() == null && listener != null) {
+        if (username.getError() == null && listener != null) {
             if (task != null) {
                 task.cancel(true);
             }
-            task = new LoginTask(getActivity(), login.getText(), "");
+            task = new LoginTask(getActivity(), username.getText(), "");
             task.execute();
         }
     }
