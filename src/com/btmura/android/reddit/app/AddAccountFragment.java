@@ -66,8 +66,8 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
     private EditText username;
     private ProgressBar progress;
-    private Button ok;
-    private Button cancel;
+    private Button loginButton;
+    private Button cancelButton;
 
     public static AddAccountFragment newInstance(String login) {
         Bundle args = new Bundle(1);
@@ -103,11 +103,12 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
         progress = (ProgressBar) v.findViewById(R.id.progress);
 
-        cancel = (Button) v.findViewById(R.id.cancel);
-        cancel.setOnClickListener(this);
+        cancelButton = (Button) v.findViewById(R.id.cancel);
+        cancelButton.setOnClickListener(this);
 
-        ok = (Button) v.findViewById(R.id.ok);
-        ok.setOnClickListener(this);
+        loginButton = (Button) v.findViewById(R.id.ok);
+        loginButton.setText(R.string.login);
+        loginButton.setOnClickListener(this);
 
         hideProgress();
 
@@ -117,22 +118,22 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     private void showProgress() {
         progress.setVisibility(View.VISIBLE);
         username.setEnabled(false);
-        cancel.setEnabled(false);
-        ok.setEnabled(false);
+        cancelButton.setEnabled(false);
+        loginButton.setEnabled(false);
     }
 
     private void hideProgress() {
         progress.setVisibility(View.INVISIBLE);
         username.setEnabled(true);
-        cancel.setEnabled(true);
-        ok.setEnabled(true);
+        cancelButton.setEnabled(true);
+        loginButton.setEnabled(true);
     }
 
     @Override
     public void onClick(View v) {
-        if (v == cancel) {
+        if (v == cancelButton) {
             handleCancel();
-        } else if (v == ok) {
+        } else if (v == loginButton) {
             handleAdd();
         }
     }
