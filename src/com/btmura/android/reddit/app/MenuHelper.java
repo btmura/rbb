@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
@@ -40,7 +39,6 @@ import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Array;
 
 public class MenuHelper {
@@ -65,16 +63,6 @@ public class MenuHelper {
         request.setNotificationVisibility(Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setTitle(title);
         manager.enqueue(request);
-    }
-
-    public static void openAuthorizeUrl(Context context) {
-        String clientId = context.getString(R.string.key_reddit_client_id);
-        StringBuilder state = new StringBuilder("rbb_").append(System.currentTimeMillis());
-        CharSequence url = Urls.authorize(clientId, state, Urls.OAUTH_REDIRECT_URL);
-
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url.toString()));
-        Contexts.startActivity(context, intent);
     }
 
     public static void openUrl(Context context, CharSequence url) {
@@ -127,9 +115,9 @@ public class MenuHelper {
     }
 
     private static void showSortDialog(Context context,
-            final Filterable filterable,
-            int titleResId,
-            int itemArrayResId) {
+                                       final Filterable filterable,
+                                       int titleResId,
+                                       int itemArrayResId) {
         new AlertDialog.Builder(context)
                 .setTitle(titleResId)
                 .setSingleChoiceItems(itemArrayResId,
@@ -184,11 +172,11 @@ public class MenuHelper {
     // Helper methods to start composer activities
 
     public static void startCommentReplyComposer(Context context,
-            String accountName,
-            String messageDestination,
-            String title,
-            String parentThingId,
-            String thingId) {
+                                                 String accountName,
+                                                 String messageDestination,
+                                                 String title,
+                                                 String parentThingId,
+                                                 String thingId) {
         Bundle extras = new Bundle(2);
         extras.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, parentThingId);
         extras.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
@@ -204,12 +192,12 @@ public class MenuHelper {
     }
 
     public static void startMessageReplyComposer(Context context,
-            String accountName,
-            String messageDestination,
-            String title,
-            String parentThingId,
-            String thingId,
-            boolean isReply) {
+                                                 String accountName,
+                                                 String messageDestination,
+                                                 String title,
+                                                 String parentThingId,
+                                                 String thingId,
+                                                 boolean isReply) {
         Bundle extras = new Bundle(1);
         extras.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, parentThingId);
         extras.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
@@ -225,11 +213,11 @@ public class MenuHelper {
     }
 
     public static void startEditCommentComposer(Context context,
-            String accountName,
-            String title,
-            String text,
-            String parentThingId,
-            String thingId) {
+                                                String accountName,
+                                                String title,
+                                                String text,
+                                                String parentThingId,
+                                                String thingId) {
         Bundle extras = new Bundle(2);
         extras.putString(ComposeActivity.EXTRA_EDIT_PARENT_THING_ID, parentThingId);
         extras.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
@@ -245,11 +233,11 @@ public class MenuHelper {
     }
 
     public static void startEditPostComposer(Context context,
-            String accountName,
-            String title,
-            String text,
-            String parentThingId,
-            String thingId) {
+                                             String accountName,
+                                             String title,
+                                             String text,
+                                             String parentThingId,
+                                             String thingId) {
         Bundle extras = new Bundle(2);
         extras.putString(ComposeActivity.EXTRA_EDIT_PARENT_THING_ID, parentThingId);
         extras.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
@@ -265,8 +253,8 @@ public class MenuHelper {
     }
 
     public static void startNewMessageComposer(Context context,
-            String accountName,
-            String messageDestination) {
+                                               String accountName,
+                                               String messageDestination) {
         startComposeActivity(context,
                 accountName,
                 ComposeActivity.MESSAGE_TYPE_SET,
@@ -279,8 +267,8 @@ public class MenuHelper {
     }
 
     public static void startNewPostComposer(Context context,
-            String accountName,
-            String subreddit) {
+                                            String accountName,
+                                            String subreddit) {
         startComposeActivity(context,
                 accountName,
                 ComposeActivity.DEFAULT_TYPE_SET,
@@ -293,14 +281,14 @@ public class MenuHelper {
     }
 
     private static void startComposeActivity(Context context,
-            String accountName,
-            int[] types,
-            String subredditDestination,
-            String messageDestination,
-            String title,
-            String text,
-            Bundle extras,
-            boolean isReply) {
+                                             String accountName,
+                                             int[] types,
+                                             String subredditDestination,
+                                             String messageDestination,
+                                             String title,
+                                             String text,
+                                             Bundle extras,
+                                             boolean isReply) {
         Intent intent = new Intent(context, ComposeActivity.class);
         intent.putExtra(ComposeActivity.EXTRA_ACCOUNT_NAME, accountName);
         intent.putExtra(ComposeActivity.EXTRA_TYPES, types);

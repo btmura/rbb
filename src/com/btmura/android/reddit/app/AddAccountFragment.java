@@ -21,9 +21,12 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +39,10 @@ import android.widget.ProgressBar;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountPrefs;
+import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.net.LoginResult;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -58,7 +63,6 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     }
 
     private OnAccountAddedListener listener;
-    private LoginTask task;
 
     private EditText username;
     private ProgressBar progress;
@@ -110,16 +114,6 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
         return v;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (task != null) {
-            showProgress();
-        } else {
-            hideProgress();
-        }
-    }
-
     private void showProgress() {
         progress.setVisibility(View.VISIBLE);
         username.setEnabled(false);
@@ -150,16 +144,24 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     }
 
     private void handleAdd() {
-        if (username.getText().length() <= 0) {
+        if (TextUtils.isEmpty(username.getText())) {
             username.setError(getString(R.string.error_blank_field));
             return;
         }
         if (username.getError() == null && listener != null) {
-            if (task != null) {
-                task.cancel(true);
-            }
-            task = new LoginTask(getActivity(), username.getText(), "");
-            task.execute();
+            forwardToBrowserLogin(username.getText());
+        }
+    }
+
+    private void forwardToBrowserLogin(CharSequence username) {
+        String clientId = getString(R.string.key_reddit_client_id);
+        StringBuilder state = new StringBuilder("rbb_").append(username);
+        CharSequence url = Urls.authorize(clientId, state, Urls.OAUTH_REDIRECT_URL);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url.toString()));
+        if (!Contexts.startActivity(getActivity(), intent)) {
+            // TODO(btmura): handle no browser case
         }
     }
 
@@ -235,7 +237,6 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
         @Override
         protected void onPostExecute(Bundle result) {
-            task = null;
             String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
             if (error != null) {
                 MessageDialogFragment.showMessage(getFragmentManager(), error);
