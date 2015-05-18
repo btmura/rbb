@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -26,18 +24,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.text.method.PasswordTransformationMethod;
-import android.text.method.TransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
@@ -51,9 +43,9 @@ import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.InputFilters;
 
-public class AddAccountFragment extends Fragment implements
-        OnCheckedChangeListener,
-        OnClickListener {
+import java.io.IOException;
+
+public class AddAccountFragment extends Fragment implements OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
 
@@ -69,8 +61,6 @@ public class AddAccountFragment extends Fragment implements
     private LoginTask task;
 
     private EditText login;
-    private EditText password;
-    private CheckBox showPassword;
     private ProgressBar progress;
     private Button ok;
     private Button cancel;
@@ -100,20 +90,12 @@ public class AddAccountFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.add_account, container, false);
 
         login = (EditText) v.findViewById(R.id.login);
         login.setFilters(InputFilters.NO_SPACE_FILTERS);
         login.setText(getArguments().getString(ARG_LOGIN));
-
-        password = (EditText) v.findViewById(R.id.password);
-        if (!TextUtils.isEmpty(login.getText())) {
-            password.requestFocus();
-        }
-
-        showPassword = (CheckBox) v.findViewById(R.id.show_password);
-        showPassword.setOnCheckedChangeListener(this);
 
         progress = (ProgressBar) v.findViewById(R.id.progress);
 
@@ -141,8 +123,6 @@ public class AddAccountFragment extends Fragment implements
     private void showProgress() {
         progress.setVisibility(View.VISIBLE);
         login.setEnabled(false);
-        password.setEnabled(false);
-        showPassword.setEnabled(false);
         cancel.setEnabled(false);
         ok.setEnabled(false);
     }
@@ -150,19 +130,8 @@ public class AddAccountFragment extends Fragment implements
     private void hideProgress() {
         progress.setVisibility(View.INVISIBLE);
         login.setEnabled(true);
-        password.setEnabled(true);
-        showPassword.setEnabled(true);
         cancel.setEnabled(true);
         ok.setEnabled(true);
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        TransformationMethod method = null;
-        if (!isChecked) {
-            method = PasswordTransformationMethod.getInstance();
-        }
-        password.setTransformationMethod(method);
     }
 
     @Override
@@ -185,15 +154,11 @@ public class AddAccountFragment extends Fragment implements
             login.setError(getString(R.string.error_blank_field));
             return;
         }
-        if (password.getText().length() <= 0) {
-            password.setError(getString(R.string.error_blank_field));
-            return;
-        }
-        if (login.getError() == null && password.getError() == null && listener != null) {
+        if (login.getError() == null && listener != null) {
             if (task != null) {
                 task.cancel(true);
             }
-            task = new LoginTask(getActivity(), login.getText(), password.getText());
+            task = new LoginTask(getActivity(), login.getText(), "");
             task.execute();
         }
     }
@@ -243,7 +208,8 @@ public class AddAccountFragment extends Fragment implements
 
                 AccountManager manager = AccountManager.get(context);
                 manager.addAccountExplicitly(account, null, null);
-                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, result.cookie);
+                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE,
+                        result.cookie);
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         result.modhash);
 
