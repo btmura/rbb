@@ -16,17 +16,26 @@
 
 package com.btmura.android.reddit.accounts;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
 import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.net.AccessTokenResult;
+import com.btmura.android.reddit.net.Urls;
+
+import java.io.IOException;
 
 public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity
         implements OnAccountAddedListener {
+
+    private static final String TAG = "AccountAuthenticator";
 
     public static final String EXTRA_LOGIN = "login";
 
@@ -42,6 +51,26 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
             ft.replace(R.id.account_authenticator_container, frag);
             ft.commit();
         }
+
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+        if (uri != null) {
+            addText(uri.toString());
+
+            CharSequence clientId = getString(R.string.key_reddit_client_id);
+            String code = uri.getQueryParameter("code");
+
+            try {
+                AccessTokenResult result = AccessTokenResult.getAccessToken(clientId, code, Urls.OAUTH_REDIRECT_URL);
+                addText("at: " + result.accessToken);
+                addText("tt: " + result.tokenType);
+                addText("ei: " + result.expiresIn);
+                addText("sc: " + result.scope);
+                addText("rt: " + result.refreshToken);
+            } catch (IOException e) {
+                addText(e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -54,5 +83,9 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
     @Override
     public void onAccountCancelled() {
         finish();
+    }
+
+    private void addText(CharSequence text) {
+        Log.d(TAG, text.toString());
     }
 }

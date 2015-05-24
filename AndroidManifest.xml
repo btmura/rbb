@@ -40,8 +40,7 @@
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
-            android:theme="@android:style/Theme.Holo.Dialog"/>
-        <activity android:name=".accounts.OAuthActivity">
+            android:theme="@android:style/Theme.Holo.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
 
