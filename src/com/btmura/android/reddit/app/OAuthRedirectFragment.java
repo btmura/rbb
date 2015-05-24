@@ -95,7 +95,7 @@ public class OAuthRedirectFragment extends Fragment implements OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.add_account, container, false);
+        View v = inflater.inflate(R.layout.oauth_redirect, container, false);
 
         username = (EditText) v.findViewById(R.id.username);
         username.setFilters(InputFilters.NO_SPACE_FILTERS);
