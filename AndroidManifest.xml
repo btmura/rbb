@@ -14,10 +14,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.btmura.android.reddit"
-          android:versionCode="11"
-          android:versionName="3.4">
+<manifest
+    package="com.btmura.android.reddit"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="11"
+    android:versionName="3.4">
 
     <uses-sdk
         android:minSdkVersion="14"
