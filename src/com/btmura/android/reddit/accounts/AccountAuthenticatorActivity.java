@@ -37,7 +37,7 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
 
     private static final String TAG = "AccountAuthenticator";
 
-    public static final String EXTRA_LOGIN = "login";
+    public static final String EXTRA_USERNAME = "username";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
         setContentView(R.layout.account_authenticator);
 
         if (savedInstanceState == null) {
-            Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_LOGIN));
+            Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_USERNAME));
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.account_authenticator_container, frag);
             ft.commit();

@@ -54,7 +54,7 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
 
-    private static final String ARG_LOGIN = "username";
+    private static final String ARG_USERNAME = "username";
 
     public interface OnAccountAddedListener {
         void onAccountAdded(Bundle result);
@@ -69,9 +69,9 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     private Button loginButton;
     private Button cancelButton;
 
-    public static AddAccountFragment newInstance(String login) {
+    public static AddAccountFragment newInstance(String username) {
         Bundle args = new Bundle(1);
-        args.putString(ARG_LOGIN, login);
+        args.putString(ARG_USERNAME, username);
 
         AddAccountFragment frag = new AddAccountFragment();
         frag.setArguments(args);
@@ -99,7 +99,7 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
 
         username = (EditText) v.findViewById(R.id.username);
         username.setFilters(InputFilters.NO_SPACE_FILTERS);
-        username.setText(getArguments().getString(ARG_LOGIN));
+        username.setText(getArguments().getString(ARG_USERNAME));
 
         progress = (ProgressBar) v.findViewById(R.id.progress);
 

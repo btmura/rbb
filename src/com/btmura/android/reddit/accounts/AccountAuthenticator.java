@@ -124,7 +124,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         if (!TextUtils.isEmpty(login)) {
             intent.putExtra(com.btmura.android.reddit.accounts.AccountAuthenticatorActivity.
-                    EXTRA_LOGIN, login);
+                    EXTRA_USERNAME, login);
         }
 
         Bundle result = new Bundle(1);
