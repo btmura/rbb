@@ -50,7 +50,7 @@ import com.btmura.android.reddit.text.InputFilters;
 
 import java.io.IOException;
 
-public class AddAccountFragment extends Fragment implements OnClickListener {
+public class OAuthRedirectFragment extends Fragment implements OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
 
@@ -69,11 +69,11 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     private Button loginButton;
     private Button cancelButton;
 
-    public static AddAccountFragment newInstance(String username) {
+    public static OAuthRedirectFragment newInstance(String username) {
         Bundle args = new Bundle(1);
         args.putString(ARG_USERNAME, username);
 
-        AddAccountFragment frag = new AddAccountFragment();
+        OAuthRedirectFragment frag = new OAuthRedirectFragment();
         frag.setArguments(args);
         return frag;
     }

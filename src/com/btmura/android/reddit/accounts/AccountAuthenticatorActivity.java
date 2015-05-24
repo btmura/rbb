@@ -24,8 +24,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.AddAccountFragment;
-import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
+import com.btmura.android.reddit.app.OAuthRedirectFragment;
+import com.btmura.android.reddit.app.OAuthRedirectFragment.OnAccountAddedListener;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.net.AccessTokenResult;
 import com.btmura.android.reddit.net.Urls;
@@ -46,7 +46,7 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
         setContentView(R.layout.account_authenticator);
 
         if (savedInstanceState == null) {
-            Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_USERNAME));
+            Fragment frag = OAuthRedirectFragment.newInstance(getIntent().getStringExtra(EXTRA_USERNAME));
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.account_authenticator_container, frag);
             ft.commit();
