@@ -16,26 +16,17 @@
 
 package com.btmura.android.reddit.accounts;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.AddAccountFragment;
 import com.btmura.android.reddit.app.OAuthRedirectFragment;
 import com.btmura.android.reddit.app.OAuthRedirectFragment.OnAccountAddedListener;
 import com.btmura.android.reddit.content.ThemePrefs;
-import com.btmura.android.reddit.net.AccessTokenResult;
-import com.btmura.android.reddit.net.Urls;
 
-import java.io.IOException;
-
-public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity
-        implements OnAccountAddedListener {
-
-    private static final String TAG = "AccountAuthenticator";
+public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity implements OnAccountAddedListener {
 
     public static final String EXTRA_USERNAME = "username";
 
@@ -46,29 +37,10 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
         setContentView(R.layout.account_authenticator);
 
         if (savedInstanceState == null) {
-            Fragment frag = OAuthRedirectFragment.newInstance(getIntent().getStringExtra(EXTRA_USERNAME));
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.account_authenticator_container, frag);
-            ft.commit();
-        }
-
-        Intent intent = getIntent();
-        Uri uri = intent.getData();
-        if (uri != null) {
-            addText(uri.toString());
-
-            CharSequence clientId = getString(R.string.key_reddit_client_id);
-            String code = uri.getQueryParameter("code");
-
-            try {
-                AccessTokenResult result = AccessTokenResult.getAccessToken(clientId, code, Urls.OAUTH_REDIRECT_URL);
-                addText("at: " + result.accessToken);
-                addText("tt: " + result.tokenType);
-                addText("ei: " + result.expiresIn);
-                addText("sc: " + result.scope);
-                addText("rt: " + result.refreshToken);
-            } catch (IOException e) {
-                addText(e.getMessage());
+            if (!isOAuthCallback()) {
+                setContainer(OAuthRedirectFragment.newInstance(getIntent().getStringExtra(EXTRA_USERNAME)));
+            } else {
+                setContainer(AddAccountFragment.newInstance(getIntent().getDataString()));
             }
         }
     }
@@ -85,7 +57,13 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
         finish();
     }
 
-    private void addText(CharSequence text) {
-        Log.d(TAG, text.toString());
+    private boolean isOAuthCallback() {
+        return getIntent().getData() != null;
+    }
+
+    private void setContainer(Fragment frag) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.account_authenticator_container, frag);
+        ft.commit();
     }
 }

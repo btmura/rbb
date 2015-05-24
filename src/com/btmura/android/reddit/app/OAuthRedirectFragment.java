@@ -52,7 +52,7 @@ import java.io.IOException;
 
 public class OAuthRedirectFragment extends Fragment implements OnClickListener {
 
-    public static final String TAG = "AddAccountFragment";
+    public static final String TAG = "OAuthRedirectFragment";
 
     private static final String ARG_USERNAME = "username";
 
