@@ -37,6 +37,9 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     public static final String AUTH_TOKEN_COOKIE = "cookie";
     public static final String AUTH_TOKEN_MODHASH = "modhash";
 
+    public static final String AUTH_TOKEN_ACCESS_TOKEN = "accessToken";
+    public static final String AUTH_TOKEN_REFRESH_TOKEN = "refreshToken";
+
     private final Context context;
 
     public static String getAccountType(Context context) {

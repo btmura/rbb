@@ -101,4 +101,13 @@ public class AccessTokenResult extends JsonParser {
         r.endObject();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "accessToken: " + accessToken
+                + " tokenType: " + tokenType
+                + " expiresIn: " + expiresIn
+                + " scope: " + scope
+                + " refreshToken: " + refreshToken;
+    }
 }

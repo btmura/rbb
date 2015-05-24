@@ -19,6 +19,7 @@ package com.btmura.android.reddit.accounts;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
@@ -38,9 +39,9 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
 
         if (savedInstanceState == null) {
             if (!isOAuthCallback()) {
-                setContainer(OAuthRedirectFragment.newInstance(getIntent().getStringExtra(EXTRA_USERNAME)));
+                setContainer(OAuthRedirectFragment.newInstance(getUsernameExtra()));
             } else {
-                setContainer(AddAccountFragment.newInstance(getIntent().getDataString()));
+                setContainer(AddAccountFragment.newInstance(getOAuthCallbackUrl()));
             }
         }
     }
@@ -58,7 +59,15 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
     }
 
     private boolean isOAuthCallback() {
-        return getIntent().getData() != null;
+        return !TextUtils.isEmpty(getOAuthCallbackUrl());
+    }
+
+    private String getUsernameExtra() {
+        return getIntent().getStringExtra(EXTRA_USERNAME);
+    }
+
+    private String getOAuthCallbackUrl() {
+        return getIntent().getDataString();
     }
 
     private void setContainer(Fragment frag) {

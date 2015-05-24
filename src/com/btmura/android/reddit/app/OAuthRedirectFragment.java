@@ -56,6 +56,7 @@ public class OAuthRedirectFragment extends Fragment implements OnClickListener {
 
     private static final String ARG_USERNAME = "username";
 
+    // TODO(btmura): move to AddAccountFragment
     public interface OnAccountAddedListener {
         void onAccountAdded(Bundle result);
 
