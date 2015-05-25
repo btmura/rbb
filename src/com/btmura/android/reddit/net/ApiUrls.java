@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.net;
 
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
 
@@ -25,13 +26,21 @@ import java.net.URLEncoder;
 /** Static methods that create Reddit API URLs. */
 public class ApiUrls {
 
-  private static final String BASE_URL = "https://oauth.reddit.com";
+  private static final String BASE_URL = "https://www.reddit.com";
+  private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";
 
   public static CharSequence subreddit(
+      String accountName,
       String subreddit,
       int filter,
       String more) {
-    StringBuilder b = new StringBuilder(BASE_URL);
+    StringBuilder b = new StringBuilder();
+
+    if (!AccountUtils.isAccount(accountName)) {
+      b.append(BASE_URL);
+    } else {
+      b.append(BASE_OAUTH_URL);
+    }
 
     if (!Subreddits.isFrontPage(subreddit)) {
       b.append("/r/").append(encode(subreddit));
@@ -59,6 +68,10 @@ public class ApiUrls {
           b.append("/top");
           break;
       }
+    }
+
+    if (!AccountUtils.isAccount(accountName)) {
+      b.append(".json");
     }
 
     if (more != null) {

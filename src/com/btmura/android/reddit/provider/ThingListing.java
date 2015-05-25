@@ -299,7 +299,7 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(query)) {
             return Urls.search(subreddit, query, filter, more);
         }
-        return ApiUrls.subreddit(subreddit, filter, more);
+        return ApiUrls.subreddit(accountName, subreddit, filter, more);
     }
 
     @Override
