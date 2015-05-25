@@ -23,12 +23,11 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.UriHelper;
-import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -36,6 +35,7 @@ import java.net.HttpURLConnection;
 public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
   private static final String TAG = "RandomSubredditLoader";
+  private static final boolean DEBUG = BuildConfig.DEBUG;
 
   private final String accountName;
 
@@ -46,19 +46,18 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
   @Override
   public String loadInBackground() {
-    if (BuildConfig.DEBUG) {
+    if (DEBUG) {
       Log.d(TAG, "loadInBackground");
     }
 
     HttpURLConnection conn = null;
     try {
-      CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM,
-          Filter.SUBREDDIT_HOT, Urls.TYPE_HTML);
-      String cookie = AccountUtils.getCookie(getContext(), accountName);
-      conn = RedditApi.connect(url, cookie, false);
+      CharSequence url = Urls2.subreddit(accountName, Subreddits.NAME_RANDOM,
+          Filter.SUBREDDIT_HOT, null, Urls2.TYPE_HTML);
+      conn = RedditApi2.connect(getContext(), accountName, url);
       if (conn.getResponseCode() == 302) {
-        return UriHelper.getSubreddit(
-            Uri.parse(conn.getHeaderField("Location")));
+        String location = conn.getHeaderField("Location");
+        return UriHelper.getSubreddit(Uri.parse(location));
       }
     } catch (IOException e) {
       Log.e(TAG, e.getMessage(), e);

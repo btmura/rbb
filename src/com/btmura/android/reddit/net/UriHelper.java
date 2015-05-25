@@ -31,6 +31,7 @@ public class UriHelper {
     private static final String[] AUTHORITIES = {
             "www.reddit.com",
             "reddit.com",
+            "oauth.reddit.com",
     };
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -51,6 +52,8 @@ public class UriHelper {
         for (int i = 0; i < AUTHORITIES.length; i++) {
             // http://www.reddit.com/r/rbb
             MATCHER.addURI(AUTHORITIES[i], "r/*", MATCH_SUBREDDIT);
+            // TODO(btmura): add .json case to other matchers
+            MATCHER.addURI(AUTHORITIES[i], "r/*/.json", MATCH_SUBREDDIT);
 
             // Various filters of subreddits.
             MATCHER.addURI(AUTHORITIES[i], "r/*/hot", MATCH_SUBREDDIT_HOT);
@@ -124,7 +127,12 @@ public class UriHelper {
                 case MATCH_SUBREDDIT_TOP:
                 case MATCH_COMMENTS:
                 case MATCH_COMMENTS_CONTEXT:
-                    return uri.getPathSegments().get(1);
+                    String sr = uri.getPathSegments().get(1);
+                    int dot = sr.indexOf('.');
+                    if (dot != -1) {
+                        sr = sr.substring(0, dot);
+                    }
+                    return sr;
             }
         }
         return null;

@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.net;
 
+import android.support.annotation.Nullable;
+
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
@@ -27,6 +29,9 @@ import java.net.URLEncoder;
 
 public class Urls2 {
 
+  public static final int TYPE_HTML = 0;
+  public static final int TYPE_JSON = 1;
+
   private static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";
 
@@ -34,52 +39,53 @@ public class Urls2 {
       String accountName,
       String subreddit,
       int filter,
-      String more) {
-    StringBuilder b = new StringBuilder();
+      @Nullable String more,
+      int apiType) {
+    StringBuilder sb = new StringBuilder();
 
     if (!AccountUtils.isAccount(accountName)) {
-      b.append(BASE_URL);
+      sb.append(BASE_URL);
     } else {
-      b.append(BASE_OAUTH_URL);
+      sb.append(BASE_OAUTH_URL);
     }
 
     if (!Subreddits.isFrontPage(subreddit)) {
-      b.append("/r/").append(encode(subreddit));
+      sb.append("/r/").append(encode(subreddit));
     }
 
     if (!Subreddits.isRandom(subreddit)) {
       switch (filter) {
         case Filter.SUBREDDIT_CONTROVERSIAL:
-          b.append("/controversial");
+          sb.append("/controversial");
           break;
 
         case Filter.SUBREDDIT_HOT:
-          b.append("/hot");
+          sb.append("/hot");
           break;
 
         case Filter.SUBREDDIT_NEW:
-          b.append("/new");
+          sb.append("/new");
           break;
 
         case Filter.SUBREDDIT_RISING:
-          b.append("/rising");
+          sb.append("/rising");
           break;
 
         case Filter.SUBREDDIT_TOP:
-          b.append("/top");
+          sb.append("/top");
           break;
       }
     }
 
-    if (!AccountUtils.isAccount(accountName)) {
-      b.append(".json");
+    if (!AccountUtils.isAccount(accountName) && apiType == TYPE_JSON) {
+      sb.append(".json");
     }
 
     if (more != null) {
-      b.append("?count=25&after=").append(encode(more));
+      sb.append("?count=25&after=").append(encode(more));
     }
 
-    return b;
+    return sb;
   }
 
   public static URL newUrl(CharSequence url) {
