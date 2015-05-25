@@ -35,35 +35,37 @@ import java.net.HttpURLConnection;
 
 public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
-    private static final String TAG = "RandomSubredditLoader";
+  private static final String TAG = "RandomSubredditLoader";
 
-    private final String accountName;
+  private final String accountName;
 
-    public RandomSubredditLoader(Context context, String accountName) {
-        super(context);
-        this.accountName = accountName;
+  public RandomSubredditLoader(Context context, String accountName) {
+    super(context);
+    this.accountName = accountName;
+  }
+
+  @Override
+  public String loadInBackground() {
+    if (BuildConfig.DEBUG) {
+      Log.d(TAG, "loadInBackground");
     }
 
-    @Override
-    public String loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-
-        try {
-            CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM, Filter.SUBREDDIT_HOT, Urls.TYPE_HTML);
-            String cookie = AccountUtils.getCookie(getContext(), accountName);
-            HttpURLConnection conn = RedditApi.connect(url, cookie, false);
-            if (conn.getResponseCode() == 302) {
-                return UriHelper.getSubreddit(Uri.parse(conn.getHeaderField("Location")));
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return null;
+    try {
+      CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM,
+          Filter.SUBREDDIT_HOT, Urls.TYPE_HTML);
+      String cookie = AccountUtils.getCookie(getContext(), accountName);
+      HttpURLConnection conn = RedditApi.connect(url, cookie, false);
+      if (conn.getResponseCode() == 302) {
+        return UriHelper.getSubreddit(
+            Uri.parse(conn.getHeaderField("Location")));
+      }
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
     }
+    return null;
+  }
 }
