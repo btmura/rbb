@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.accounts;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
@@ -26,6 +24,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
+
+import java.io.IOException;
 
 public class AccountUtils {
 
@@ -59,12 +59,6 @@ public class AccountUtils {
 
     public static String getModhash(AccountManager manager, Account account)
             throws OperationCanceledException, AuthenticatorException, IOException {
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
-    }
-
-    public static String getModhash(Context context, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        AccountManager manager = AccountManager.get(context);
         return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
     }
 
