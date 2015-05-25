@@ -21,6 +21,8 @@ import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 public class Urls2 {
@@ -78,6 +80,14 @@ public class Urls2 {
     }
 
     return b;
+  }
+
+  public static URL newUrl(CharSequence url) {
+    try {
+      return new URL(url.toString());
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static String encode(String param) {

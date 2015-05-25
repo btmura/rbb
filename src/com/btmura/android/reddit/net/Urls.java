@@ -74,14 +74,6 @@ public class Urls {
     private static final String BASE_USER_HTML_URL = BASE_URL + "/u/";
     private static final String BASE_USER_JSON_URL = BASE_URL + "/user/";
 
-    public static URL newUrl(CharSequence url) {
-        try {
-            return new URL(url.toString());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static CharSequence aboutMe() {
         return new StringBuilder(API_ME_URL).append(".json");
     }

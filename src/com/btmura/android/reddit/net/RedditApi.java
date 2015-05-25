@@ -161,7 +161,7 @@ public class RedditApi {
         InputStream in = null;
         try {
             CharSequence url = Urls.login(login);
-            conn = (HttpsURLConnection) Urls.newUrl(url).openConnection();
+            conn = (HttpsURLConnection) Urls2.newUrl(url).openConnection();
             setCommonHeaders(conn, null);
             setFormDataHeaders(conn);
             conn.connect();
@@ -245,7 +245,7 @@ public class RedditApi {
 
     public static HttpURLConnection connect(CharSequence url, String cookie,
                                             boolean doOutput) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) Urls.newUrl(url).openConnection();
+        HttpURLConnection conn = (HttpURLConnection) Urls2.newUrl(url).openConnection();
         conn.setInstanceFollowRedirects(false);
         setCommonHeaders(conn, cookie);
         if (doOutput) {

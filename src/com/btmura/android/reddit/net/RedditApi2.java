@@ -64,7 +64,7 @@ public class RedditApi2 {
             String accountName,
             CharSequence url)
             throws IOException, AuthenticatorException, OperationCanceledException {
-        HttpURLConnection conn = (HttpURLConnection) Urls.newUrl(url).openConnection();
+        HttpURLConnection conn = (HttpURLConnection) Urls2.newUrl(url).openConnection();
         conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
         conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
         if (AccountUtils.isAccount(accountName)) {
