@@ -50,11 +50,12 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
       Log.d(TAG, "loadInBackground");
     }
 
+    HttpURLConnection conn = null;
     try {
       CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM,
           Filter.SUBREDDIT_HOT, Urls.TYPE_HTML);
       String cookie = AccountUtils.getCookie(getContext(), accountName);
-      HttpURLConnection conn = RedditApi.connect(url, cookie, false);
+      conn = RedditApi.connect(url, cookie, false);
       if (conn.getResponseCode() == 302) {
         return UriHelper.getSubreddit(
             Uri.parse(conn.getHeaderField("Location")));
@@ -65,6 +66,10 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
       Log.e(TAG, e.getMessage(), e);
     } catch (AuthenticatorException e) {
       Log.e(TAG, e.getMessage(), e);
+    } finally {
+      if (conn != null) {
+        conn.disconnect();
+      }
     }
     return null;
   }
