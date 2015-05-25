@@ -21,6 +21,7 @@ import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
@@ -33,20 +34,23 @@ public class AccountUtils {
         return !TextUtils.isEmpty(accountName);
     }
 
-    public static Account getAccount(Context context, String accountName) {
-        return new Account(accountName, context.getString(R.string.account_type));
+    public static Account getAccount(Context ctx, String accountName) {
+        return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
     }
 
+    // TODO(btmura): remove after OAuth transition
     public static String getCookie(AccountManager manager, Account account)
             throws OperationCanceledException, AuthenticatorException, IOException {
         return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
     }
 
+    // TODO(btmura): remove after OAuth transition
     public static String getCookie(Context context, Account account)
             throws OperationCanceledException, AuthenticatorException, IOException {
         return getCookie(AccountManager.get(context), account);
     }
 
+    // TODO(btmura): remove after OAuth transition
     public static String getCookie(Context context, String accountName)
             throws OperationCanceledException, AuthenticatorException, IOException {
         if (!isAccount(accountName)) {
@@ -57,9 +61,30 @@ public class AccountUtils {
         return getCookie(context, account);
     }
 
+    // TODO(btmura): remove after OAuth transition
     public static String getModhash(AccountManager manager, Account account)
             throws OperationCanceledException, AuthenticatorException, IOException {
         return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+    }
+
+    @Nullable
+    public static String getAccessToken(Context ctx, String accountName) throws AuthenticatorException, OperationCanceledException, IOException {
+        return getAuthToken(ctx, accountName, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN);
+    }
+
+    @Nullable
+    public static String getRefreshToken(Context ctx, String accountName) throws AuthenticatorException, OperationCanceledException, IOException {
+        return getAuthToken(ctx, accountName, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN);
+    }
+
+    @Nullable
+    private static String getAuthToken(Context ctx, String accountName, String authTokenType) throws AuthenticatorException, OperationCanceledException, IOException {
+        if (!isAccount(accountName)) {
+            return null;
+        }
+        Account a = getAccount(ctx, accountName);
+        AccountManager am = AccountManager.get(ctx);
+        return am.blockingGetAuthToken(a, authTokenType, true /* display notification */);
     }
 
     private AccountUtils() {

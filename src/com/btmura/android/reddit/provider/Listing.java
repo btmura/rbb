@@ -16,11 +16,10 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.io.IOException;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
+
+import java.util.List;
 
 /**
  * {@link Listing} is an internal interface to enforce some uniformity on grabbing values to present
@@ -35,7 +34,7 @@ interface Listing {
     String getSessionThingId();
 
     /** Get the values for this listing possibly using the network. */
-    List<ContentValues> getValues() throws IOException;
+    List<ContentValues> getValues() throws Exception;
 
     /** Called after the insertion transaction to perform additional ops. */
     void performExtraWork(Context context);

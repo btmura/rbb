@@ -568,9 +568,6 @@ public class ThingProvider extends BaseProvider {
             throws OperationCanceledException, AuthenticatorException, IOException {
         Context context = getContext();
         String cookie = AccountUtils.getCookie(context, accountName);
-        if (cookie == null && AccountUtils.isAccount(accountName)) {
-            return null;
-        }
 
         int count = extras.getInt(EXTRA_COUNT);
         int filter = extras.getInt(EXTRA_FILTER, -1);
@@ -601,8 +598,7 @@ public class ThingProvider extends BaseProvider {
                         accountName,
                         subreddit,
                         filter,
-                        more,
-                        cookie);
+                        more);
 
             case Sessions.TYPE_USER:
                 return ThingListing.newUserInstance(context,
@@ -610,8 +606,7 @@ public class ThingProvider extends BaseProvider {
                         accountName,
                         user,
                         filter,
-                        more,
-                        cookie);
+                        more);
 
             case Sessions.TYPE_COMMENTS:
                 return CommentListing.newInstance(context,
@@ -630,8 +625,7 @@ public class ThingProvider extends BaseProvider {
                         subreddit,
                         query,
                         filter,
-                        more,
-                        cookie);
+                        more);
 
             case Sessions.TYPE_SUBREDDIT_SEARCH:
                 return SubredditResultListing.newInstance(accountName, query, cookie);
@@ -642,7 +636,7 @@ public class ThingProvider extends BaseProvider {
     }
 
     private Bundle getListingSession(String accountName, Listing listing, Bundle sessionData)
-            throws IOException {
+            throws Exception {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "getListingSession accountName: " + accountName
                     + " sessionData: " + sessionData);

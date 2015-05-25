@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -41,7 +43,9 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
+import com.btmura.android.reddit.net.ApiUrls;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
@@ -177,7 +181,6 @@ class ThingListing extends JsonParser implements Listing {
     private final String profileUser;
     private final int filter;
     private final String more;
-    private final String cookie;
     private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
@@ -192,8 +195,7 @@ class ThingListing extends JsonParser implements Listing {
             String subreddit,
             String query,
             int filter,
-            String more,
-            String cookie) {
+            String more) {
         return new ThingListing(context,
                 dbHelper,
                 Sessions.TYPE_THING_SEARCH,
@@ -202,8 +204,7 @@ class ThingListing extends JsonParser implements Listing {
                 query,
                 null,
                 filter,
-                more,
-                cookie);
+                more);
     }
 
     static ThingListing newSubredditInstance(Context context,
@@ -211,8 +212,7 @@ class ThingListing extends JsonParser implements Listing {
             String accountName,
             String subreddit,
             int filter,
-            String more,
-            String cookie) {
+            String more) {
         return new ThingListing(context,
                 dbHelper,
                 Sessions.TYPE_SUBREDDIT,
@@ -221,8 +221,7 @@ class ThingListing extends JsonParser implements Listing {
                 null,
                 null,
                 filter,
-                more,
-                cookie);
+                more);
     }
 
     static ThingListing newUserInstance(Context context,
@@ -230,8 +229,7 @@ class ThingListing extends JsonParser implements Listing {
             String accountName,
             String profileUser,
             int filter,
-            String more,
-            String cookie) {
+            String more) {
         return new ThingListing(context,
                 dbHelper,
                 Sessions.TYPE_USER,
@@ -240,8 +238,7 @@ class ThingListing extends JsonParser implements Listing {
                 null,
                 profileUser,
                 filter,
-                more,
-                cookie);
+                more);
     }
 
     private ThingListing(Context context,
@@ -252,8 +249,7 @@ class ThingListing extends JsonParser implements Listing {
             String query,
             String profileUser,
             int filter,
-            String more,
-            String cookie) {
+            String more) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.sessionType = sessionType;
@@ -263,7 +259,6 @@ class ThingListing extends JsonParser implements Listing {
         this.profileUser = profileUser;
         this.filter = filter;
         this.more = more;
-        this.cookie = cookie;
     }
 
     @Override
@@ -277,8 +272,8 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     @Override
-    public List<ContentValues> getValues() throws IOException {
-        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, false);
+    public List<ContentValues> getValues() throws IOException, AuthenticatorException, OperationCanceledException {
+        HttpURLConnection conn = RedditApi2.connect(context, accountName, getUrl());
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());
@@ -304,7 +299,7 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(query)) {
             return Urls.search(subreddit, query, filter, more);
         }
-        return Urls.subredditMore(subreddit, filter, more, Urls.TYPE_JSON);
+        return ApiUrls.subreddit(subreddit, filter, more);
     }
 
     @Override
