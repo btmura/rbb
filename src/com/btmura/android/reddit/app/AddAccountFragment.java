@@ -18,7 +18,10 @@ package com.btmura.android.reddit.app;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -30,7 +33,11 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.net.AccessTokenResult;
+import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 
 import java.io.IOException;
 
@@ -118,11 +125,29 @@ public class AddAccountFragment extends Fragment {
 
         Account a = AccountUtils.getAccount(ctx, username);
         AccountManager am = AccountManager.get(ctx);
-        am.addAccountExplicitly(a, null /* password */, null /* userdata */);
-        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN,
-            atr.accessToken);
-        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN,
-            atr.refreshToken);
+        if (!addAccount(am, a, atr)) {
+          // TODO(btmura): show error message
+          return Bundle.EMPTY;
+        }
+
+        if (!AccountProvider.initializeAccount(ctx, username)) {
+          // TODO(btmura): show error message
+          removeAccount(am, a);
+          return Bundle.EMPTY;
+        }
+
+        // Set this account as the last account to make the UI switch to the
+        // new account after the user returns to the app. If somehow we crash
+        // before the account is added, that is ok, because the AccountLoader
+        // will fall back to the app storage account.
+        AccountPrefs.setLastAccount(ctx, username);
+
+//        ContentResolver.setSyncAutomatically(a,
+//            AccountProvider.AUTHORITY, true);
+//        ContentResolver.setSyncAutomatically(a,
+//            SubredditProvider.AUTHORITY, true);
+//        ContentResolver.setSyncAutomatically(a,
+//            ThingProvider.AUTHORITY, true);
 
         Bundle b = new Bundle(2);
         b.putString(AccountManager.KEY_ACCOUNT_NAME, a.name);
@@ -175,6 +200,37 @@ public class AddAccountFragment extends Fragment {
       } catch (UnsupportedOperationException e) {
         Log.e(TAG, "error parsing callback url", e);
         return null;
+      }
+    }
+
+    private boolean addAccount(
+        AccountManager am,
+        Account a,
+        AccessTokenResult atr) {
+      if (am.addAccountExplicitly(a, null /* pw */, null /* userdata */)) {
+        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN,
+            atr.accessToken);
+        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN,
+            atr.refreshToken);
+        return true;
+      }
+      return false;
+    }
+
+    private boolean removeAccount(AccountManager am, Account a) {
+      // TODO(btmura): use new API to remove account when possible
+      // TODO(btmura): removed code duplication with AccountListFragment
+      try {
+        return am.removeAccount(a, null, null).getResult();
+      } catch (OperationCanceledException e) {
+        Log.e(TAG, "error removing account", e);
+        return false;
+      } catch (IOException e) {
+        Log.e(TAG, "error removing account", e);
+        return false;
+      } catch (AuthenticatorException e) {
+        Log.e(TAG, "error removing account", e);
+        return false;
       }
     }
 

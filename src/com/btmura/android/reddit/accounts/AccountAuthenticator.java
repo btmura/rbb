@@ -88,7 +88,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "getAuthToken");
+            Log.d(TAG, "getAuthToken: authTokenType: " + authTokenType);
         }
         return createIntentResult(response, account.name);
     }

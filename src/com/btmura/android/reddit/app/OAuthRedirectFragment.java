@@ -43,6 +43,7 @@ import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.net.LoginResult;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -151,14 +152,14 @@ public class OAuthRedirectFragment extends Fragment implements OnClickListener {
             return;
         }
         if (username.getError() == null && listener != null) {
+            // TODO(btmura): check for existing account
             forwardToBrowserLogin(username.getText());
         }
     }
 
     private void forwardToBrowserLogin(CharSequence username) {
-        String clientId = getString(R.string.key_reddit_client_id);
         StringBuilder state = new StringBuilder("rbb_").append(username);
-        CharSequence url = Urls.authorize(clientId, state, Urls.OAUTH_REDIRECT_URL);
+        CharSequence url = Urls2.authorize(getActivity(), state);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url.toString()));
@@ -197,9 +198,9 @@ public class OAuthRedirectFragment extends Fragment implements OnClickListener {
                 // data will just sit there in the db. If there is an existing
                 // account, then they will still see their subreddits but any
                 // pending actions will be erased...
-                if (!AccountProvider.initializeAccount(context, login, result.cookie)) {
-                    return errorBundle(R.string.login_importing_error);
-                }
+//                if (!AccountProvider.initializeAccount(context, login, result.cookie)) {
+//                    return errorBundle(R.string.login_importing_error);
+//                }
 
                 // Set this account as the last account to make the UI switch to
                 // the new account after the user returns to the app. If somehow

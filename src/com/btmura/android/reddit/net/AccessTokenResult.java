@@ -84,7 +84,7 @@ public class AccessTokenResult extends JsonParser {
         sb.append("grant_type=authorization_code&code=")
             .append(code)
             .append("&redirect_uri=")
-            .append(Urls.OAUTH_REDIRECT_URL);
+            .append(Urls2.OAUTH_REDIRECT_URL);
       } else {
         sb.append("grant_type=refresh_token&refresh_token=")
             .append(refreshToken);

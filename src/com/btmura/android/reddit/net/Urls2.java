@@ -16,9 +16,11 @@
 
 package com.btmura.android.reddit.net;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
@@ -31,14 +33,37 @@ import java.net.URLEncoder;
 
 public class Urls2 {
 
+  public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
+
   public static final int TYPE_HTML = 0;
   public static final int TYPE_JSON = 1;
 
   private static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";
 
+  private static final String AUTHORIZE_PATH = "/api/v1/authorize";
   private static final String COMMENTS_PATH = "/comments/";
+  private static final String MY_SUBREDDITS_PATH =
+      "/subreddits/mine/subscriber";
 
+  public static CharSequence authorize(Context ctx, CharSequence state) {
+    String clientId = ctx.getString(R.string.key_reddit_client_id);
+    return new StringBuilder(BASE_URL)
+        .append(AUTHORIZE_PATH)
+        .append("?client_id=").append(clientId)
+        .append("&response_type=code&state=").append(state)
+        .append("&redirect_uri=").append(OAUTH_REDIRECT_URL)
+        .append("&duration=permanent&scope=")
+        .append(encode("mysubreddits,read"));
+  }
+
+  public static CharSequence mySubreddits() {
+    return new StringBuilder(BASE_OAUTH_URL)
+        .append(MY_SUBREDDITS_PATH)
+        .append("?limit=").append(100);
+  }
+
+  // TODO(btmura): rename to subredditThings
   public static CharSequence subreddit(
       String accountName,
       String subreddit,

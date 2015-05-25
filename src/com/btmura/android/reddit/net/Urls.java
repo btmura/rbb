@@ -34,14 +34,11 @@ public class Urls {
     /** Type for getting a JSON response. */
     public static final int TYPE_JSON = 1;
 
-    public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
-
     public static final String BASE_URL = "https://www.reddit.com";
     private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
-    public static final String API_ACCESS_TOKEN_URL = BASE_URL + "/api/v1/access_token";
+    public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
 
-    private static final String API_AUTHORIZE_URL = BASE_URL + "/api/v1/authorize";
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
     private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
@@ -50,7 +47,6 @@ public class Urls {
     private static final String API_INFO_URL = BASE_URL + "/api/info";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_ME_URL = BASE_URL + "/api/me";
-    private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
     private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
     private static final String API_SAVE_URL = BASE_URL + "/api/save";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
@@ -65,7 +61,6 @@ public class Urls {
     private static final String BASE_MESSAGE_THREAD_URL = BASE_URL + "/message/messages/";
     private static final String BASE_SEARCH_QUERY = "/search.json?q=";
     private static final String BASE_SEARCH_URL = BASE_URL + BASE_SEARCH_QUERY;
-    private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
     private static final String BASE_USER_HTML_URL = BASE_URL + "/u/";
@@ -77,16 +72,6 @@ public class Urls {
 
     public static CharSequence aboutUser(String user) {
         return new StringBuilder(BASE_USER_JSON_URL).append(user).append("/about.json");
-    }
-
-    public static CharSequence authorize(CharSequence clientId,
-                                         CharSequence state,
-                                         CharSequence redirectUri) {
-        return new StringBuilder(API_AUTHORIZE_URL)
-                .append("?client_id=").append(clientId)
-                .append("&response_type=code&state=").append(state)
-                .append("&redirect_uri=").append(redirectUri)
-                .append("&duration=permanent&scope=read");
     }
 
     public static CharSequence captcha(String id) {
@@ -220,14 +205,6 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence newCaptcha() {
-        return API_NEW_CAPTCHA_URL;
-    }
-
-    public static CharSequence newCaptchaQuery() {
-        return "api_type=json";
-    }
-
     public static CharSequence readMessage() {
         return API_READ_MESSAGE;
     }
@@ -357,14 +334,6 @@ public class Urls {
 
         if (more != null) {
             b.append("?count=25&after=").append(encode(more));
-        }
-        return b;
-    }
-
-    public static CharSequence subredditList(int limit) {
-        StringBuilder b = new StringBuilder(BASE_SUBREDDIT_LIST_URL);
-        if (limit != -1) {
-            b.append("?limit=").append(limit);
         }
         return b;
     }

@@ -42,6 +42,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -83,14 +84,15 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
         // Extra method just allows us to always print out sync stats after.
-        doSync(account, extras, authority, provider, syncResult);
+        doSync(account, provider, syncResult);
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
     }
 
-    private void doSync(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult) {
+    private void doSync(Account account,
+                        ContentProviderClient provider,
+                        SyncResult syncResult) {
         try {
             // Get cookie and modhash needed to subscribe to subreddits.
             AccountManager manager = AccountManager.get(getContext());
@@ -106,7 +108,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             // Get subreddits from reddit. These could be a bit stale.
-            ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
+            ArrayList<String> subreddits =
+                RedditApi2.getMySubreddits(getContext(), account.name);
 
             // Get database operations required to sync with the server.
             ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();

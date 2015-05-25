@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -104,10 +103,6 @@ public class RedditApi {
         return getBitmap(Urls.captcha(id));
     }
 
-    public static Result newCaptcha() throws IOException {
-        return postData(Urls.newCaptcha(), Urls.newCaptchaQuery(), null);
-    }
-
     public static ThingBundle getInfo(Context context, String thingId, String cookie,
             MarkdownFormatter formatter) throws IOException {
         HttpURLConnection conn = null;
@@ -131,21 +126,6 @@ public class RedditApi {
             conn = connect(Urls.sidebar(subreddit), cookie, false);
             in = new BufferedInputStream(conn.getInputStream());
             return SidebarResult.fromJsonReader(context, new JsonReader(new InputStreamReader(in)));
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    public static ArrayList<String> getSubreddits(String cookie) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.subredditList(1000), cookie, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            JsonReader reader = new JsonReader(new InputStreamReader(in));
-            SubredditParser parser = new SubredditParser();
-            parser.parseListingObject(reader);
-            return parser.results;
         } finally {
             close(in, conn);
         }

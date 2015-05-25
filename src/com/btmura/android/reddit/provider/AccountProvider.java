@@ -19,6 +19,8 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -42,7 +44,7 @@ import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.util.Array;
 
 public class AccountProvider extends BaseProvider {
@@ -69,9 +71,6 @@ public class AccountProvider extends BaseProvider {
     private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
     private static final String METHOD_MARK_MESSAGES_READ = "markMessagesRead";
 
-    /** String extra containing the cookie for an account. */
-    private static final String EXTRA_COOKIE = "cookie";
-
     public AccountProvider() {
         super(TAG);
     }
@@ -91,10 +90,8 @@ public class AccountProvider extends BaseProvider {
     }
 
     /** Return true if account was initialized successfully with subreddits. */
-    public static boolean initializeAccount(Context context, String accountName, String cookie) {
-        Bundle args = new Bundle(1);
-        args.putString(EXTRA_COOKIE, cookie);
-        return Provider.call(context, ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT, accountName, args)
+    public static boolean initializeAccount(Context context, String accountName) {
+        return Provider.call(context, ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT, accountName, null)
                 != null;
     }
 
@@ -107,7 +104,7 @@ public class AccountProvider extends BaseProvider {
     @Override
     public Bundle call(String method, String accountName, Bundle extras) {
         if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
-            return initializeAccount(accountName, extras);
+            return initializeAccount(accountName);
         } else if (METHOD_MARK_MESSAGES_READ.equals(method)) {
             return markMessagesRead(accountName);
         }
@@ -122,12 +119,17 @@ public class AccountProvider extends BaseProvider {
      * somebody with access to the database must do this job to assure everything is done in a
      * single transaction.
      */
-    private Bundle initializeAccount(String accountName, Bundle extras) {
-        String cookie = extras.getString(EXTRA_COOKIE);
+    private Bundle initializeAccount(String accountName) {
         ArrayList<String> subreddits;
         try {
-            subreddits = RedditApi.getSubreddits(cookie);
+            subreddits = RedditApi2.getMySubreddits(getContext(), accountName);
         } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
+        } catch (OperationCanceledException e) {
             Log.e(TAG, e.getMessage(), e);
             return null;
         }

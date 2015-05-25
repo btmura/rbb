@@ -19,13 +19,18 @@ package com.btmura.android.reddit.net;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
+import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 
 // TODO(btmura): remove RedditApi and replace with this class
 public class RedditApi2 {
@@ -42,6 +47,7 @@ public class RedditApi2 {
       throws IOException, AuthenticatorException, OperationCanceledException {
     HttpURLConnection conn = innerConnect(ctx, accountName, url);
 
+    // TODO(btmura): check whether error is scope problem or not
     if (AccountUtils.isAccount(accountName)
         && conn.getResponseCode() == HTTP_UNAUTHORIZED) {
       conn.disconnect();
@@ -58,7 +64,6 @@ public class RedditApi2 {
 
     return conn;
   }
-
 
   private static HttpURLConnection innerConnect(
       Context ctx,
@@ -77,9 +82,39 @@ public class RedditApi2 {
     }
     conn.connect();
     if (DEBUG) {
-      Log.d(TAG, "response code: " + conn.getResponseCode());
+      Log.d(TAG, "url: " + url + " response code: " + conn.getResponseCode());
     }
     return conn;
+  }
+
+  public static ArrayList<String> getMySubreddits(
+      Context ctx,
+      String accountName)
+      throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      conn = connect(ctx, accountName, Urls2.mySubreddits());
+      in = new BufferedInputStream(conn.getInputStream());
+      JsonReader r = new JsonReader(new InputStreamReader(in));
+      SubredditParser p = new SubredditParser();
+      p.parseListingObject(r);
+      return p.results;
+    } finally {
+      close(in, conn);
+    }
+  }
+
+  private static void close(InputStream in, HttpURLConnection conn) throws IOException {
+    if (in != null) {
+      in.close();
+    }
+    if (conn != null) {
+      conn.disconnect();
+    }
   }
 
   private RedditApi2() {
