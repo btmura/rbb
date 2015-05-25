@@ -25,51 +25,54 @@ import java.net.URLEncoder;
 /** Static methods that create Reddit API URLs. */
 public class ApiUrls {
 
-    private static final String BASE_URL = "https://oauth.reddit.com";
+  private static final String BASE_URL = "https://oauth.reddit.com";
 
-    public static CharSequence subreddit(String subreddit, int filter, String more) {
-        StringBuilder b = new StringBuilder(BASE_URL);
+  public static CharSequence subreddit(
+      String subreddit,
+      int filter,
+      String more) {
+    StringBuilder b = new StringBuilder(BASE_URL);
 
-        if (!Subreddits.isFrontPage(subreddit)) {
-            b.append("/r/").append(encode(subreddit));
-        }
-
-        if (!Subreddits.isRandom(subreddit)) {
-            switch (filter) {
-                case Filter.SUBREDDIT_CONTROVERSIAL:
-                    b.append("/controversial");
-                    break;
-
-                case Filter.SUBREDDIT_HOT:
-                    b.append("/hot");
-                    break;
-
-                case Filter.SUBREDDIT_NEW:
-                    b.append("/new");
-                    break;
-
-                case Filter.SUBREDDIT_RISING:
-                    b.append("/rising");
-                    break;
-
-                case Filter.SUBREDDIT_TOP:
-                    b.append("/top");
-                    break;
-            }
-        }
-
-        if (more != null) {
-            b.append("?count=25&after=").append(encode(more));
-        }
-
-        return b;
+    if (!Subreddits.isFrontPage(subreddit)) {
+      b.append("/r/").append(encode(subreddit));
     }
 
-    public static String encode(String param) {
-        try {
-            return URLEncoder.encode(param, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+    if (!Subreddits.isRandom(subreddit)) {
+      switch (filter) {
+        case Filter.SUBREDDIT_CONTROVERSIAL:
+          b.append("/controversial");
+          break;
+
+        case Filter.SUBREDDIT_HOT:
+          b.append("/hot");
+          break;
+
+        case Filter.SUBREDDIT_NEW:
+          b.append("/new");
+          break;
+
+        case Filter.SUBREDDIT_RISING:
+          b.append("/rising");
+          break;
+
+        case Filter.SUBREDDIT_TOP:
+          b.append("/top");
+          break;
+      }
     }
+
+    if (more != null) {
+      b.append("?count=25&after=").append(encode(more));
+    }
+
+    return b;
+  }
+
+  public static String encode(String param) {
+    try {
+      return URLEncoder.encode(param, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
