@@ -60,7 +60,7 @@ public class Urls2 {
   public static CharSequence mySubreddits() {
     return new StringBuilder(BASE_OAUTH_URL)
         .append(MY_SUBREDDITS_PATH)
-        .append("?limit=").append(100);
+        .append("?limit=").append(1000);
   }
 
   // TODO(btmura): rename to subredditThings
