@@ -41,7 +41,7 @@ public class Urls2 {
   private static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";
 
-  private static final String AUTHORIZE_PATH = "/api/v1/authorize";
+  private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
   private static final String MY_SUBREDDITS_PATH =
       "/subreddits/mine/subscriber";
