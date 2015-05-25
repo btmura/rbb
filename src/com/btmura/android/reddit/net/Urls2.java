@@ -23,8 +23,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-/** Static methods that create Reddit API URLs. */
-public class ApiUrls {
+public class Urls2 {
 
   private static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";

@@ -43,8 +43,7 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
-import com.btmura.android.reddit.net.ApiUrls;
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.MarkdownFormatter;
@@ -299,7 +298,7 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(query)) {
             return Urls.search(subreddit, query, filter, more);
         }
-        return ApiUrls.subreddit(accountName, subreddit, filter, more);
+        return Urls2.subreddit(accountName, subreddit, filter, more);
     }
 
     @Override
