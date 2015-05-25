@@ -354,60 +354,6 @@ public class Urls {
         return thingQuery(thingId, modhash);
     }
 
-    public static CharSequence user(String user, int filter, String more, int apiType) {
-        StringBuilder b;
-        switch (apiType) {
-            case TYPE_HTML:
-                b = new StringBuilder(BASE_USER_HTML_URL);
-                break;
-
-            case TYPE_JSON:
-                b = new StringBuilder(BASE_USER_JSON_URL);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-        b.append(encode(user));
-
-        switch (filter) {
-            case Filter.PROFILE_OVERVIEW:
-                b.append("/overview");
-                break;
-
-            case Filter.PROFILE_COMMENTS:
-                b.append("/comments");
-                break;
-
-            case Filter.PROFILE_SUBMITTED:
-                b.append("/submitted");
-                break;
-
-            case Filter.PROFILE_LIKED:
-                b.append("/liked");
-                break;
-
-            case Filter.PROFILE_DISLIKED:
-                b.append("/disliked");
-                break;
-
-            case Filter.PROFILE_HIDDEN:
-                b.append("/hidden");
-                break;
-
-            case Filter.PROFILE_SAVED:
-                b.append("/saved");
-                break;
-        }
-        if (apiType == TYPE_JSON) {
-            b.append("/.json");
-        }
-        if (more != null) {
-            b.append("?count=25&after=").append(encode(more));
-        }
-        return b;
-    }
-
     public static CharSequence vote() {
         return API_VOTE_URL;
     }

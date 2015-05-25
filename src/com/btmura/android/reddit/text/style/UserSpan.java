@@ -25,20 +25,22 @@ import android.view.View;
 import com.btmura.android.reddit.app.UserProfileActivity;
 import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 
 public class UserSpan extends ClickableSpan {
 
-    public final String user;
+  public final String user;
 
-    public UserSpan(String user) {
-        this.user = user;
-    }
+  public UserSpan(String user) {
+    this.user = user;
+  }
 
-    @Override
-    public void onClick(View widget) {
-        Context context = widget.getContext();
-        Intent intent = new Intent(context, UserProfileActivity.class);
-        intent.setData(Uri.parse(Urls.user(user, -1, null, Urls.TYPE_HTML).toString()));
-        Contexts.startActivity(context, intent);
-    }
+  @Override
+  public void onClick(View widget) {
+    Context context = widget.getContext();
+    Intent intent = new Intent(context, UserProfileActivity.class);
+    intent.setData(Uri.parse(Urls2.user("", user, -1, null, Urls.TYPE_HTML)
+        .toString()));
+    Contexts.startActivity(context, intent);
+  }
 }

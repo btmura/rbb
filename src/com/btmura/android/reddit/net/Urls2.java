@@ -45,6 +45,8 @@ public class Urls2 {
   private static final String COMMENTS_PATH = "/comments/";
   private static final String MY_SUBREDDITS_PATH =
       "/subreddits/mine/subscriber";
+  private static final String USER_HTML_PATH = "/u/";
+  private static final String USER_JSON_PATH = "/user/";
 
   public static CharSequence authorize(Context ctx, CharSequence state) {
     String clientId = ctx.getString(R.string.key_reddit_client_id);
@@ -54,7 +56,7 @@ public class Urls2 {
         .append("&response_type=code&state=").append(state)
         .append("&redirect_uri=").append(OAUTH_REDIRECT_URL)
         .append("&duration=permanent&scope=")
-        .append(encode("mysubreddits,read"));
+        .append(encode("history,mysubreddits,read"));
   }
 
   public static CharSequence mySubreddits() {
@@ -169,6 +171,65 @@ public class Urls2 {
     }
     if (hasLimit) {
       sb.append("&limit=").append(numComments);
+    }
+    return sb;
+  }
+
+  public static CharSequence user(
+      String accountName,
+      String user,
+      int filter,
+      String more,
+      int apiType) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
+    switch (apiType) {
+      case TYPE_HTML:
+        sb.append(USER_HTML_PATH);
+        break;
+
+      case TYPE_JSON:
+        sb.append(USER_JSON_PATH);
+        break;
+
+      default:
+        throw new IllegalArgumentException();
+    }
+    sb.append(encode(user));
+
+    switch (filter) {
+      case Filter.PROFILE_OVERVIEW:
+        sb.append("/overview");
+        break;
+
+      case Filter.PROFILE_COMMENTS:
+        sb.append("/comments");
+        break;
+
+      case Filter.PROFILE_SUBMITTED:
+        sb.append("/submitted");
+        break;
+
+      case Filter.PROFILE_LIKED:
+        sb.append("/liked");
+        break;
+
+      case Filter.PROFILE_DISLIKED:
+        sb.append("/disliked");
+        break;
+
+      case Filter.PROFILE_HIDDEN:
+        sb.append("/hidden");
+        break;
+
+      case Filter.PROFILE_SAVED:
+        sb.append("/saved");
+        break;
+    }
+    if (needsJsonExtension(accountName, apiType)) {
+      sb.append("/.json");
+    }
+    if (more != null) {
+      sb.append("?count=25&after=").append(encode(more));
     }
     return sb;
   }
