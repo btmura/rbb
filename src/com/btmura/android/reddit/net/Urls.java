@@ -24,8 +24,6 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 
 public class Urls {
@@ -63,7 +61,6 @@ public class Urls {
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-    private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_MESSAGE_URL = BASE_URL + "/message/";
     private static final String BASE_MESSAGE_THREAD_URL = BASE_URL + "/message/messages/";
     private static final String BASE_SEARCH_QUERY = "/search.json?q=";
@@ -118,60 +115,6 @@ public class Urls {
                 .append("&text=").append(encode(text))
                 .append("&uh=").append(encode(modhash))
                 .append("&api_type=json");
-    }
-
-    public static CharSequence commentListing(String id,
-                                              String linkId,
-                                              int filter,
-                                              int numComments,
-                                              int apiType) {
-        boolean hasLinkId = !TextUtils.isEmpty(linkId);
-        boolean hasLimit = numComments != -1;
-        id = ThingIds.removeTag(id);
-        StringBuilder b = new StringBuilder(BASE_COMMENTS_URL);
-        b.append(hasLinkId ? ThingIds.removeTag(linkId) : id);
-        if (apiType == TYPE_JSON) {
-            b.append(".json");
-        }
-        if (hasLinkId || hasLimit || filter != -1) {
-            b.append("?");
-        }
-        if (hasLinkId) {
-            b.append("&comment=").append(id).append("&context=3");
-        } else if (filter != -1) {
-            switch (filter) {
-                case Filter.COMMENTS_BEST:
-                    b.append("&sort=confidence");
-                    break;
-
-                case Filter.COMMENTS_CONTROVERSIAL:
-                    b.append("&sort=controversial");
-                    break;
-
-                case Filter.COMMENTS_HOT:
-                    b.append("&sort=hot");
-                    break;
-
-                case Filter.COMMENTS_NEW:
-                    b.append("&sort=new");
-                    break;
-
-                case Filter.COMMENTS_OLD:
-                    b.append("&sort=old");
-                    break;
-
-                case Filter.COMMENTS_TOP:
-                    b.append("&sort=top");
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        if (hasLimit) {
-            b.append("&limit=").append(numComments);
-        }
-        return b;
     }
 
     public static CharSequence compose() {

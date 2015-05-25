@@ -615,8 +615,7 @@ public class ThingProvider extends BaseProvider {
                         thingId,
                         linkId,
                         filter,
-                        count,
-                        cookie);
+                        count);
 
             case Sessions.TYPE_THING_SEARCH:
                 return ThingListing.newSearchInstance(context,

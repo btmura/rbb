@@ -17,10 +17,12 @@
 package com.btmura.android.reddit.net;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.ThingIds;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -35,19 +37,15 @@ public class Urls2 {
   private static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";
 
+  private static final String COMMENTS_PATH = "/comments/";
+
   public static CharSequence subreddit(
       String accountName,
       String subreddit,
       int filter,
       @Nullable String more,
       int apiType) {
-    StringBuilder sb = new StringBuilder();
-
-    if (!AccountUtils.isAccount(accountName)) {
-      sb.append(BASE_URL);
-    } else {
-      sb.append(BASE_OAUTH_URL);
-    }
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
     if (!Subreddits.isFrontPage(subreddit)) {
       sb.append("/r/").append(encode(subreddit));
@@ -77,7 +75,7 @@ public class Urls2 {
       }
     }
 
-    if (!AccountUtils.isAccount(accountName) && apiType == TYPE_JSON) {
+    if (needsJsonExtension(accountName, apiType)) {
       sb.append(".json");
     }
 
@@ -86,6 +84,80 @@ public class Urls2 {
     }
 
     return sb;
+  }
+
+  public static CharSequence comments(
+      String accountName,
+      String thingId,
+      String linkId,
+      int filter,
+      int numComments,
+      int apiType) {
+    thingId = ThingIds.removeTag(thingId);
+
+    boolean hasLinkId = !TextUtils.isEmpty(linkId);
+    boolean hasLimit = numComments != -1;
+
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(COMMENTS_PATH)
+        .append(hasLinkId ? ThingIds.removeTag(linkId) : thingId);
+
+    if (needsJsonExtension(accountName, apiType)) {
+      sb.append(".json");
+    }
+
+    if (hasLinkId || hasLimit || filter != -1) {
+      sb.append("?");
+    }
+
+    if (hasLinkId) {
+      sb.append("&comment=").append(thingId).append("&context=3");
+    } else if (filter != -1) {
+      switch (filter) {
+        case Filter.COMMENTS_BEST:
+          sb.append("&sort=confidence");
+          break;
+
+        case Filter.COMMENTS_CONTROVERSIAL:
+          sb.append("&sort=controversial");
+          break;
+
+        case Filter.COMMENTS_HOT:
+          sb.append("&sort=hot");
+          break;
+
+        case Filter.COMMENTS_NEW:
+          sb.append("&sort=new");
+          break;
+
+        case Filter.COMMENTS_OLD:
+          sb.append("&sort=old");
+          break;
+
+        case Filter.COMMENTS_TOP:
+          sb.append("&sort=top");
+          break;
+
+        default:
+          break;
+      }
+    }
+    if (hasLimit) {
+      sb.append("&limit=").append(numComments);
+    }
+    return sb;
+  }
+
+  private static String getBaseUrl(String accountName) {
+    return isOAuth(accountName) ? BASE_OAUTH_URL : BASE_URL;
+  }
+
+  private static boolean needsJsonExtension(String accountName, int apiType) {
+    return !isOAuth(accountName) && apiType == TYPE_JSON;
+  }
+
+  private static boolean isOAuth(String accountName) {
+    return AccountUtils.isAccount(accountName);
   }
 
   public static URL newUrl(CharSequence url) {

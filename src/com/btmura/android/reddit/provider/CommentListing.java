@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -41,7 +43,9 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
@@ -71,7 +75,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final String linkId;
     private final int filter;
     private final int numComments;
-    private final String cookie;
     private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     // TODO: Pass estimate of size to CommentListing rather than doing this.
@@ -86,16 +89,14 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String thingId,
             String linkId,
             int filter,
-            int numComments,
-            String cookie) {
+            int numComments) {
         return new CommentListing(context,
                 dbHelper,
                 accountName,
                 thingId,
                 linkId,
                 filter,
-                numComments,
-                cookie);
+                numComments);
     }
 
     private CommentListing(Context context,
@@ -104,8 +105,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String thingId,
             String linkId,
             int filter,
-            int numComments,
-            String cookie) {
+            int numComments) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
@@ -113,7 +113,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.linkId = linkId;
         this.filter = filter;
         this.numComments = numComments;
-        this.cookie = cookie;
     }
 
     @Override
@@ -127,13 +126,18 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     @Override
-    public ArrayList<ContentValues> getValues() throws IOException {
-        CharSequence url = Urls.commentListing(thingId,
-                linkId,
-                filter,
-                numComments,
-                Urls.TYPE_JSON);
-        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
+    public ArrayList<ContentValues> getValues() throws
+        IOException,
+        AuthenticatorException,
+        OperationCanceledException {
+        CharSequence url = Urls2.comments(
+            accountName,
+            thingId,
+            linkId,
+            filter,
+            numComments,
+            Urls2.TYPE_JSON);
+        HttpURLConnection conn = RedditApi2.connect(context, accountName, url);
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());
