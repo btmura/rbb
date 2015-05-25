@@ -28,10 +28,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.net.AccessTokenResult;
-import com.btmura.android.reddit.net.Urls;
 
 import java.io.IOException;
 
@@ -108,7 +106,7 @@ public class AddAccountFragment extends Fragment {
                     return Bundle.EMPTY;
                 }
 
-                AccessTokenResult atr = getAccessTokenResult(code);
+                AccessTokenResult atr = getAccessTokenResult(ctx, code);
                 if (DEBUG) {
                     Log.d(TAG, "atr: " + atr);
                 }
@@ -158,9 +156,9 @@ public class AddAccountFragment extends Fragment {
             return !TextUtils.isEmpty(code);
         }
 
-        private AccessTokenResult getAccessTokenResult(String code) throws IOException {
-            CharSequence clientId = getString(R.string.key_reddit_client_id);
-            return AccessTokenResult.getAccessToken(clientId, code, Urls.OAUTH_REDIRECT_URL);
+        private AccessTokenResult getAccessTokenResult(Context ctx, String code)
+                throws IOException {
+            return AccessTokenResult.getAccessToken(ctx, code);
         }
 
         private boolean isValidAccessTokenResult(AccessTokenResult atr) {

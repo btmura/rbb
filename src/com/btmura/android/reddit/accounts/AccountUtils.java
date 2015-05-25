@@ -87,6 +87,13 @@ public class AccountUtils {
         return am.blockingGetAuthToken(a, authTokenType, true /* display notification */);
     }
 
+    public static void setAccessToken(Context ctx, String accountName, String accessToken) {
+        // TODO(btmura): check accountName is not empty
+        Account a = getAccount(ctx, accountName);
+        AccountManager am = AccountManager.get(ctx);
+        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN, accessToken);
+    }
+
     private AccountUtils() {
     }
 }

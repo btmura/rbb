@@ -19,7 +19,9 @@ package com.btmura.android.reddit.net;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
+import android.util.Log;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 
 import java.io.IOException;
@@ -28,7 +30,40 @@ import java.net.HttpURLConnection;
 // TODO(btmura): remove RedditApi and replace with this class
 public class RedditApi2 {
 
-    public static HttpURLConnection connect(Context ctx, String accountName, CharSequence url) throws IOException, AuthenticatorException, OperationCanceledException {
+    private static final String TAG = "RedditApi2";
+    private static final boolean DEBUG = BuildConfig.DEBUG;
+
+    private static final int HTTP_UNAUTHORIZED = 401;
+
+    public static HttpURLConnection connect(
+            Context ctx,
+            String accountName,
+            CharSequence url)
+            throws IOException, AuthenticatorException, OperationCanceledException {
+        HttpURLConnection conn = innerConnect(ctx, accountName, url);
+
+        if (AccountUtils.isAccount(accountName) && conn.getResponseCode() == HTTP_UNAUTHORIZED) {
+            conn.disconnect();
+
+            // TODO(btmura): put refresh token code in separate method
+            String rt = AccountUtils.getRefreshToken(ctx, accountName);
+            // TODO(btmura): handle empty refresh token
+            AccessTokenResult atr = AccessTokenResult.refreshAccessToken(ctx, rt);
+            // TODO(btmura): validate access token result
+            AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
+
+            conn = innerConnect(ctx, accountName, url);
+        }
+
+        return conn;
+    }
+
+
+    private static HttpURLConnection innerConnect(
+            Context ctx,
+            String accountName,
+            CharSequence url)
+            throws IOException, AuthenticatorException, OperationCanceledException {
         HttpURLConnection conn = (HttpURLConnection) Urls.newUrl(url).openConnection();
         conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
         conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
@@ -38,8 +73,12 @@ public class RedditApi2 {
             conn.setRequestProperty("Authorization", "bearer " + at);
         }
         conn.connect();
+        if (DEBUG) {
+            Log.d(TAG, "response code: " + conn.getResponseCode());
+        }
         return conn;
     }
+
 
     private RedditApi2() {
     }
