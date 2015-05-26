@@ -148,18 +148,6 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence login(String userName) {
-        return new StringBuilder(API_LOGIN_URL).append(encode(userName));
-    }
-
-    public static CharSequence loginQuery(String userName, String password) {
-        StringBuilder b = new StringBuilder();
-        b.append("user=").append(encode(userName));
-        b.append("&passwd=").append(encode(password));
-        b.append("&api_type=json");
-        return b;
-    }
-
     public static CharSequence readMessage() {
         return API_READ_MESSAGE;
     }

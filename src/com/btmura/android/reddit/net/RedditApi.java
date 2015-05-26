@@ -27,8 +27,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Scanner;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,7 +35,6 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 
@@ -134,24 +131,6 @@ public class RedditApi {
     public static Result hide(String thingId, boolean hide, String cookie, String modhash)
             throws IOException {
         return postData(Urls.hide(hide), Urls.hideQuery(thingId, modhash), cookie);
-    }
-
-    public static LoginResult login(String login, String password) throws IOException {
-        HttpsURLConnection conn = null;
-        InputStream in = null;
-        try {
-            CharSequence url = Urls.login(login);
-            conn = (HttpsURLConnection) Urls2.newUrl(url).openConnection();
-            setCommonHeaders(conn, null);
-            setFormDataHeaders(conn);
-            conn.connect();
-
-            writeFormData(conn, Urls.loginQuery(login, password));
-            in = new BufferedInputStream(conn.getInputStream());
-            return LoginResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
-        } finally {
-            close(in, conn);
-        }
     }
 
     public static Result readMessage(String thingId, boolean read, String cookie, String modhash)

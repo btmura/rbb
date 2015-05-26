@@ -21,7 +21,6 @@ import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,13 +30,12 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.net.AccessTokenResult;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.ThingProvider;
 
 import java.io.IOException;
 
@@ -87,6 +85,12 @@ public class AddAccountFragment extends Fragment {
   class AddAccountTask extends AsyncTask<Void, Integer, Bundle> {
 
     private final Context ctx = getActivity().getApplicationContext();
+
+    @Override
+    protected void onPreExecute() {
+      // TODO(btmura): show progress indicator
+      // showProgress();
+    }
 
     @Override
     protected Bundle doInBackground(Void... params) {
@@ -156,8 +160,8 @@ public class AddAccountFragment extends Fragment {
       } catch (IOException e) {
         // TODO(btmura): show error message to user
         Log.e(TAG, "error getting access token", e);
+        return errorBundle(R.string.login_error, e.getMessage());
       }
-      return Bundle.EMPTY;
     }
 
     private Uri getOAuthCallbackUri() {
@@ -234,11 +238,28 @@ public class AddAccountFragment extends Fragment {
       }
     }
 
+    private Bundle errorBundle(int resId, String... formatArgs) {
+      Bundle b = new Bundle(1);
+      b.putString(AccountManager.KEY_ERROR_MESSAGE,
+          getString(resId, (Object[]) formatArgs));
+      return b;
+    }
+
     @Override
-    protected void onPostExecute(Bundle bundle) {
-      task = null;
-      if (bundle != Bundle.EMPTY && listener != null) {
-        listener.onAccountAdded(bundle);
+    protected void onCancelled() {
+      // TODO(btmura): hide progress indicator
+      // hideProgress();
+    }
+
+    @Override
+    protected void onPostExecute(Bundle result) {
+      String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
+      if (error != null) {
+        MessageDialogFragment.showMessage(getFragmentManager(), error);
+        // TODO(btmura): hide progress indicator
+        // hideProgress();
+      } else if (listener != null) {
+        listener.onAccountAdded(result);
       }
     }
   }
