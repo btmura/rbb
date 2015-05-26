@@ -40,6 +40,7 @@ import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -119,7 +120,8 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
                     switch (c.getInt(ACTION)) {
                         case AccountActions.ACTION_MARK_MESSAGES_READ:
                             if (!markRead) {
-                                RedditApi.markMessagesRead(cookie);
+                                RedditApi2.markMessagesRead(getContext(),
+                                    account.name);
                                 markRead = true;
                             }
                             int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,

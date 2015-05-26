@@ -57,13 +57,10 @@ public class Urls {
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-    private static final String BASE_MESSAGE_URL = BASE_URL + "/message/";
-    private static final String BASE_MESSAGE_THREAD_URL = BASE_URL + "/message/messages/";
     private static final String BASE_SEARCH_QUERY = "/search.json?q=";
     private static final String BASE_SEARCH_URL = BASE_URL + BASE_SEARCH_QUERY;
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
-    private static final String BASE_USER_HTML_URL = BASE_URL + "/u/";
     private static final String BASE_USER_JSON_URL = BASE_URL + "/user/";
 
     public static CharSequence aboutMe() {
@@ -160,48 +157,6 @@ public class Urls {
         b.append("user=").append(encode(userName));
         b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
-        return b;
-    }
-
-    public static CharSequence messageThread(String thingId, int apiType) {
-        StringBuilder b = new StringBuilder(BASE_MESSAGE_THREAD_URL);
-        b.append(ThingIds.removeTag(thingId));
-        if (apiType == TYPE_JSON) {
-            b.append(".json");
-        }
-        return b;
-    }
-
-    public static CharSequence message(int filter, String more, boolean mark, int apiType) {
-        StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
-        switch (filter) {
-            case Filter.MESSAGE_INBOX:
-                b.append("inbox");
-                break;
-
-            case Filter.MESSAGE_UNREAD:
-                b.append("unread");
-                break;
-
-            case Filter.MESSAGE_SENT:
-                b.append("sent");
-                break;
-
-            default:
-                throw new IllegalArgumentException(Integer.toString(filter));
-        }
-        if (apiType == TYPE_JSON) {
-            b.append("/.json");
-        }
-        if (more != null || mark) {
-            b.append("?");
-        }
-        if (more != null) {
-            b.append("&count=25&after=").append(encode(more));
-        }
-        if (mark) {
-            b.append("&mark=true");
-        }
         return b;
     }
 

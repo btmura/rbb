@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.Filter;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 
 // TODO(btmura): remove RedditApi and replace with this class
 public class RedditApi2 {
+
+  // TODO(btmura): add RedditApiException type
 
   private static final String TAG = "RedditApi2";
   private static final boolean DEBUG = BuildConfig.DEBUG;
@@ -108,7 +111,25 @@ public class RedditApi2 {
     }
   }
 
-  private static void close(InputStream in, HttpURLConnection conn) throws IOException {
+  public static void markMessagesRead(Context ctx, String accountName) throws
+      IOException,
+      AuthenticatorException,
+      OperationCanceledException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      CharSequence url = Urls2.messages(accountName, Filter.MESSAGE_UNREAD,
+          null, true, Urls.TYPE_HTML);
+      conn = connect(ctx, accountName, url);
+      in = new BufferedInputStream(conn.getInputStream());
+      in.read();
+    } finally {
+      close(in, conn);
+    }
+  }
+
+  private static void close(InputStream in, HttpURLConnection conn) throws
+      IOException {
     if (in != null) {
       in.close();
     }

@@ -582,18 +582,24 @@ public class ThingProvider extends BaseProvider {
         int listingType = extras.getInt(EXTRA_SESSION_TYPE);
         switch (listingType) {
             case Sessions.TYPE_MESSAGE_THREAD:
-                return MessageListing.newThreadInstance(helper, accountName, thingId, cookie);
+                return MessageListing.newThreadInstance(
+                        context,
+                        helper,
+                        accountName,
+                        thingId);
 
             case Sessions.TYPE_MESSAGES:
-                return MessageListing.newInstance(helper,
+                return MessageListing.newInstance(
+                        context,
+                        helper,
                         accountName,
                         filter,
                         more,
-                        mark,
-                        cookie);
+                        mark);
 
             case Sessions.TYPE_SUBREDDIT:
-                return ThingListing.newSubredditInstance(context,
+                return ThingListing.newSubredditInstance(
+                        context,
                         helper,
                         accountName,
                         subreddit,
@@ -601,7 +607,8 @@ public class ThingProvider extends BaseProvider {
                         more);
 
             case Sessions.TYPE_USER:
-                return ThingListing.newUserInstance(context,
+                return ThingListing.newUserInstance(
+                        context,
                         helper,
                         accountName,
                         user,
@@ -609,7 +616,8 @@ public class ThingProvider extends BaseProvider {
                         more);
 
             case Sessions.TYPE_COMMENTS:
-                return CommentListing.newInstance(context,
+                return CommentListing.newInstance(
+                        context,
                         helper,
                         accountName,
                         thingId,
@@ -618,7 +626,8 @@ public class ThingProvider extends BaseProvider {
                         count);
 
             case Sessions.TYPE_THING_SEARCH:
-                return ThingListing.newSearchInstance(context,
+                return ThingListing.newSearchInstance(
+                        context,
                         helper,
                         accountName,
                         subreddit,

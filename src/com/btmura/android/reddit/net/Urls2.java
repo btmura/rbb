@@ -43,6 +43,8 @@ public class Urls2 {
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
+  private static final String MESSAGES_PATH = "/message/";
+  private static final String MESSAGE_THREAD_PATH = "/message/messages/";
   private static final String MY_SUBREDDITS_PATH =
       "/subreddits/mine/subscriber";
   private static final String USER_HTML_PATH = "/u/";
@@ -56,7 +58,7 @@ public class Urls2 {
         .append("&response_type=code&state=").append(state)
         .append("&redirect_uri=").append(OAUTH_REDIRECT_URL)
         .append("&duration=permanent&scope=")
-        .append(encode("history,mysubreddits,read"));
+        .append(encode("history,mysubreddits,privatemessages,read"));
   }
 
   public static CharSequence mySubreddits() {
@@ -65,7 +67,6 @@ public class Urls2 {
         .append("?limit=").append(1000);
   }
 
-  // TODO(btmura): rename to subredditThings
   public static CharSequence subreddit(
       String accountName,
       String subreddit,
@@ -171,6 +172,59 @@ public class Urls2 {
     }
     if (hasLimit) {
       sb.append("&limit=").append(numComments);
+    }
+    return sb;
+  }
+
+  public static CharSequence messages(
+      String accountName,
+      int filter,
+      String more,
+      boolean mark,
+      int apiType) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(MESSAGES_PATH);
+
+    switch (filter) {
+      case Filter.MESSAGE_INBOX:
+        sb.append("inbox");
+        break;
+
+      case Filter.MESSAGE_UNREAD:
+        sb.append("unread");
+        break;
+
+      case Filter.MESSAGE_SENT:
+        sb.append("sent");
+        break;
+
+      default:
+        throw new IllegalArgumentException(Integer.toString(filter));
+    }
+    if (needsJsonExtension(accountName, apiType)) {
+      sb.append("/.json");
+    }
+    if (more != null || mark) {
+      sb.append("?");
+    }
+    if (more != null) {
+      sb.append("&count=25&after=").append(encode(more));
+    }
+    if (mark) {
+      sb.append("&mark=true");
+    }
+    return sb;
+  }
+
+  public static CharSequence messageThread(
+      String accountName,
+      String thingId,
+      int apiType) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(MESSAGE_THREAD_PATH)
+        .append(ThingIds.removeTag(thingId));
+    if (needsJsonExtension(accountName, apiType)) {
+      sb.append(".json");
     }
     return sb;
   }

@@ -27,6 +27,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
@@ -188,7 +189,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
         }
 
         // Assume this is a raw message.
-        return Urls.messageThread(getThingId(pos), Urls.TYPE_HTML);
+        return Urls2.messageThread("", getThingId(pos), Urls2.TYPE_HTML);
     }
 
     private boolean isCheckedCount(ListView listView, int checkedItemCount) {

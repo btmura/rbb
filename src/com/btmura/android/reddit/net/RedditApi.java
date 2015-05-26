@@ -154,19 +154,6 @@ public class RedditApi {
         }
     }
 
-    public static void markMessagesRead(String cookie) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            CharSequence url = Urls.message(Filter.MESSAGE_UNREAD, null, true, Urls.TYPE_HTML);
-            conn = connect(url, cookie, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            in.read();
-        } finally {
-            close(in, conn);
-        }
-    }
-
     public static Result readMessage(String thingId, boolean read, String cookie, String modhash)
             throws IOException {
         if (read) {
