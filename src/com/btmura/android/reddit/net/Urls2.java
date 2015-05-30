@@ -61,12 +61,6 @@ public class Urls2 {
         .append(encode("history,mysubreddits,privatemessages,read"));
   }
 
-  public static CharSequence mySubreddits() {
-    return new StringBuilder(BASE_OAUTH_URL)
-        .append(MY_SUBREDDITS_PATH)
-        .append("?limit=").append(1000);
-  }
-
   public static CharSequence subreddit(
       String accountName,
       String subreddit,
