@@ -162,9 +162,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         }
 
         // Comment references just provide a thing and link id.
-        String thingId = getThingId(position);
-        String linkId = getLinkId(position);
-        return Urls2.comments("", thingId, linkId, -1, -1, Urls.TYPE_HTML);
+        return Urls2.commentsLink(getThingId(position), getLinkId(position));
     }
 
     private void prepareSubredditActionItem(Menu menu, ListView listView, int position) {

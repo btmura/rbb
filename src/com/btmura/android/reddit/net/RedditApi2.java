@@ -100,7 +100,7 @@ public class RedditApi2 {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
-      conn = connect(ctx, accountName, OAuthUrls.mySubreddits());
+      conn = connect(ctx, accountName, Urls2.mySubreddits());
       in = new BufferedInputStream(conn.getInputStream());
       JsonReader r = new JsonReader(new InputStreamReader(in));
       SubredditParser p = new SubredditParser();

@@ -31,6 +31,7 @@ import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
@@ -140,7 +141,7 @@ public class SidebarFragment extends ListFragment
     }
 
     private CharSequence getClipText() {
-        return Urls.subreddit(getSubreddit(), -1, Urls.TYPE_HTML);
+        return Urls2.subredditLink(getSubreddit());
     }
 
     private String getSubreddit() {

@@ -35,24 +35,23 @@ public class Urls2 {
 
   public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
+  // TODO(btmura): make types private
   public static final int TYPE_HTML = 0;
   public static final int TYPE_JSON = 1;
 
-  private static final String BASE_URL = "https://www.reddit.com";
-  private static final String BASE_OAUTH_URL = "https://oauth.reddit.com";
+  private static final String WWW_REDDIT_COM = "https://www.reddit.com";
+  private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
   private static final String MESSAGES_PATH = "/message/";
   private static final String MESSAGE_THREAD_PATH = "/message/messages/";
-  private static final String MY_SUBREDDITS_PATH =
-      "/subreddits/mine/subscriber";
   private static final String USER_HTML_PATH = "/u/";
   private static final String USER_JSON_PATH = "/user/";
 
   public static CharSequence authorize(Context ctx, CharSequence state) {
     String clientId = ctx.getString(R.string.key_reddit_client_id);
-    return new StringBuilder(BASE_URL)
+    return new StringBuilder(WWW_REDDIT_COM)
         .append(AUTHORIZE_PATH)
         .append("?client_id=").append(clientId)
         .append("&response_type=code&state=").append(state)
@@ -61,7 +60,24 @@ public class Urls2 {
         .append(encode("history,mysubreddits,privatemessages,read"));
   }
 
+  public static CharSequence mySubreddits() {
+    return new StringBuilder(OAUTH_REDDIT_COM)
+        .append("/subreddits/mine/subscriber?limit=1000");
+  }
+
   public static CharSequence subreddit(
+      String accountName,
+      String subreddit,
+      int filter,
+      @Nullable String more) {
+    return innerSubreddit(accountName, subreddit, filter, more, TYPE_JSON);
+  }
+
+  public static CharSequence subredditLink(String subreddit) {
+    return innerSubreddit("", subreddit, -1, null, TYPE_HTML);
+  }
+
+  private static CharSequence innerSubreddit(
       String accountName,
       String subreddit,
       int filter,
@@ -109,6 +125,20 @@ public class Urls2 {
   }
 
   public static CharSequence comments(
+      String accountName,
+      String thingId,
+      String linkId,
+      int filter,
+      int numComments) {
+    return innerComments(accountName, thingId, linkId, filter, numComments,
+        TYPE_JSON);
+  }
+
+  public static CharSequence commentsLink(String thingId, String linkId) {
+    return innerComments("", thingId, linkId, -1, -1, TYPE_HTML);
+  }
+
+  private static CharSequence innerComments(
       String accountName,
       String thingId,
       String linkId,
@@ -164,9 +194,11 @@ public class Urls2 {
           break;
       }
     }
+
     if (hasLimit) {
       sb.append("&limit=").append(numComments);
     }
+
     return sb;
   }
 
@@ -285,7 +317,7 @@ public class Urls2 {
   }
 
   private static String getBaseUrl(String accountName) {
-    return isOAuth(accountName) ? BASE_OAUTH_URL : BASE_URL;
+    return isOAuth(accountName) ? OAUTH_REDDIT_COM : WWW_REDDIT_COM;
   }
 
   private static CharSequence getUserPath(int apiType) {

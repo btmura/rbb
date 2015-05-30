@@ -135,8 +135,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             thingId,
             linkId,
             filter,
-            numComments,
-            Urls2.TYPE_JSON);
+            numComments);
         HttpURLConnection conn = RedditApi2.connect(context, accountName, url);
         InputStream input = null;
         try {

@@ -53,7 +53,7 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
     HttpURLConnection conn = null;
     try {
       CharSequence url = Urls2.subreddit(accountName, Subreddits.NAME_RANDOM,
-          Filter.SUBREDDIT_HOT, null, Urls2.TYPE_HTML);
+          Filter.SUBREDDIT_HOT, null);
       conn = RedditApi2.connect(getContext(), accountName, url);
       if (conn.getResponseCode() == 302) {
         String location = conn.getHeaderField("Location");

@@ -226,55 +226,6 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence subreddit(String subreddit, int filter, int apiType) {
-        return subredditMore(subreddit, filter, null, apiType);
-    }
-
-    public static CharSequence subredditMore(String subreddit,
-                                             int filter,
-                                             String more,
-                                             int apiType) {
-        StringBuilder b = new StringBuilder(BASE_URL);
-
-        if (!Subreddits.isFrontPage(subreddit)) {
-            b.append("/r/").append(encode(subreddit));
-        }
-
-        // Only add the filter for non random subreddits.
-        if (!Subreddits.isRandom(subreddit)) {
-            switch (filter) {
-                case Filter.SUBREDDIT_CONTROVERSIAL:
-                    b.append("/controversial");
-                    break;
-
-                case Filter.SUBREDDIT_HOT:
-                    b.append("/hot");
-                    break;
-
-                case Filter.SUBREDDIT_NEW:
-                    b.append("/new");
-                    break;
-
-                case Filter.SUBREDDIT_RISING:
-                    b.append("/rising");
-                    break;
-
-                case Filter.SUBREDDIT_TOP:
-                    b.append("/top");
-                    break;
-            }
-        }
-
-        if (apiType == TYPE_JSON) {
-            b.append("/.json");
-        }
-
-        if (more != null) {
-            b.append("?count=25&after=").append(encode(more));
-        }
-        return b;
-    }
-
     public static CharSequence subredditSearch(String query, String more) {
         return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, -1, more, false);
     }
