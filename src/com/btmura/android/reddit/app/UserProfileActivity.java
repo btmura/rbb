@@ -49,7 +49,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     private final LoaderCallbacks<AccountInfoResult> karmaLoaderCallbacks =
             new LoaderCallbacks<AccountInfoResult>() {
                 public Loader<AccountInfoResult> onCreateLoader(int id, Bundle args) {
-                    return new UserInfoLoader(getApplicationContext(), currentUser);
+                    return new UserInfoLoader(getApplicationContext(), accountName, currentUser);
                 }
 
                 public void onLoadFinished(Loader<AccountInfoResult> loader,
@@ -122,7 +122,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
     }
 
     @Override
@@ -133,6 +132,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount(this);
+        getSupportLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
 
         // Reset the adapter to trigger a selection callback since there is only 1 account.
         bar.setListNavigationCallbacks(adapter, this);

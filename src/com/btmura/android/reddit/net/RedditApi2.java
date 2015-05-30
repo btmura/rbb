@@ -111,6 +111,26 @@ public class RedditApi2 {
     }
   }
 
+  public static AccountInfoResult getUserInfo(
+      Context ctx,
+      String accountName,
+      String user) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      CharSequence url = Urls2.userInfo(accountName, user, Urls2.TYPE_JSON);
+      conn = connect(ctx, accountName, url);
+      in = new BufferedInputStream(conn.getInputStream());
+      return AccountInfoResult.fromJsonReader(
+          new JsonReader(new InputStreamReader(in)));
+    } finally {
+      close(in, conn);
+    }
+  }
+
   public static void markMessagesRead(Context ctx, String accountName) throws
       IOException,
       AuthenticatorException,

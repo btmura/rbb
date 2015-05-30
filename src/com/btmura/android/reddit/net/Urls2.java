@@ -235,21 +235,9 @@ public class Urls2 {
       int filter,
       String more,
       int apiType) {
-    StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
-    switch (apiType) {
-      case TYPE_HTML:
-        sb.append(USER_HTML_PATH);
-        break;
-
-      case TYPE_JSON:
-        sb.append(USER_JSON_PATH);
-        break;
-
-      default:
-        throw new IllegalArgumentException();
-    }
-    sb.append(encode(user));
-
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(getUserPath(apiType))
+        .append(encode(user));
     switch (filter) {
       case Filter.PROFILE_OVERVIEW:
         sb.append("/overview");
@@ -288,8 +276,35 @@ public class Urls2 {
     return sb;
   }
 
+  public static CharSequence userInfo(
+      String accountName,
+      String user,
+      int apiType) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(getUserPath(apiType))
+        .append(encode(user))
+        .append("/about");
+    if (needsJsonExtension(accountName, apiType)) {
+      sb.append("/.json");
+    }
+    return sb;
+  }
+
   private static String getBaseUrl(String accountName) {
     return isOAuth(accountName) ? BASE_OAUTH_URL : BASE_URL;
+  }
+
+  private static CharSequence getUserPath(int apiType) {
+    switch (apiType) {
+      case TYPE_HTML:
+        return USER_HTML_PATH;
+
+      case TYPE_JSON:
+        return USER_JSON_PATH;
+
+      default:
+        throw new IllegalArgumentException();
+    }
   }
 
   private static boolean needsJsonExtension(String accountName, int apiType) {

@@ -52,10 +52,6 @@ public class RedditApi {
         return getAccountResult(Urls.aboutMe(), cookie);
     }
 
-    public static AccountInfoResult aboutUser(String user, String cookie) throws IOException {
-        return getAccountResult(Urls.aboutUser(user), cookie);
-    }
-
     private static AccountInfoResult getAccountResult(CharSequence url, String cookie)
             throws IOException {
         HttpURLConnection conn = null;
