@@ -45,7 +45,6 @@ public class Urls {
     private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
     private static final String API_HIDE_URL = BASE_URL + "/api/hide";
     private static final String API_INFO_URL = BASE_URL + "/api/info";
-    private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
     private static final String API_SAVE_URL = BASE_URL + "/api/save";
@@ -61,7 +60,6 @@ public class Urls {
     private static final String BASE_SEARCH_URL = BASE_URL + BASE_SEARCH_QUERY;
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
-    private static final String BASE_USER_JSON_URL = BASE_URL + "/user/";
 
     public static CharSequence aboutMe() {
         return new StringBuilder(API_ME_URL).append(".json");
