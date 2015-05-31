@@ -78,6 +78,16 @@ public class Urls2Test extends TestCase {
         Urls2.messageThreadLink("123abc"));
   }
 
+  public void testSidebar() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/r/cars/about.json",
+        Urls2.sidebar(NO_ACCOUNT, "cars"));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/r/cars/about",
+        Urls2.sidebar(ACCOUNT, "cars"));
+  }
+
   public void testUserInfo() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/about.json",

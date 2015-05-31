@@ -110,20 +110,6 @@ public class RedditApi {
         }
     }
 
-    public static SidebarResult getSidebar(Context context, String subreddit,
-            String cookie)
-            throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.sidebar(subreddit), cookie, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            return SidebarResult.fromJsonReader(context, new JsonReader(new InputStreamReader(in)));
-        } finally {
-            close(in, conn);
-        }
-    }
-
     public static Result hide(String thingId, boolean hide, String cookie, String modhash)
             throws IOException {
         return postData(Urls.hide(hide), Urls.hideQuery(thingId, modhash), cookie);

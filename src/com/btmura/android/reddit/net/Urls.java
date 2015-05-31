@@ -188,10 +188,6 @@ public class Urls {
         }
     }
 
-    public static CharSequence sidebar(String name) {
-        return new StringBuilder(BASE_SUBREDDIT_URL).append(encode(name)).append("/about.json");
-    }
-
     public static CharSequence submit() {
         return API_SUBMIT_URL;
     }

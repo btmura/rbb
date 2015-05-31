@@ -16,12 +16,8 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.text.Collator;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -29,57 +25,74 @@ import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+import java.text.Collator;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class RelatedSubredditLoader extends CursorLoader {
 
-    private static final String TAG = "RelatedSubredditLoader";
+  private static final String TAG = "RelatedSubredditLoader";
 
-    public static final int INDEX_NAME = 1;
+  public static final int INDEX_NAME = 1;
 
-    private static final Pattern SUBREDDIT_PATTERN = Pattern.compile("r/([0-9A-Za-z_]+)");
+  private static final Pattern SUBREDDIT_PATTERN = Pattern.compile(
+      "r/([0-9A-Za-z_]+)");
 
-    private static final String[] COLUMN_NAMES = {
-            Subreddits._ID,
-            Subreddits.COLUMN_NAME,
-    };
+  private static final String[] COLUMN_NAMES = {
+      Subreddits._ID,
+      Subreddits.COLUMN_NAME,
+  };
 
-    private final String subreddit;
+  private final String accountName;
+  private final String subreddit;
 
-    public RelatedSubredditLoader(Context context, String subreddit) {
-        super(context);
-        this.subreddit = subreddit;
+  public RelatedSubredditLoader(
+      Context ctx,
+      String accountName,
+      String subreddit) {
+    super(ctx);
+    this.accountName = accountName;
+    this.subreddit = subreddit;
+  }
+
+  @Override
+  public Cursor loadInBackground() {
+    try {
+      SidebarResult result =
+          RedditApi2.getSidebar(getContext(), accountName, subreddit);
+      result.recycle();
+      return buildCursor(findSubreddits(result.description));
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
     }
+    return null;
+  }
 
-    @Override
-    public Cursor loadInBackground() {
-        try {
-            SidebarResult result = RedditApi.getSidebar(getContext(), subreddit, null);
-            result.recycle();
-            return buildCursor(findSubreddits(result.description));
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return null;
+  private TreeSet<String> findSubreddits(CharSequence description) {
+    TreeSet<String> subreddits = new TreeSet<String>(Collator.getInstance());
+    Matcher matcher = SUBREDDIT_PATTERN.matcher(description);
+    while (matcher.find()) {
+      subreddits.add(matcher.group(1));
     }
+    return subreddits;
+  }
 
-    private TreeSet<String> findSubreddits(CharSequence description) {
-        TreeSet<String> subreddits = new TreeSet<String>(Collator.getInstance());
-        Matcher matcher = SUBREDDIT_PATTERN.matcher(description);
-        while (matcher.find()) {
-            subreddits.add(matcher.group(1));
-        }
-        return subreddits;
+  private MatrixCursor buildCursor(TreeSet<String> subreddits) {
+    int i = 0;
+    MatrixCursor cursor = new MatrixCursor(COLUMN_NAMES, subreddits.size());
+    for (String subreddit : subreddits) {
+      cursor.addRow(Array.of(i++, subreddit));
     }
-
-    private MatrixCursor buildCursor(TreeSet<String> subreddits) {
-        int i = 0;
-        MatrixCursor cursor = new MatrixCursor(COLUMN_NAMES, subreddits.size());
-        for (String subreddit : subreddits) {
-            cursor.addRow(Array.of(i++, subreddit));
-        }
-        return cursor;
-    }
+    return cursor;
+  }
 }

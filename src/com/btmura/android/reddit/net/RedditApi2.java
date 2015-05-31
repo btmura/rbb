@@ -111,6 +111,26 @@ public class RedditApi2 {
     }
   }
 
+  public static SidebarResult getSidebar(
+      Context ctx,
+      String accountName,
+      String subreddit) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      CharSequence url = Urls2.sidebar(accountName, subreddit);
+      conn = connect(ctx, accountName, url);
+      in = new BufferedInputStream(conn.getInputStream());
+      return SidebarResult
+          .fromJsonReader(ctx, new JsonReader(new InputStreamReader(in)));
+    } finally {
+      close(in, conn);
+    }
+  }
+
   public static AccountInfoResult getUserInfo(
       Context ctx,
       String accountName,

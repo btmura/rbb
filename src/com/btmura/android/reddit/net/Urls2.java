@@ -50,6 +50,7 @@ public class Urls2 {
   private static final String COMMENTS_PATH = "/comments/";
   private static final String MESSAGES_PATH = "/message/";
   private static final String MESSAGE_THREAD_PATH = "/message/messages/";
+  private static final String SUBREDDIT_PATH = "/r/";
   private static final String USER_HTML_PATH = "/u/";
   private static final String USER_JSON_PATH = "/user/";
 
@@ -90,7 +91,7 @@ public class Urls2 {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
     if (!Subreddits.isFrontPage(subreddit)) {
-      sb.append("/r/").append(encode(subreddit));
+      sb.append(SUBREDDIT_PATH).append(encode(subreddit));
     }
 
     if (!Subreddits.isRandom(subreddit)) {
@@ -304,6 +305,19 @@ public class Urls2 {
     return new StringBuilder(WWW_REDDIT_COM)
         .append(MESSAGE_THREAD_PATH)
         .append(encode(ThingIds.removeTag(thingId)));
+  }
+
+  public static CharSequence sidebar(
+      String accountName,
+      String subreddit) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(SUBREDDIT_PATH)
+        .append(encode(subreddit))
+        .append("/about");
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
+    }
+    return sb;
   }
 
   public static CharSequence userInfo(String accountName, String user) {

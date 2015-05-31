@@ -30,121 +30,134 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.SidebarResult;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
 public class SidebarFragment extends ListFragment
-        implements RightFragment, LoaderCallbacks<SidebarResult> {
+    implements RightFragment, LoaderCallbacks<SidebarResult> {
 
-    private static final String EXTRA_SUBREDDIT = "subreddit";
+  private static final String EXTRA_ACCOUNT_NAME = "accountName";
+  private static final String EXTRA_SUBREDDIT = "subreddit";
 
-    private SidebarAdapter adapter;
+  private SidebarAdapter adapter;
 
-    public static SidebarFragment newInstance(String subreddit) {
-        Bundle b = new Bundle(1);
-        b.putString(EXTRA_SUBREDDIT, subreddit);
+  public static SidebarFragment newInstance(
+      String accountName,
+      String subreddit) {
+    Bundle b = new Bundle(2);
+    b.putString(EXTRA_ACCOUNT_NAME, accountName);
+    b.putString(EXTRA_SUBREDDIT, subreddit);
 
-        SidebarFragment frag = new SidebarFragment();
-        frag.setArguments(b);
-        return frag;
+    SidebarFragment frag = new SidebarFragment();
+    frag.setArguments(b);
+    return frag;
+  }
+
+  @Override
+  public boolean equalFragments(ComparableFragment o) {
+    return ComparableFragments.equalClasses(this, o)
+        && ComparableFragments.equalStrings(this, o, EXTRA_ACCOUNT_NAME)
+        && ComparableFragments.equalStrings(this, o, EXTRA_SUBREDDIT);
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    adapter = new SidebarAdapter(getActivity());
+    setHasOptionsMenu(true);
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    setListAdapter(adapter);
+    setListShown(false);
+    getLoaderManager().initLoader(0, null, this);
+  }
+
+  @Override
+  public Loader<SidebarResult> onCreateLoader(int id, Bundle args) {
+    return new SidebarLoader(
+        getActivity().getApplicationContext(),
+        getAccountName(),
+        getSubreddit());
+  }
+
+  @Override
+  public void onLoadFinished(Loader<SidebarResult> loader, SidebarResult data) {
+    adapter.swapData(data);
+    setEmptyText(getString(data != null
+        ? R.string.empty_list
+        : R.string.error));
+    setListShown(true);
+  }
+
+  @Override
+  public void onLoaderReset(Loader<SidebarResult> loader) {
+    adapter.swapData(null);
+  }
+
+  @Override
+  public void onListItemClick(ListView l, View v, int position, long id) {
+    MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
+  }
+
+  @Override
+  public void setSelectedThing(String thingId, String linkId) {
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    super.onCreateOptionsMenu(menu, inflater);
+    inflater.inflate(R.menu.sidebar_menu, menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.menu_share:
+        handleShare();
+        return true;
+
+      case R.id.menu_copy_url:
+        handleCopyUrl();
+        return true;
+
+      case R.id.menu_add_subreddit:
+        handleAddSubreddit();
+        return true;
+
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
-    @Override
-    public boolean equalFragments(ComparableFragment o) {
-        return ComparableFragments.equalClasses(this, o)
-                && ComparableFragments.equalStrings(this, o, EXTRA_SUBREDDIT);
-    }
+  private void handleShare() {
+    MenuHelper.share(getActivity(), getClipLabel(), getClipText());
+  }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        adapter = new SidebarAdapter(getActivity());
-        setHasOptionsMenu(true);
-    }
+  private void handleCopyUrl() {
+    MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
+  }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setListAdapter(adapter);
-        setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
-    }
+  private void handleAddSubreddit() {
+    MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
+  }
 
-    @Override
-    public Loader<SidebarResult> onCreateLoader(int id, Bundle args) {
-        return new SidebarLoader(getActivity().getApplicationContext(), getSubreddit());
-    }
+  private String getClipLabel() {
+    return getSubreddit();
+  }
 
-    @Override
-    public void onLoadFinished(Loader<SidebarResult> loader, SidebarResult data) {
-        adapter.swapData(data);
-        setEmptyText(getString(data != null ? R.string.empty_list : R.string.error));
-        setListShown(true);
-    }
+  private CharSequence getClipText() {
+    return Urls2.subredditLink(getSubreddit());
+  }
 
-    @Override
-    public void onLoaderReset(Loader<SidebarResult> loader) {
-        adapter.swapData(null);
-    }
+  private String getAccountName() {
+    return getArguments().getString(EXTRA_ACCOUNT_NAME);
+  }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
-    }
-
-    @Override
-    public void setSelectedThing(String thingId, String linkId) {
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.sidebar_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_share:
-                handleShare();
-                return true;
-
-            case R.id.menu_copy_url:
-                handleCopyUrl();
-                return true;
-
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleShare() {
-        MenuHelper.share(getActivity(), getClipLabel(), getClipText());
-    }
-
-    private void handleCopyUrl() {
-        MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
-    }
-
-    private String getClipLabel() {
-        return getSubreddit();
-    }
-
-    private CharSequence getClipText() {
-        return Urls2.subredditLink(getSubreddit());
-    }
-
-    private String getSubreddit() {
-        return getArguments().getString(EXTRA_SUBREDDIT);
-    }
+  private String getSubreddit() {
+    return getArguments().getString(EXTRA_SUBREDDIT);
+  }
 }

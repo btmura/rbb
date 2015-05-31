@@ -16,49 +16,59 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.util.Log;
 
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.SidebarResult;
+
+import java.io.IOException;
 
 /**
  * {@link BaseAsyncTaskLoader} that loads the sidebar of a subreddit.
  */
 public class SidebarLoader extends BaseAsyncTaskLoader<SidebarResult> {
 
-    private static final String TAG = "SidebarLoader";
+  private static final String TAG = "SidebarLoader";
 
-    private final String subreddit;
+  private final String accountName;
+  private final String subreddit;
 
-    public SidebarLoader(Context context, String subreddit) {
-        super(context.getApplicationContext());
-        this.subreddit = subreddit;
+  public SidebarLoader(Context context, String accountName, String subreddit) {
+    super(context.getApplicationContext());
+    this.accountName = accountName;
+    this.subreddit = subreddit;
+  }
+
+  @Override
+  public SidebarResult loadInBackground() {
+    try {
+      return RedditApi2.getSidebar(getContext(), accountName, subreddit);
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
     }
+    return null;
+  }
 
-    @Override
-    public SidebarResult loadInBackground() {
-        try {
-            return RedditApi.getSidebar(getContext(), subreddit, null);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return null;
+  @Override
+  protected void onNewDataDelivered(
+      SidebarResult oldData,
+      SidebarResult newData) {
+    if (oldData != null && oldData != newData) {
+      oldData.recycle();
     }
+  }
 
-    @Override
-    protected void onNewDataDelivered(SidebarResult oldData, SidebarResult newData) {
-        if (oldData != null && oldData != newData) {
-            oldData.recycle();
-        }
+  @Override
+  protected void onCleanData(SidebarResult data) {
+    if (data != null) {
+      data.recycle();
     }
-
-    @Override
-    protected void onCleanData(SidebarResult data) {
-        if (data != null) {
-            data.recycle();
-        }
-    }
+  }
 }

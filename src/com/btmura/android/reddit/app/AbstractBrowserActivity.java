@@ -190,7 +190,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectAccountWithFilter(accountName, 0);
         setCenterFragment(R.id.right_container,
                 ControlFragment.newSidebarInstance(accountName, subreddit),
-                SidebarFragment.newInstance(subreddit),
+                SidebarFragment.newInstance(accountName, subreddit),
                 false);
     }
 
@@ -215,12 +215,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (isSinglePane) {
             setCenterFragment(R.id.right_container,
                     ControlFragment.newRelatedSubredditsInstance(accountName, subreddit),
-                    RelatedSubredditListFragment.newInstance(subreddit, isSingleChoice),
+                    RelatedSubredditListFragment.newInstance(accountName, subreddit, isSingleChoice),
                     false);
         } else {
             setLeftFragment(R.id.left_container,
                     ControlFragment.newRelatedSubredditsInstance(accountName, subreddit),
-                    RelatedSubredditListFragment.newInstance(subreddit, isSingleChoice));
+                    RelatedSubredditListFragment.newInstance(accountName, subreddit, isSingleChoice));
         }
     }
 
