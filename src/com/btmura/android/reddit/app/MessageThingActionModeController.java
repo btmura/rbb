@@ -156,7 +156,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
     }
 
     @Override
-    public boolean isSwipeable(int position) {
+    public boolean isSwipeable(int pos) {
         return false;
     }
 
@@ -170,15 +170,15 @@ public class MessageThingActionModeController implements ThingActionModeControll
 
     // Utility methods
 
-    private String getMessageTitle(int position) {
+    private String getMessageTitle(int pos) {
         // Comment reply messages just have "comment reply" as subject so try to use the link title.
-        String title = getLinkTitle(position);
+        String title = getLinkTitle(pos);
         if (!TextUtils.isEmpty(title)) {
             return title;
         }
 
         // Assume this is a message with a subject.
-        return getSubject(position);
+        return getSubject(pos);
     }
 
     private CharSequence getMessageUrl(int pos) {
@@ -189,7 +189,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
         }
 
         // Assume this is a raw message.
-        return Urls2.messageThread("", getThingId(pos), Urls2.TYPE_HTML);
+        return Urls2.messageThreadLink(getThingId(pos));
     }
 
     private boolean isCheckedCount(ListView listView, int checkedItemCount) {

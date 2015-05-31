@@ -170,8 +170,7 @@ class MessageListing extends JsonParser implements Listing {
             Urls.TYPE_JSON);
 
       case Sessions.TYPE_MESSAGE_THREAD:
-        return Urls2.messageThread(accountName, thingId,
-            Urls.TYPE_JSON);
+        return Urls2.messageThread(thingId);
 
       default:
         throw new IllegalArgumentException();

@@ -64,6 +64,18 @@ public class Urls2Test extends TestCase {
         Urls2.profileLink("btmura"));
   }
 
+  public void testMessageThread() {
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/message/messages/123abc",
+        Urls2.messageThread("123abc"));
+  }
+
+  public void testMessageThreadLink() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/message/messages/123abc",
+        Urls2.messageThreadLink("123abc"));
+  }
+
   public void testUserInfo() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/about.json",

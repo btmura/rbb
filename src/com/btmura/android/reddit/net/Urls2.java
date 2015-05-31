@@ -248,19 +248,6 @@ public class Urls2 {
     return sb;
   }
 
-  public static CharSequence messageThread(
-      String accountName,
-      String thingId,
-      int apiType) {
-    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(MESSAGE_THREAD_PATH)
-        .append(ThingIds.removeTag(thingId));
-    if (needsJsonExtension(accountName, apiType)) {
-      sb.append(".json");
-    }
-    return sb;
-  }
-
   public static CharSequence profile(
       String accountName,
       String user,
@@ -311,6 +298,18 @@ public class Urls2 {
     return new StringBuilder(WWW_REDDIT_COM)
         .append(USER_HTML_PATH)
         .append(user);
+  }
+
+  public static CharSequence messageThread(String thingId) {
+    return new StringBuilder(OAUTH_REDDIT_COM)
+        .append(MESSAGE_THREAD_PATH)
+        .append(ThingIds.removeTag(thingId));
+  }
+
+  public static CharSequence messageThreadLink(String thingId) {
+    return new StringBuilder(WWW_REDDIT_COM)
+        .append(MESSAGE_THREAD_PATH)
+        .append(ThingIds.removeTag(thingId));
   }
 
   public static CharSequence userInfo(String accountName, String user) {
