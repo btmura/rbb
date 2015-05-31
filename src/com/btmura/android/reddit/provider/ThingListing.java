@@ -296,7 +296,7 @@ class ThingListing extends JsonParser implements Listing {
             return Urls2.profile(accountName, profileUser, filter, more);
         }
         if (!TextUtils.isEmpty(query)) {
-            return Urls.search(subreddit, query, filter, more);
+            return Urls2.search(accountName, subreddit, query, filter, more);
         }
         return Urls2.subreddit(accountName, subreddit, filter, more);
     }

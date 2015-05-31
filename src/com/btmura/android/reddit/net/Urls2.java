@@ -33,6 +33,8 @@ import java.net.URLEncoder;
 
 public class Urls2 {
 
+  // TODO(btmura): make count a parameter
+
   public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
   private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
@@ -122,7 +124,6 @@ public class Urls2 {
       sb.append(".json");
     }
 
-    // TODO(btmura): make count a parameter
     if (more != null) {
       sb.append("?count=25&after=").append(encode(more));
     }
@@ -305,6 +306,63 @@ public class Urls2 {
     return new StringBuilder(WWW_REDDIT_COM)
         .append(MESSAGE_THREAD_PATH)
         .append(encode(ThingIds.removeTag(thingId)));
+  }
+
+  public static CharSequence search(
+      String accountName,
+      @Nullable String subreddit,
+      String query,
+      int filter,
+      @Nullable String more) {
+    return innerSearch(accountName, subreddit, query, filter, more);
+  }
+
+  private static CharSequence innerSearch(
+      String accountName,
+      @Nullable String subreddit,
+      String query,
+      int filter,
+      @Nullable String more) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
+
+    if (!TextUtils.isEmpty(subreddit)) {
+      sb.append(SUBREDDIT_PATH).append(encode(subreddit));
+    }
+
+    sb.append("/search");
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
+    }
+    sb.append("?q=").append(encode(query));
+
+    switch (filter) {
+      case Filter.SEARCH_RELEVANCE:
+        sb.append("&sort=relevance");
+        break;
+
+      case Filter.SEARCH_NEW:
+        sb.append("&sort=new");
+        break;
+
+      case Filter.SEARCH_HOT:
+        sb.append("&sort=hot");
+        break;
+
+      case Filter.SEARCH_TOP:
+        sb.append("&sort=top");
+        break;
+
+      case Filter.SEARCH_COMMENTS:
+        sb.append("&sort=comments");
+        break;
+    }
+    if (more != null) {
+      sb.append("&count=25&after=").append(encode(more));
+    }
+    if (!TextUtils.isEmpty(subreddit)) {
+      sb.append("&restrict_sr=on");
+    }
+    return sb;
   }
 
   public static CharSequence sidebar(

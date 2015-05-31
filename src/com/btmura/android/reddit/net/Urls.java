@@ -49,10 +49,7 @@ public class Urls {
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-    private static final String BASE_SEARCH_QUERY = "/search.json?q=";
-    private static final String BASE_SEARCH_URL = BASE_URL + BASE_SEARCH_QUERY;
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
-    private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
 
     public static CharSequence aboutMe() {
         return new StringBuilder(API_ME_URL).append(".json");
@@ -175,17 +172,6 @@ public class Urls {
 
     public static CharSequence save(boolean save) {
         return save ? API_SAVE_URL : API_UNSAVE_URL;
-    }
-
-    public static CharSequence search(String subreddit, String query, int filter, String more) {
-        if (!TextUtils.isEmpty(subreddit)) {
-            StringBuilder b = new StringBuilder(BASE_SUBREDDIT_URL);
-            b.append(encode(subreddit));
-            b.append(BASE_SEARCH_QUERY);
-            return newSearchUrl(b, query, filter, more, true);
-        } else {
-            return newSearchUrl(BASE_SEARCH_URL, query, filter, more, false);
-        }
     }
 
     public static CharSequence submit() {

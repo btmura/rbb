@@ -24,7 +24,12 @@ import junit.framework.TestCase;
 public class Urls2Test extends TestCase {
 
   private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+  private static final String NO_SUBREDDIT = null;
+  private static final int NO_FILTER = -1;
+  private static final String NO_MORE = null;
+
   private static final String ACCOUNT = "account";
+
 
   public void testMySubreddits() {
     assertCharSequenceEquals(
@@ -34,12 +39,12 @@ public class Urls2Test extends TestCase {
 
   public void testSubreddit() {
     assertCharSequenceEquals(
-        "https://www.reddit.com/r/androiddev/hot.json",
-        Urls2.subreddit(NO_ACCOUNT, "androiddev", Filter.SUBREDDIT_HOT, null));
+        "https://www.reddit.com/r/android/hot.json",
+        Urls2.subreddit(NO_ACCOUNT, "android", Filter.SUBREDDIT_HOT, NO_MORE));
 
     assertCharSequenceEquals(
-        "https://oauth.reddit.com/r/androiddev/new",
-        Urls2.subreddit(ACCOUNT, "androiddev", Filter.SUBREDDIT_NEW, null));
+        "https://oauth.reddit.com/r/android/new",
+        Urls2.subreddit(ACCOUNT, "android", Filter.SUBREDDIT_NEW, NO_MORE));
   }
 
   public void testSubredditLink() {
@@ -53,11 +58,11 @@ public class Urls2Test extends TestCase {
   public void testProfile() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/overview.json",
-        Urls2.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, null));
+        Urls2.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, NO_MORE));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/user/btmura/comments",
-        Urls2.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, null));
+        Urls2.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, NO_MORE));
   }
 
   public void testProfileLink() {
@@ -76,6 +81,24 @@ public class Urls2Test extends TestCase {
     assertCharSequenceEquals(
         "https://www.reddit.com/message/messages/123abc",
         Urls2.messageThreadLink("123abc"));
+  }
+
+  public void testSearch() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/search.json?q=s2000",
+        Urls2.search(NO_ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/search?q=s2000",
+        Urls2.search(ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
+
+    assertCharSequenceEquals(
+        "https://www.reddit.com/r/cars/search.json?q=s2000&restrict_sr=on",
+        Urls2.search(NO_ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/r/cars/search?q=s2000&restrict_sr=on",
+        Urls2.search(ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
   }
 
   public void testSidebar() {
