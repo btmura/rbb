@@ -175,7 +175,7 @@ public class MessageThreadListController
 
     private void handleAuthor(ListView listView) {
         int position = Views.getCheckedPosition(listView);
-        MenuHelper.startProfileActivity(context, adapter.getAuthor(position), -1);
+        MenuHelper.startProfileActivity(context, adapter.getAuthor(position));
     }
 
     @Override

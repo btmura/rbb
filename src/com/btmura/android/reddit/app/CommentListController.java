@@ -99,7 +99,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     // Actions to be done on comments.
 
     public void author(int position) {
-        MenuHelper.startProfileActivity(context, getAuthor(position), -1);
+        MenuHelper.startProfileActivity(context, getAuthor(position));
     }
 
     public void copyUrl(int position) {

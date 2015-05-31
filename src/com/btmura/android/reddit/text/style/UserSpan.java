@@ -24,7 +24,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.app.UserProfileActivity;
 import com.btmura.android.reddit.content.Contexts;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.net.Urls2;
 
 public class UserSpan extends ClickableSpan {
@@ -39,8 +38,7 @@ public class UserSpan extends ClickableSpan {
   public void onClick(View widget) {
     Context context = widget.getContext();
     Intent intent = new Intent(context, UserProfileActivity.class);
-    intent.setData(Uri.parse(Urls2.user("", user, -1, null, Urls.TYPE_HTML)
-        .toString()));
+    intent.setData(Uri.parse(Urls2.profileLink(user).toString()));
     Contexts.startActivity(context, intent);
   }
 }

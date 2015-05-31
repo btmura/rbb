@@ -242,7 +242,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private void handleAuthor(ListView listView) {
         int position = Views.getCheckedPosition(listView);
-        MenuHelper.startProfileActivity(context, getAuthor(position), -1);
+        MenuHelper.startProfileActivity(context, getAuthor(position));
     }
 
     private void handleSubreddit(ListView listView) {

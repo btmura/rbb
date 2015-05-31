@@ -261,14 +261,13 @@ public class Urls2 {
     return sb;
   }
 
-  public static CharSequence user(
+  public static CharSequence profile(
       String accountName,
       String user,
       int filter,
-      String more,
-      int apiType) {
+      @Nullable String more) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(getUserPath(apiType))
+        .append(USER_JSON_PATH)
         .append(encode(user));
     switch (filter) {
       case Filter.PROFILE_OVERVIEW:
@@ -299,8 +298,8 @@ public class Urls2 {
         sb.append("/saved");
         break;
     }
-    if (needsJsonExtension(accountName, apiType)) {
-      sb.append("/.json");
+    if (needsJsonExtension(accountName, TYPE_JSON)) {
+      sb.append(".json");
     }
     if (more != null) {
       sb.append("?count=25&after=").append(encode(more));
@@ -308,43 +307,25 @@ public class Urls2 {
     return sb;
   }
 
+  public static CharSequence profileLink(String user) {
+    return new StringBuilder(WWW_REDDIT_COM)
+        .append(USER_HTML_PATH)
+        .append(user);
+  }
+
   public static CharSequence userInfo(String accountName, String user) {
-    return innerUserInfo(accountName, user, TYPE_JSON);
-  }
-
-  public static CharSequence userInfoLink(String user) {
-    return innerUserInfo(NO_ACCOUNT, user, TYPE_HTML);
-  }
-
-  private static CharSequence innerUserInfo(
-      String accountName,
-      String user,
-      int apiType) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(getUserPath(apiType))
+        .append(USER_JSON_PATH)
         .append(encode(user))
         .append("/about");
-    if (needsJsonExtension(accountName, apiType)) {
-      sb.append("/.json");
+    if (needsJsonExtension(accountName, TYPE_JSON)) {
+      sb.append(".json");
     }
     return sb;
   }
 
   private static String getBaseUrl(String accountName) {
     return isOAuth(accountName) ? OAUTH_REDDIT_COM : WWW_REDDIT_COM;
-  }
-
-  private static CharSequence getUserPath(int apiType) {
-    switch (apiType) {
-      case TYPE_HTML:
-        return USER_HTML_PATH;
-
-      case TYPE_JSON:
-        return USER_JSON_PATH;
-
-      default:
-        throw new IllegalArgumentException();
-    }
   }
 
   private static boolean needsJsonExtension(String accountName, int apiType) {

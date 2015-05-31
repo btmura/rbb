@@ -137,7 +137,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
 
     private void handleAuthor(ListView lv) {
         int pos = Views.getCheckedPosition(lv);
-        MenuHelper.startProfileActivity(context, getAuthor(pos), -1);
+        MenuHelper.startProfileActivity(context, getAuthor(pos));
     }
 
     private void handleSubreddit(ListView lv) {

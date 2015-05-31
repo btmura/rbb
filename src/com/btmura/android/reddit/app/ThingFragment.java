@@ -351,7 +351,7 @@ public class ThingFragment extends Fragment implements
     }
 
     private void handleUser() {
-        MenuHelper.startProfileActivity(getActivity(), thingData.parent.getAuthor(), -1);
+        MenuHelper.startProfileActivity(getActivity(), thingData.parent.getAuthor());
     }
 
     private void handleSubreddit() {

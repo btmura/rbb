@@ -37,7 +37,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
@@ -151,10 +150,9 @@ public class MenuHelper {
         context.startActivity(new Intent(context, ContentBrowserActivity.class));
     }
 
-    public static void startProfileActivity(Context context, String user, int filter) {
+    public static void startProfileActivity(Context context, String user) {
         Intent intent = new Intent(context, UserProfileActivity.class);
-        intent.setData(Uri.parse(
-            Urls2.user("", user, filter, null, Urls.TYPE_HTML).toString()));
+        intent.setData(Uri.parse(Urls2.profileLink(user).toString()));
         context.startActivity(intent);
     }
 

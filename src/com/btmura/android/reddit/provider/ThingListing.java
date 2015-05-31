@@ -293,8 +293,7 @@ class ThingListing extends JsonParser implements Listing {
 
     private CharSequence getUrl() {
         if (!TextUtils.isEmpty(profileUser)) {
-            return Urls2.user(accountName, profileUser, filter, more,
-                Urls2.TYPE_JSON);
+            return Urls2.profile(accountName, profileUser, filter, more);
         }
         if (!TextUtils.isEmpty(query)) {
             return Urls.search(subreddit, query, filter, more);

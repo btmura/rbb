@@ -23,44 +23,55 @@ import junit.framework.TestCase;
 
 public class Urls2Test extends TestCase {
 
+  private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+  private static final String ACCOUNT = "account";
+
   public void testMySubreddits() {
     assertCharSequenceEquals(
         "https://oauth.reddit.com/subreddits/mine/subscriber?limit=1000",
-        Urls2.mySubreddits().toString());
+        Urls2.mySubreddits());
   }
 
   public void testSubreddit() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/androiddev/hot.json",
-        Urls2.subreddit(AccountUtils.NO_ACCOUNT, "androiddev",
-            Filter.SUBREDDIT_HOT, null));
+        Urls2.subreddit(NO_ACCOUNT, "androiddev", Filter.SUBREDDIT_HOT, null));
 
     assertCharSequenceEquals(
-        "https://oauth.reddit.com/r/androiddev/controversial",
-        Urls2.subreddit("rbbaccount", "androiddev",
-            Filter.SUBREDDIT_CONTROVERSIAL, null));
+        "https://oauth.reddit.com/r/androiddev/new",
+        Urls2.subreddit(ACCOUNT, "androiddev", Filter.SUBREDDIT_NEW, null));
   }
 
   public void testSubredditLink() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/androiddev",
-        Urls2.subredditLink("androiddev").toString());
+        Urls2.subredditLink("androiddev"));
+  }
+
+  public void testProfile() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/user/btmura/overview.json",
+        Urls2.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, null));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/user/btmura/comments",
+        Urls2.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, null));
+  }
+
+  public void testProfileLink() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/u/btmura",
+        Urls2.profileLink("btmura"));
   }
 
   public void testUserInfo() {
     assertCharSequenceEquals(
-        "https://www.reddit.com/u/btmura.json",
-        Urls2.userInfo(AccountUtils.NO_ACCOUNT, "btmura"));
+        "https://www.reddit.com/user/btmura/about.json",
+        Urls2.userInfo(NO_ACCOUNT, "btmura"));
 
     assertCharSequenceEquals(
-        "https://oauth.reddit.com/user/btmura",
-        Urls2.userInfo("rbbaccount", "btmura"));
-  }
-
-  public void testUserInfoLink() {
-    assertCharSequenceEquals(
-        "http://www.reddit.com/u/btmura",
-        Urls2.userInfoLink("btmura"));
+        "https://oauth.reddit.com/user/btmura/about",
+        Urls2.userInfo(ACCOUNT, "btmura"));
   }
 
   private void assertCharSequenceEquals(
