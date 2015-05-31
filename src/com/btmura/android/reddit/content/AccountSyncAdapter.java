@@ -16,9 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import android.accounts.Account;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -44,136 +41,151 @@ import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 /**
- * {@link AbstractThreadedSyncAdapter} for periodically syncing account information using the
- * /api/me API method to check for mail and other info.
+ * {@link AbstractThreadedSyncAdapter} for periodically syncing account
+ * information using the /api/me API method to check for mail and other info.
  */
 public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    public static final String TAG = "AccountSyncAdapter";
+  public static final String TAG = "AccountSyncAdapter";
 
-    /** Delay between sync to avoid spamming the server. */
-    private static final long SYNC_DELAY_SECONDS = TimeUnit.MINUTES.toSeconds(1);
+  /** Delay between sync to avoid spamming the server. */
+  private static final long SYNC_DELAY_SECONDS = TimeUnit.MINUTES.toSeconds(1);
 
-    public static class Service extends android.app.Service {
-        @Override
-        public IBinder onBind(Intent intent) {
-            return new AccountSyncAdapter(this).getSyncAdapterBinder();
-        }
-    }
-
-    public AccountSyncAdapter(Context context) {
-        super(context, true);
-    }
-
+  public static class Service extends android.app.Service {
     @Override
-    public void onPerformSync(Account account,
-            Bundle extras,
-            String authority,
-            ContentProviderClient provider,
-            SyncResult syncResult) {
-        // Extra method just allows us to always print out sync stats after.
-        doSync(account, provider, syncResult);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
-        }
+    public IBinder onBind(Intent intent) {
+      return new AccountSyncAdapter(this).getSyncAdapterBinder();
+    }
+  }
 
-        // Only sync one time per minute. SyncManager code seems to be using
-        // delayUntil as a timestamp even though the docs say its more of a
-        // duration.
-        syncResult.delayUntil = System.currentTimeMillis() / 1000 + SYNC_DELAY_SECONDS;
+  public AccountSyncAdapter(Context context) {
+    super(context, true);
+  }
+
+  @Override
+  public void onPerformSync(
+      Account account,
+      Bundle extras,
+      String authority,
+      ContentProviderClient provider,
+      SyncResult syncResult) {
+    // Extra method just allows us to always print out sync stats after.
+    doSync(account, provider, syncResult);
+    if (BuildConfig.DEBUG) {
+      Log.d(TAG, "accountName: " + account.name
+          + " syncResult: " + syncResult.toString());
     }
 
-    private static final String[] ACTION_PROJECTION = {
-            AccountActions._ID,
-            AccountActions.COLUMN_ACTION,
-    };
+    // Only sync one time per minute. SyncManager code seems to be using
+    // delayUntil as a timestamp even though the docs say its more of a
+    // duration.
+    syncResult.delayUntil = System.currentTimeMillis() / 1000
+        + SYNC_DELAY_SECONDS;
+  }
 
-    private static final int ID = 0;
-    private static final int ACTION = 1;
+  private static final String[] ACTION_PROJECTION = {
+      AccountActions._ID,
+      AccountActions.COLUMN_ACTION,
+  };
 
-    private static final String[] ACCOUNT_PROJECTION = {
-            Accounts._ID,
-            Accounts.COLUMN_LINK_KARMA,
-            Accounts.COLUMN_COMMENT_KARMA,
-            Accounts.COLUMN_HAS_MAIL,
-    };
+  private static final int ID = 0;
+  private static final int ACTION = 1;
 
-    private static final int LINK_KARMA = 1;
-    private static final int COMMENT_KARMA = 2;
-    private static final int HAS_MAIL = 3;
+  private static final String[] ACCOUNT_PROJECTION = {
+      Accounts._ID,
+      Accounts.COLUMN_LINK_KARMA,
+      Accounts.COLUMN_COMMENT_KARMA,
+      Accounts.COLUMN_HAS_MAIL,
+  };
 
-    private void doSync(Account account, ContentProviderClient provider, SyncResult syncResult) {
-        try {
-            String cookie = AccountUtils.getCookie(getContext(), account);
-            if (cookie == null) {
-                syncResult.stats.numAuthExceptions++;
-                return;
-            }
+  private static final int LINK_KARMA = 1;
+  private static final int COMMENT_KARMA = 2;
+  private static final int HAS_MAIL = 3;
 
-            // Mark the account's messages as read if requested.
-            boolean markRead = false;
-            Cursor c = provider.query(AccountProvider.ACCOUNT_ACTIONS_URI, ACTION_PROJECTION,
-                    AccountActions.SELECT_BY_ACCOUNT, Array.of(account.name), null);
-            try {
-                while (c.moveToNext()) {
-                    switch (c.getInt(ACTION)) {
-                        case AccountActions.ACTION_MARK_MESSAGES_READ:
-                            if (!markRead) {
-                                RedditApi2.markMessagesRead(getContext(),
-                                    account.name);
-                                markRead = true;
-                            }
-                            int deleted = provider.delete(AccountProvider.ACCOUNT_ACTIONS_URI,
-                                    AccountActions.SELECT_BY_ID, Array.of(c.getInt(ID)));
-                            syncResult.stats.numDeletes += deleted;
-                            break;
-                    }
-                }
-            } finally {
-                if (c != null) {
-                    c.close();
-                }
-            }
+  private void doSync(
+      Account account,
+      ContentProviderClient provider,
+      SyncResult syncResult) {
+    try {
+      String cookie = AccountUtils.getCookie(getContext(), account);
+      if (cookie == null) {
+        syncResult.stats.numAuthExceptions++;
+        return;
+      }
 
-            // Update the account row with the latest information if it has changed.
-            AccountInfoResult result = RedditApi.aboutMe(cookie);
-            boolean newHasMail = result.hasMail && !markRead;
-            c = provider.query(AccountProvider.ACCOUNTS_URI, ACCOUNT_PROJECTION,
-                    Accounts.SELECT_BY_ACCOUNT, Array.of(account.name), null);
-            try {
-                // Only update the database if it's missing or different.
-                if (!c.moveToNext()
-                        || result.linkKarma != c.getInt(LINK_KARMA)
-                        || result.commentKarma != c.getInt(COMMENT_KARMA)
-                        || newHasMail != (c.getInt(HAS_MAIL) == 1)) {
-                    // Insert or replace the existing row and notify loaders.
-                    ContentValues v = new ContentValues(4);
-                    v.put(Accounts.COLUMN_ACCOUNT, account.name);
-                    v.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
-                    v.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
-                    v.put(Accounts.COLUMN_HAS_MAIL, newHasMail);
-                    provider.insert(AccountProvider.ACCOUNTS_URI, v);
-                    syncResult.stats.numInserts++;
-                }
-            } finally {
-                if (c != null) {
-                    c.close();
-                }
-            }
-
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numAuthExceptions++;
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numAuthExceptions++;
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numIoExceptions++;
-        } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
+      // Mark the account's messages as read if requested.
+      boolean markRead = false;
+      Cursor c = provider.query(
+          AccountProvider.ACCOUNT_ACTIONS_URI,
+          ACTION_PROJECTION,
+          AccountActions.SELECT_BY_ACCOUNT, Array.of(account.name),
+          null);
+      try {
+        while (c.moveToNext()) {
+          switch (c.getInt(ACTION)) {
+            case AccountActions.ACTION_MARK_MESSAGES_READ:
+              if (!markRead) {
+                RedditApi2.markMessagesRead(getContext(), account.name);
+                markRead = true;
+              }
+              int deleted = provider.delete(
+                  AccountProvider.ACCOUNT_ACTIONS_URI,
+                  AccountActions.SELECT_BY_ID, Array.of(c.getInt(ID)));
+              syncResult.stats.numDeletes += deleted;
+              break;
+          }
         }
+      } finally {
+        if (c != null) {
+          c.close();
+        }
+      }
+
+      // Update the account row with the latest information if it has changed.
+      AccountInfoResult result = RedditApi.aboutMe(cookie);
+      boolean newHasMail = result.hasMail && !markRead;
+      c = provider.query(
+          AccountProvider.ACCOUNTS_URI,
+          ACCOUNT_PROJECTION,
+          Accounts.SELECT_BY_ACCOUNT, Array.of(account.name),
+          null);
+      try {
+        // Only update the database if it's missing or different.
+        if (!c.moveToNext()
+            || result.linkKarma != c.getInt(LINK_KARMA)
+            || result.commentKarma != c.getInt(COMMENT_KARMA)
+            || newHasMail != (c.getInt(HAS_MAIL) == 1)) {
+          // Insert or replace the existing row and notify loaders.
+          ContentValues v = new ContentValues(4);
+          v.put(Accounts.COLUMN_ACCOUNT, account.name);
+          v.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
+          v.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
+          v.put(Accounts.COLUMN_HAS_MAIL, newHasMail);
+          provider.insert(AccountProvider.ACCOUNTS_URI, v);
+          syncResult.stats.numInserts++;
+        }
+      } finally {
+        if (c != null) {
+          c.close();
+        }
+      }
+
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
+      syncResult.stats.numAuthExceptions++;
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+      syncResult.stats.numAuthExceptions++;
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+      syncResult.stats.numIoExceptions++;
+    } catch (RemoteException e) {
+      Log.e(TAG, e.getMessage(), e);
+      syncResult.databaseError = true;
     }
+  }
 }
