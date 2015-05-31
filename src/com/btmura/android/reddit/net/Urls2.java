@@ -42,12 +42,16 @@ public class Urls2 {
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
+  private static final String MY_SUBREDDITS_URL =
+      OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
+
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
   private static final String MESSAGES_PATH = "/message/";
   private static final String MESSAGE_THREAD_PATH = "/message/messages/";
   private static final String USER_HTML_PATH = "/u/";
   private static final String USER_JSON_PATH = "/user/";
+
 
   public static CharSequence authorize(Context ctx, CharSequence state) {
     String clientId = ctx.getString(R.string.key_reddit_client_id);
@@ -61,8 +65,7 @@ public class Urls2 {
   }
 
   public static CharSequence mySubreddits() {
-    return new StringBuilder(OAUTH_REDDIT_COM)
-        .append("/subreddits/mine/subscriber?limit=1000");
+    return MY_SUBREDDITS_URL;
   }
 
   public static CharSequence subreddit(
@@ -117,6 +120,7 @@ public class Urls2 {
       sb.append(".json");
     }
 
+    // TODO(btmura): make count a parameter
     if (more != null) {
       sb.append("?count=25&after=").append(encode(more));
     }

@@ -30,6 +30,8 @@ import java.io.IOException;
 
 public class AccountUtils {
 
+    public static final String NO_ACCOUNT = "";
+
     public static boolean isAccount(String accountName) {
         return !TextUtils.isEmpty(accountName);
     }
