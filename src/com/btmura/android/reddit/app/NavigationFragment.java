@@ -90,6 +90,8 @@ public class NavigationFragment extends ListFragment implements
 
     private static final String LOADER_ARG_ACCOUNT_NAME = "accountName";
 
+    private static final int DEFAULT_SUBREDDIT_FILTER = Filter.SUBREDDIT_HOT;
+
     private final SubredditLoaderCallbacks subredditLoaderCallbacks =
             new SubredditLoaderCallbacks();
     private final RandomSubredditLoaderCallbacks randomLoaderCallbacks =
@@ -236,7 +238,7 @@ public class NavigationFragment extends ListFragment implements
         selectPlace(PLACE_SUBREDDIT,
                 requestedSubreddit,
                 Subreddits.isRandom(requestedSubreddit),
-                AccountPrefs.getLastSubredditFilter(getActivity(), Filter.SUBREDDIT_HOT),
+                AccountPrefs.getLastSubredditFilter(getActivity(), DEFAULT_SUBREDDIT_FILTER),
                 requestedThingBundle,
                 false,
                 false);
@@ -265,7 +267,7 @@ public class NavigationFragment extends ListFragment implements
                         accountName,
                         false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                        Filter.SUBREDDIT_HOT);
+                        DEFAULT_SUBREDDIT_FILTER);
                 selectPlace(place, subreddit, isRandom, filter, null, true, force);
                 break;
 
@@ -416,6 +418,8 @@ public class NavigationFragment extends ListFragment implements
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
         boolean isRandom = Subreddits.isRandom(subreddit);
+        int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
+            DEFAULT_SUBREDDIT_FILTER);
         selectPlace(PLACE_SUBREDDIT, subreddit, isRandom, filter, null, true, true);
     }
 
