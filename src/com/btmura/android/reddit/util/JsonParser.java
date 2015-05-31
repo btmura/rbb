@@ -398,13 +398,30 @@ public class JsonParser {
 
     // TODO: Create other safe read methods and use them.
 
-    protected static String readString(JsonReader reader, String nullValue)
+    protected static boolean readBoolean(JsonReader r, boolean defaultValue)
             throws IOException {
-        if (reader.peek() == JsonToken.NULL) {
-            reader.skipValue();
-            return nullValue;
-        } else {
-            return reader.nextString().trim();
+        if (JsonToken.NULL.equals(r.peek())) {
+            r.skipValue();
+            return defaultValue;
         }
+        return r.nextBoolean();
+    }
+
+    protected static int readInt(JsonReader r, int defaultValue)
+            throws IOException {
+        if (JsonToken.NULL.equals(r.peek())) {
+            r.skipValue();
+            return defaultValue;
+        }
+        return r.nextInt();
+    }
+
+    protected static String readString(JsonReader r, String defaultValue)
+            throws IOException {
+        if (JsonToken.NULL.equals(r.peek())) {
+            r.skipValue();
+            return defaultValue;
+        }
+        return r.nextString().trim();
     }
 }

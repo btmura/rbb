@@ -18,7 +18,6 @@ package com.btmura.android.reddit.net;
 
 import android.text.TextUtils;
 
-import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.util.ThingIds;
 
@@ -49,7 +48,6 @@ public class Urls {
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-    private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
 
     public static CharSequence aboutMe() {
         return new StringBuilder(API_ME_URL).append(".json");
@@ -201,10 +199,6 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence subredditSearch(String query, String more) {
-        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, -1, more, false);
-    }
-
     public static CharSequence subscribe() {
         return API_SUBSCRIBE_URL;
     }
@@ -227,42 +221,6 @@ public class Urls {
         b.append("&dir=").append(encode(Integer.toString(vote)));
         b.append("&uh=").append(encode(modhash));
         b.append("&api_type=json");
-        return b;
-    }
-
-    private static CharSequence newSearchUrl(CharSequence base, String query, int filter,
-                                             String more, boolean restrict) {
-        StringBuilder b = new StringBuilder(base).append(encode(query));
-        switch (filter) {
-            case Filter.SEARCH_RELEVANCE:
-                b.append("&sort=relevance");
-                break;
-
-            case Filter.SEARCH_NEW:
-                b.append("&sort=new");
-                break;
-
-            case Filter.SEARCH_HOT:
-                b.append("&sort=hot");
-                break;
-
-            case Filter.SEARCH_TOP:
-                b.append("&sort=top");
-                break;
-
-            case Filter.SEARCH_COMMENTS:
-                b.append("&sort=comments");
-                break;
-
-            default:
-                break;
-        }
-        if (more != null) {
-            b.append("&count=25&after=").append(encode(more));
-        }
-        if (restrict) {
-            b.append("&restrict_sr=on");
-        }
         return b;
     }
 

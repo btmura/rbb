@@ -567,7 +567,6 @@ public class ThingProvider extends BaseProvider {
     private Listing createListing(String accountName, Bundle extras)
             throws OperationCanceledException, AuthenticatorException, IOException {
         Context context = getContext();
-        String cookie = AccountUtils.getCookie(context, accountName);
 
         int count = extras.getInt(EXTRA_COUNT);
         int filter = extras.getInt(EXTRA_FILTER, -1);
@@ -636,7 +635,10 @@ public class ThingProvider extends BaseProvider {
                         more);
 
             case Sessions.TYPE_SUBREDDIT_SEARCH:
-                return SubredditResultListing.newInstance(accountName, query, cookie);
+                return SubredditResultListing.newInstance(
+                        context,
+                        accountName,
+                        query);
 
             default:
                 throw new IllegalArgumentException();

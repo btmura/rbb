@@ -101,6 +101,16 @@ public class Urls2Test extends TestCase {
         Urls2.search(ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
   }
 
+  public void testSubredditSearch() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/reddits/search.json?q=s2000",
+        Urls2.subredditSearch(NO_ACCOUNT, "s2000"));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/reddits/search?q=s2000",
+        Urls2.subredditSearch(ACCOUNT, "s2000"));
+  }
+
   public void testSidebar() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/cars/about.json",

@@ -50,11 +50,12 @@ public class Urls2 {
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
-  private static final String MESSAGES_PATH = "/message/";
+  private static final String MESSAGES_PATH = "/message";
   private static final String MESSAGE_THREAD_PATH = "/message/messages/";
-  private static final String SUBREDDIT_PATH = "/r/";
-  private static final String USER_HTML_PATH = "/u/";
-  private static final String USER_JSON_PATH = "/user/";
+  private static final String SUBREDDITS_PATH = "/subreddits";
+  private static final String R_PATH = "/r/";
+  private static final String U_PATH = "/u/";
+  private static final String USER_PATH = "/user/";
 
 
   public static CharSequence authorize(Context ctx, CharSequence state) {
@@ -93,7 +94,7 @@ public class Urls2 {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
     if (!Subreddits.isFrontPage(subreddit)) {
-      sb.append(SUBREDDIT_PATH).append(encode(subreddit));
+      sb.append(R_PATH).append(encode(subreddit));
     }
 
     if (!Subreddits.isRandom(subreddit)) {
@@ -218,15 +219,15 @@ public class Urls2 {
 
     switch (filter) {
       case Filter.MESSAGE_INBOX:
-        sb.append("inbox");
+        sb.append("/inbox");
         break;
 
       case Filter.MESSAGE_UNREAD:
-        sb.append("unread");
+        sb.append("/unread");
         break;
 
       case Filter.MESSAGE_SENT:
-        sb.append("sent");
+        sb.append("/sent");
         break;
 
       default:
@@ -250,7 +251,7 @@ public class Urls2 {
       int filter,
       @Nullable String more) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(USER_JSON_PATH)
+        .append(USER_PATH)
         .append(encode(user));
     switch (filter) {
       case Filter.PROFILE_OVERVIEW:
@@ -292,7 +293,7 @@ public class Urls2 {
 
   public static CharSequence profileLink(String user) {
     return new StringBuilder(WWW_REDDIT_COM)
-        .append(USER_HTML_PATH)
+        .append(U_PATH)
         .append(encode(user));
   }
 
@@ -314,19 +315,28 @@ public class Urls2 {
       String query,
       int filter,
       @Nullable String more) {
-    return innerSearch(accountName, subreddit, query, filter, more);
+    return innerSearch(accountName, subreddit, false, query, filter, more);
+  }
+
+  public static CharSequence subredditSearch(
+      String accountName,
+      String query) {
+    return innerSearch(accountName, null, true, query, -1, null);
   }
 
   private static CharSequence innerSearch(
       String accountName,
       @Nullable String subreddit,
+      boolean subredditSearch,
       String query,
       int filter,
       @Nullable String more) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
-    if (!TextUtils.isEmpty(subreddit)) {
-      sb.append(SUBREDDIT_PATH).append(encode(subreddit));
+    if (subredditSearch) {
+      sb.append(SUBREDDITS_PATH);
+    } else if (!TextUtils.isEmpty(subreddit)) {
+      sb.append(R_PATH).append(encode(subreddit));
     }
 
     sb.append("/search");
@@ -369,7 +379,7 @@ public class Urls2 {
       String accountName,
       String subreddit) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(SUBREDDIT_PATH)
+        .append(R_PATH)
         .append(encode(subreddit))
         .append("/about");
     if (needsJsonExtension(accountName, FORMAT_JSON)) {
@@ -380,7 +390,7 @@ public class Urls2 {
 
   public static CharSequence userInfo(String accountName, String user) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(USER_JSON_PATH)
+        .append(USER_PATH)
         .append(encode(user))
         .append("/about");
     if (needsJsonExtension(accountName, FORMAT_JSON)) {
