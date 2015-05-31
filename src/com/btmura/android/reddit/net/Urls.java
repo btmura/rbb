@@ -20,19 +20,12 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class Urls {
-
-    /** Type for getting a HTML response. */
-    public static final int TYPE_HTML = 0;
-
-    /** Type for getting a JSON response. */
-    public static final int TYPE_JSON = 1;
 
     public static final String BASE_URL = "https://www.reddit.com";
     private static final String BASE_SSL_URL = "https://ssl.reddit.com";

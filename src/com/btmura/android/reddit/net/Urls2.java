@@ -37,9 +37,8 @@ public class Urls2 {
 
   private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
 
-  // TODO(btmura): make types private
-  public static final int TYPE_HTML = 0;
-  public static final int TYPE_JSON = 1;
+  private static final int FORMAT_HTML = 0;
+  private static final int FORMAT_JSON = 1;
 
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
@@ -59,9 +58,9 @@ public class Urls2 {
     String clientId = ctx.getString(R.string.key_reddit_client_id);
     return new StringBuilder(WWW_REDDIT_COM)
         .append(AUTHORIZE_PATH)
-        .append("?client_id=").append(clientId)
-        .append("&response_type=code&state=").append(state)
-        .append("&redirect_uri=").append(OAUTH_REDIRECT_URL)
+        .append("?client_id=").append(encode(clientId))
+        .append("&response_type=code&state=").append(encode(state))
+        .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
         .append(encode("history,mysubreddits,privatemessages,read"));
   }
@@ -75,11 +74,11 @@ public class Urls2 {
       String subreddit,
       int filter,
       @Nullable String more) {
-    return innerSubreddit(accountName, subreddit, filter, more, TYPE_JSON);
+    return innerSubreddit(accountName, subreddit, filter, more, FORMAT_JSON);
   }
 
   public static CharSequence subredditLink(String subreddit) {
-    return innerSubreddit(NO_ACCOUNT, subreddit, -1, null, TYPE_HTML);
+    return innerSubreddit(NO_ACCOUNT, subreddit, -1, null, FORMAT_HTML);
   }
 
   private static CharSequence innerSubreddit(
@@ -87,7 +86,7 @@ public class Urls2 {
       String subreddit,
       int filter,
       @Nullable String more,
-      int apiType) {
+      int format) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
     if (!Subreddits.isFrontPage(subreddit)) {
@@ -118,7 +117,7 @@ public class Urls2 {
       }
     }
 
-    if (needsJsonExtension(accountName, apiType)) {
+    if (needsJsonExtension(accountName, format)) {
       sb.append(".json");
     }
 
@@ -137,11 +136,11 @@ public class Urls2 {
       int filter,
       int numComments) {
     return innerComments(accountName, thingId, linkId, filter, numComments,
-        TYPE_JSON);
+        FORMAT_JSON);
   }
 
   public static CharSequence commentsLink(String thingId, String linkId) {
-    return innerComments(NO_ACCOUNT, thingId, linkId, -1, -1, TYPE_HTML);
+    return innerComments(NO_ACCOUNT, thingId, linkId, -1, -1, FORMAT_HTML);
   }
 
   private static CharSequence innerComments(
@@ -150,7 +149,7 @@ public class Urls2 {
       String linkId,
       int filter,
       int numComments,
-      int apiType) {
+      int format) {
     thingId = ThingIds.removeTag(thingId);
 
     boolean hasLinkId = !TextUtils.isEmpty(linkId);
@@ -158,9 +157,9 @@ public class Urls2 {
 
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
         .append(COMMENTS_PATH)
-        .append(hasLinkId ? ThingIds.removeTag(linkId) : thingId);
+        .append(encode(hasLinkId ? ThingIds.removeTag(linkId) : thingId));
 
-    if (needsJsonExtension(accountName, apiType)) {
+    if (needsJsonExtension(accountName, format)) {
       sb.append(".json");
     }
 
@@ -169,7 +168,7 @@ public class Urls2 {
     }
 
     if (hasLinkId) {
-      sb.append("&comment=").append(thingId).append("&context=3");
+      sb.append("&comment=").append(encode(thingId)).append("&context=3");
     } else if (filter != -1) {
       switch (filter) {
         case Filter.COMMENTS_BEST:
@@ -280,7 +279,7 @@ public class Urls2 {
         sb.append("/saved");
         break;
     }
-    if (needsJsonExtension(accountName, TYPE_JSON)) {
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
       sb.append(".json");
     }
     if (more != null) {
@@ -292,19 +291,19 @@ public class Urls2 {
   public static CharSequence profileLink(String user) {
     return new StringBuilder(WWW_REDDIT_COM)
         .append(USER_HTML_PATH)
-        .append(user);
+        .append(encode(user));
   }
 
   public static CharSequence messageThread(String thingId) {
     return new StringBuilder(OAUTH_REDDIT_COM)
         .append(MESSAGE_THREAD_PATH)
-        .append(ThingIds.removeTag(thingId));
+        .append(encode(ThingIds.removeTag(thingId)));
   }
 
   public static CharSequence messageThreadLink(String thingId) {
     return new StringBuilder(WWW_REDDIT_COM)
         .append(MESSAGE_THREAD_PATH)
-        .append(ThingIds.removeTag(thingId));
+        .append(encode(ThingIds.removeTag(thingId)));
   }
 
   public static CharSequence userInfo(String accountName, String user) {
@@ -312,7 +311,7 @@ public class Urls2 {
         .append(USER_JSON_PATH)
         .append(encode(user))
         .append("/about");
-    if (needsJsonExtension(accountName, TYPE_JSON)) {
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
       sb.append(".json");
     }
     return sb;
@@ -322,8 +321,8 @@ public class Urls2 {
     return isOAuth(accountName) ? OAUTH_REDDIT_COM : WWW_REDDIT_COM;
   }
 
-  private static boolean needsJsonExtension(String accountName, int apiType) {
-    return !isOAuth(accountName) && apiType == TYPE_JSON;
+  private static boolean needsJsonExtension(String accountName, int format) {
+    return !isOAuth(accountName) && format == FORMAT_JSON;
   }
 
   private static boolean isOAuth(String accountName) {
@@ -338,9 +337,9 @@ public class Urls2 {
     }
   }
 
-  public static String encode(String param) {
+  public static String encode(CharSequence param) {
     try {
-      return URLEncoder.encode(param, "UTF-8");
+      return URLEncoder.encode(param.toString(), "UTF-8");
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }

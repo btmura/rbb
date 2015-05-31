@@ -48,6 +48,8 @@ public class Urls2Test extends TestCase {
         Urls2.subredditLink("androiddev"));
   }
 
+  // TODO(btmura): add test for comment URLs
+
   public void testProfile() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/overview.json",
