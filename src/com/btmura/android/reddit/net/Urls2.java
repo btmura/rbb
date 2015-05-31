@@ -282,12 +282,12 @@ public class Urls2 {
         sb.append("/submitted");
         break;
 
-      case Filter.PROFILE_LIKED:
-        sb.append("/liked");
+      case Filter.PROFILE_UPVOTED:
+        sb.append("/upvoted");
         break;
 
-      case Filter.PROFILE_DISLIKED:
-        sb.append("/disliked");
+      case Filter.PROFILE_DOWNVOTED:
+        sb.append("/downvoted");
         break;
 
       case Filter.PROFILE_HIDDEN:

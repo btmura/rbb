@@ -470,8 +470,8 @@ class ThingListing extends JsonParser implements Listing {
                     mergeSaveActions();
                     break;
 
-                case Filter.PROFILE_LIKED:
-                case Filter.PROFILE_DISLIKED:
+                case Filter.PROFILE_UPVOTED:
+                case Filter.PROFILE_DOWNVOTED:
                     mergeVoteActions(filter);
                     break;
             }
@@ -540,7 +540,7 @@ class ThingListing extends JsonParser implements Listing {
         boolean firstPage = TextUtils.isEmpty(more);
         String selection;
         switch (filter) {
-            case Filter.PROFILE_LIKED:
+            case Filter.PROFILE_UPVOTED:
                 // If we're on the first page, then grab both likes, dislikes, and neutral votes.
                 // The liked items will be prepended to the top and disliked and netural items will
                 // be pruned.
@@ -552,7 +552,7 @@ class ThingListing extends JsonParser implements Listing {
                         : VoteActions.SELECT_SHOWABLE_NOT_UP_BY_ACCOUNT;
                 break;
 
-            case Filter.PROFILE_DISLIKED:
+            case Filter.PROFILE_DOWNVOTED:
                 selection = firstPage
                         ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
                         : VoteActions.SELECT_SHOWABLE_NOT_DOWN_BY_ACCOUNT;
@@ -568,9 +568,9 @@ class ThingListing extends JsonParser implements Listing {
         while (c.moveToNext()) {
             int action = c.getInt(VOTE_ACTION);
             if (action == VoteActions.ACTION_VOTE_UP
-                    && filter == Filter.PROFILE_LIKED
+                    && filter == Filter.PROFILE_UPVOTED
                     || action == VoteActions.ACTION_VOTE_DOWN
-                    && filter == Filter.PROFILE_DISLIKED) {
+                    && filter == Filter.PROFILE_DOWNVOTED) {
                 addVote(c);
             } else {
                 removeByThingId(c.getString(VOTE_THING_ID));

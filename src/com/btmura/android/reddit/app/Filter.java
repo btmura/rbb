@@ -32,8 +32,8 @@ public interface Filter {
     static final int PROFILE_OVERVIEW = 0;
     static final int PROFILE_COMMENTS = 1;
     static final int PROFILE_SUBMITTED = 2;
-    static final int PROFILE_LIKED = 3;
-    static final int PROFILE_DISLIKED = 4;
+    static final int PROFILE_UPVOTED = 3;
+    static final int PROFILE_DOWNVOTED = 4;
     static final int PROFILE_HIDDEN = 5;
     static final int PROFILE_SAVED = 6;
 

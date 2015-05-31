@@ -63,8 +63,8 @@
     <string name="filter_profile_overview">overview</string>
     <string name="filter_profile_comments">comments</string>
     <string name="filter_profile_submitted">submitted</string>
-    <string name="filter_profile_liked">liked</string>
-    <string name="filter_profile_disliked">disliked</string>
+    <string name="filter_profile_upvoted">upvoted</string>
+    <string name="filter_profile_downvoted">downvoted</string>
     <string name="filter_profile_hidden">hidden</string>
     <string name="filter_profile_saved">saved</string>
     <string name="filter_search_comments">comments</string>

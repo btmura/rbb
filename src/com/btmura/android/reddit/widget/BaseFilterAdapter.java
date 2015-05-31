@@ -20,9 +20,9 @@ import static com.btmura.android.reddit.app.Filter.MESSAGE_INBOX;
 import static com.btmura.android.reddit.app.Filter.MESSAGE_SENT;
 import static com.btmura.android.reddit.app.Filter.MESSAGE_UNREAD;
 import static com.btmura.android.reddit.app.Filter.PROFILE_COMMENTS;
-import static com.btmura.android.reddit.app.Filter.PROFILE_DISLIKED;
+import static com.btmura.android.reddit.app.Filter.PROFILE_DOWNVOTED;
 import static com.btmura.android.reddit.app.Filter.PROFILE_HIDDEN;
-import static com.btmura.android.reddit.app.Filter.PROFILE_LIKED;
+import static com.btmura.android.reddit.app.Filter.PROFILE_UPVOTED;
 import static com.btmura.android.reddit.app.Filter.PROFILE_OVERVIEW;
 import static com.btmura.android.reddit.app.Filter.PROFILE_SAVED;
 import static com.btmura.android.reddit.app.Filter.PROFILE_SUBMITTED;
@@ -55,8 +55,8 @@ abstract class BaseFilterAdapter extends BaseAdapter {
         add(context, R.string.filter_profile_comments, PROFILE_COMMENTS);
         add(context, R.string.filter_profile_submitted, PROFILE_SUBMITTED);
         if (hasAccount) {
-            add(context, R.string.filter_profile_liked, PROFILE_LIKED);
-            add(context, R.string.filter_profile_disliked, PROFILE_DISLIKED);
+            add(context, R.string.filter_profile_upvoted, PROFILE_UPVOTED);
+            add(context, R.string.filter_profile_downvoted, PROFILE_DOWNVOTED);
             add(context, R.string.filter_profile_hidden, PROFILE_HIDDEN);
             add(context, R.string.filter_profile_saved, PROFILE_SAVED);
         }
