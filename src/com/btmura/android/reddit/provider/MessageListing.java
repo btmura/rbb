@@ -166,8 +166,7 @@ class MessageListing extends JsonParser implements Listing {
   private CharSequence getUrl() {
     switch (sessionType) {
       case Sessions.TYPE_MESSAGES:
-        return Urls2.messages(accountName, filter, more, mark,
-            Urls.TYPE_JSON);
+        return Urls2.messages(filter, more, mark);
 
       case Sessions.TYPE_MESSAGE_THREAD:
         return Urls2.messageThread(thingId);

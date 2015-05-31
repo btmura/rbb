@@ -138,8 +138,7 @@ public class RedditApi2 {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
-      CharSequence url = Urls2.messages(accountName, Filter.MESSAGE_UNREAD,
-          null, true, Urls.TYPE_HTML);
+      CharSequence url = Urls2.messages(Filter.MESSAGE_INBOX, null, true);
       conn = connect(ctx, accountName, url);
       in = new BufferedInputStream(conn.getInputStream());
       in.read();

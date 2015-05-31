@@ -209,12 +209,10 @@ public class Urls2 {
   }
 
   public static CharSequence messages(
-      String accountName,
       int filter,
-      String more,
-      boolean mark,
-      int apiType) {
-    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+      @Nullable String more,
+      boolean mark) {
+    StringBuilder sb = new StringBuilder(OAUTH_REDDIT_COM)
         .append(MESSAGES_PATH);
 
     switch (filter) {
@@ -231,10 +229,7 @@ public class Urls2 {
         break;
 
       default:
-        throw new IllegalArgumentException(Integer.toString(filter));
-    }
-    if (needsJsonExtension(accountName, apiType)) {
-      sb.append("/.json");
+        throw new IllegalArgumentException();
     }
     if (more != null || mark) {
       sb.append("?");
