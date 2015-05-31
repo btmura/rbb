@@ -121,7 +121,7 @@ public class RedditApi2 {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
-      CharSequence url = Urls2.userInfo(accountName, user, Urls2.TYPE_JSON);
+      CharSequence url = Urls2.userInfo(accountName, user);
       conn = connect(ctx, accountName, url);
       in = new BufferedInputStream(conn.getInputStream());
       return AccountInfoResult.fromJsonReader(

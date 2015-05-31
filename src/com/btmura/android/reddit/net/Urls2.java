@@ -35,6 +35,8 @@ public class Urls2 {
 
   public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
+  private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+
   // TODO(btmura): make types private
   public static final int TYPE_HTML = 0;
   public static final int TYPE_JSON = 1;
@@ -77,7 +79,7 @@ public class Urls2 {
   }
 
   public static CharSequence subredditLink(String subreddit) {
-    return innerSubreddit("", subreddit, -1, null, TYPE_HTML);
+    return innerSubreddit(NO_ACCOUNT, subreddit, -1, null, TYPE_HTML);
   }
 
   private static CharSequence innerSubreddit(
@@ -139,7 +141,7 @@ public class Urls2 {
   }
 
   public static CharSequence commentsLink(String thingId, String linkId) {
-    return innerComments("", thingId, linkId, -1, -1, TYPE_HTML);
+    return innerComments(NO_ACCOUNT, thingId, linkId, -1, -1, TYPE_HTML);
   }
 
   private static CharSequence innerComments(
@@ -306,7 +308,15 @@ public class Urls2 {
     return sb;
   }
 
-  public static CharSequence userInfo(
+  public static CharSequence userInfo(String accountName, String user) {
+    return innerUserInfo(accountName, user, TYPE_JSON);
+  }
+
+  public static CharSequence userInfoLink(String user) {
+    return innerUserInfo(NO_ACCOUNT, user, TYPE_HTML);
+  }
+
+  private static CharSequence innerUserInfo(
       String accountName,
       String user,
       int apiType) {

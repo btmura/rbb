@@ -47,6 +47,22 @@ public class Urls2Test extends TestCase {
         Urls2.subredditLink("androiddev").toString());
   }
 
+  public void testUserInfo() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/u/btmura.json",
+        Urls2.userInfo(AccountUtils.NO_ACCOUNT, "btmura"));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/user/btmura",
+        Urls2.userInfo("rbbaccount", "btmura"));
+  }
+
+  public void testUserInfoLink() {
+    assertCharSequenceEquals(
+        "http://www.reddit.com/u/btmura",
+        Urls2.userInfoLink("btmura"));
+  }
+
   private void assertCharSequenceEquals(
       CharSequence expected,
       CharSequence actual) {
