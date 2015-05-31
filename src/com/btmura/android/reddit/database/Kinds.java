@@ -22,6 +22,8 @@ package com.btmura.android.reddit.database;
  */
 public final class Kinds {
 
+    // TODO(btmura): don't throw exceptions and blow up
+
     /** Name of the kind column. Refer to this in table classes for clarity. */
     public static final String COLUMN_KIND = "kind";
 

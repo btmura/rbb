@@ -316,135 +316,135 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     @Override
-    public void onEntityStart(int index) {
+    public void onEntityStart(int i) {
         // Pass -1 and null since we don't know those until later
         values.add(newContentValues(-1, null, 19));
     }
 
     @Override
-    public void onAuthor(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_AUTHOR, readString(reader, ""));
+    public void onAuthor(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_AUTHOR, readString(r, ""));
     }
 
     @Override
-    public void onBody(JsonReader reader, int index) throws IOException {
-        CharSequence body = readFormattedString(reader);
-        values.get(index).put(Things.COLUMN_BODY, body.toString());
+    public void onBody(JsonReader r, int i) throws IOException {
+        CharSequence body = readFormattedString(r);
+        values.get(i).put(Things.COLUMN_BODY, body.toString());
     }
 
     @Override
-    public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_CREATED_UTC, reader.nextLong());
+    public void onCreatedUtc(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_CREATED_UTC, r.nextLong());
     }
 
     @Override
-    public void onDomain(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_DOMAIN, readString(reader, ""));
+    public void onDomain(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_DOMAIN, readString(r, ""));
     }
 
     @Override
-    public void onDowns(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_DOWNS, reader.nextInt());
+    public void onDowns(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_DOWNS, r.nextInt());
     }
 
     @Override
-    public void onHidden(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_HIDDEN, reader.nextBoolean());
+    public void onHidden(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_HIDDEN, r.nextBoolean());
     }
 
     @Override
-    public void onKind(JsonReader reader, int index) throws IOException {
-        int kindValue = Kinds.parseKind(reader.nextString());
-        values.get(index).put(Things.COLUMN_KIND, kindValue);
+    public void onKind(JsonReader r, int i) throws IOException {
+        int kindValue = Kinds.parseKind(r.nextString());
+        values.get(i).put(Things.COLUMN_KIND, kindValue);
     }
 
     @Override
-    public void onLikes(JsonReader reader, int index) throws IOException {
+    public void onLikes(JsonReader r, int i) throws IOException {
         int likes = 0;
-        if (reader.peek() == JsonToken.BOOLEAN) {
-            likes = reader.nextBoolean() ? 1 : -1;
+        if (r.peek() == JsonToken.BOOLEAN) {
+            likes = r.nextBoolean() ? 1 : -1;
         } else {
-            reader.skipValue();
+            r.skipValue();
         }
-        values.get(index).put(Things.COLUMN_LIKES, likes);
+        values.get(i).put(Things.COLUMN_LIKES, likes);
     }
 
     @Override
-    public void onLinkId(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_LINK_ID, reader.nextString());
+    public void onLinkId(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_LINK_ID, r.nextString());
     }
 
     @Override
-    public void onLinkTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = readFormattedString(reader);
-        values.get(index).put(Things.COLUMN_LINK_TITLE, title.toString());
+    public void onLinkTitle(JsonReader r, int i) throws IOException {
+        CharSequence title = readFormattedString(r);
+        values.get(i).put(Things.COLUMN_LINK_TITLE, title.toString());
     }
 
     @Override
-    public void onName(JsonReader reader, int index) throws IOException {
-        String name = readString(reader, "");
-        values.get(index).put(Things.COLUMN_THING_ID, name);
+    public void onName(JsonReader r, int i) throws IOException {
+        String name = readString(r, "");
+        values.get(i).put(Things.COLUMN_THING_ID, name);
     }
 
     @Override
-    public void onNumComments(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_NUM_COMMENTS, reader.nextInt());
+    public void onNumComments(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_NUM_COMMENTS, r.nextInt());
     }
 
     @Override
-    public void onOver18(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_OVER_18, reader.nextBoolean());
+    public void onOver18(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_OVER_18, r.nextBoolean());
     }
 
     @Override
-    public void onPermaLink(JsonReader reader, int index) throws IOException {
-        String url = readFormattedString(reader).toString();
-        values.get(index).put(Things.COLUMN_PERMA_LINK, url);
+    public void onPermaLink(JsonReader r, int i) throws IOException {
+        String url = readFormattedString(r).toString();
+        values.get(i).put(Things.COLUMN_PERMA_LINK, url);
     }
 
     @Override
-    public void onSaved(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SAVED, reader.nextBoolean());
+    public void onSaved(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_SAVED, r.nextBoolean());
     }
 
     @Override
-    public void onScore(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SCORE, reader.nextInt());
+    public void onScore(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_SCORE, r.nextInt());
     }
 
     @Override
-    public void onIsSelf(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SELF, reader.nextBoolean());
+    public void onIsSelf(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_SELF, r.nextBoolean());
     }
 
     @Override
-    public void onSubreddit(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SUBREDDIT, readString(reader, ""));
+    public void onSubreddit(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_SUBREDDIT, readString(r, ""));
     }
 
     @Override
-    public void onTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = readFormattedString(reader);
-        values.get(index).put(Things.COLUMN_TITLE, title.toString());
+    public void onTitle(JsonReader r, int i) throws IOException {
+        CharSequence title = readFormattedString(r);
+        values.get(i).put(Things.COLUMN_TITLE, title.toString());
     }
 
     @Override
-    public void onThumbnail(JsonReader reader, int index) throws IOException {
-        String thumbnail = readString(reader, null);
+    public void onThumbnail(JsonReader r, int i) throws IOException {
+        String thumbnail = readString(r, null);
         if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
-            values.get(index).put(Things.COLUMN_THUMBNAIL_URL, thumbnail);
+            values.get(i).put(Things.COLUMN_THUMBNAIL_URL, thumbnail);
         }
     }
 
     @Override
-    public void onUrl(JsonReader reader, int index) throws IOException {
-        String url = readFormattedString(reader).toString();
-        values.get(index).put(Things.COLUMN_URL, url);
+    public void onUrl(JsonReader r, int i) throws IOException {
+        String url = readFormattedString(r).toString();
+        values.get(i).put(Things.COLUMN_URL, url);
     }
 
     @Override
-    public void onUps(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_UPS, reader.nextInt());
+    public void onUps(JsonReader r, int i) throws IOException {
+        values.get(i).put(Things.COLUMN_UPS, r.nextInt());
     }
 
     private CharSequence readFormattedString(JsonReader reader) throws IOException {

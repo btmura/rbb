@@ -50,18 +50,18 @@ public class AccountInfoResult extends JsonParser {
     }
 
     @Override
-    public void onLinkKarma(JsonReader reader, int index) throws IOException {
-        linkKarma = reader.nextInt();
+    public void onLinkKarma(JsonReader r, int i) throws IOException {
+        linkKarma = r.nextInt();
     }
 
     @Override
-    public void onCommentKarma(JsonReader reader, int index) throws IOException {
-        commentKarma = reader.nextInt();
+    public void onCommentKarma(JsonReader r, int i) throws IOException {
+        commentKarma = r.nextInt();
     }
 
     @Override
-    public void onHasMail(JsonReader reader, int index) throws IOException {
+    public void onHasMail(JsonReader r, int i) throws IOException {
         // hasMail is null when we are viewing somebody else's account info.
-        hasMail = reader.peek() != JsonToken.NULL && reader.nextBoolean();
+        hasMail = r.peek() != JsonToken.NULL && r.nextBoolean();
     }
 }

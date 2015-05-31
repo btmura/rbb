@@ -362,117 +362,117 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         }
 
         @Override
-        public void onAuthor(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_AUTHOR, readString(reader, ""));
+        public void onAuthor(JsonReader r, int i) throws IOException {
+            data.putString(KEY_AUTHOR, readString(r, ""));
         }
 
         @Override
-        public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-            data.putLong(KEY_CREATED_UTC, reader.nextLong());
+        public void onCreatedUtc(JsonReader r, int i) throws IOException {
+            data.putLong(KEY_CREATED_UTC, r.nextLong());
         }
 
         @Override
-        public void onDomain(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_DOMAIN, readString(reader, ""));
+        public void onDomain(JsonReader r, int i) throws IOException {
+            data.putString(KEY_DOMAIN, readString(r, ""));
         }
 
         @Override
-        public void onDowns(JsonReader reader, int index) throws IOException {
-            data.putInt(KEY_DOWNS, reader.nextInt());
+        public void onDowns(JsonReader r, int i) throws IOException {
+            data.putInt(KEY_DOWNS, r.nextInt());
         }
 
         @Override
-        public void onKind(JsonReader reader, int index) throws IOException {
-            data.putInt(KEY_KIND, Kinds.parseKind(reader.nextString()));
+        public void onKind(JsonReader r, int i) throws IOException {
+            data.putInt(KEY_KIND, Kinds.parseKind(r.nextString()));
         }
 
         @Override
-        public void onLikes(JsonReader reader, int index) throws IOException {
+        public void onLikes(JsonReader r, int i) throws IOException {
             int likes = 0;
-            if (reader.peek() == JsonToken.BOOLEAN) {
-                likes = reader.nextBoolean() ? 1 : -1;
+            if (r.peek() == JsonToken.BOOLEAN) {
+                likes = r.nextBoolean() ? 1 : -1;
             } else {
-                reader.skipValue();
+                r.skipValue();
             }
             data.putInt(KEY_LIKES, likes);
         }
 
         @Override
-        public void onLinkId(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_LINK_ID, readString(reader, null));
+        public void onLinkId(JsonReader r, int i) throws IOException {
+            data.putString(KEY_LINK_ID, readString(r, null));
         }
 
         @Override
-        public void onLinkTitle(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_LINK_TITLE, readFormattedString(reader));
+        public void onLinkTitle(JsonReader r, int i) throws IOException {
+            data.putString(KEY_LINK_TITLE, readFormattedString(r));
         }
 
         @Override
-        public void onName(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_THING_ID, readString(reader, ""));
+        public void onName(JsonReader r, int i) throws IOException {
+            data.putString(KEY_THING_ID, readString(r, ""));
         }
 
         @Override
-        public void onNumComments(JsonReader reader, int index) throws IOException {
-            data.putInt(KEY_NUM_COMMENTS, reader.nextInt());
+        public void onNumComments(JsonReader r, int i) throws IOException {
+            data.putInt(KEY_NUM_COMMENTS, r.nextInt());
         }
 
         @Override
-        public void onOver18(JsonReader reader, int index) throws IOException {
-            data.putBoolean(KEY_OVER_18, reader.nextBoolean());
+        public void onOver18(JsonReader r, int i) throws IOException {
+            data.putBoolean(KEY_OVER_18, r.nextBoolean());
         }
 
         @Override
-        public void onPermaLink(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_PERMA_LINK, readString(reader, ""));
+        public void onPermaLink(JsonReader r, int i) throws IOException {
+            data.putString(KEY_PERMA_LINK, readString(r, ""));
         }
 
         @Override
-        public void onSaved(JsonReader reader, int index) throws IOException {
-            data.putBoolean(KEY_SAVED, reader.nextBoolean());
+        public void onSaved(JsonReader r, int i) throws IOException {
+            data.putBoolean(KEY_SAVED, r.nextBoolean());
         }
 
         @Override
-        public void onScore(JsonReader reader, int index) throws IOException {
-            data.putInt(KEY_SCORE, reader.nextInt());
+        public void onScore(JsonReader r, int i) throws IOException {
+            data.putInt(KEY_SCORE, r.nextInt());
         }
 
         @Override
-        public void onIsSelf(JsonReader reader, int index) throws IOException {
-            data.putBoolean(KEY_SELF, reader.nextBoolean());
+        public void onIsSelf(JsonReader r, int i) throws IOException {
+            data.putBoolean(KEY_SELF, r.nextBoolean());
         }
 
         @Override
-        public void onSubject(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_SUBJECT, readFormattedString(reader));
+        public void onSubject(JsonReader r, int i) throws IOException {
+            data.putString(KEY_SUBJECT, readFormattedString(r));
         }
 
         @Override
-        public void onSubreddit(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_SUBREDDIT, readString(reader, ""));
+        public void onSubreddit(JsonReader r, int i) throws IOException {
+            data.putString(KEY_SUBREDDIT, readString(r, ""));
         }
 
         @Override
-        public void onThumbnail(JsonReader reader, int index) throws IOException {
-            String thumbnail = readString(reader, null);
+        public void onThumbnail(JsonReader r, int i) throws IOException {
+            String thumbnail = readString(r, null);
             if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
                 data.putString(KEY_THUMBNAIL_URL, thumbnail);
             }
         }
 
         @Override
-        public void onTitle(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_TITLE, readFormattedString(reader));
+        public void onTitle(JsonReader r, int i) throws IOException {
+            data.putString(KEY_TITLE, readFormattedString(r));
         }
 
         @Override
-        public void onUps(JsonReader reader, int index) throws IOException {
-            data.putInt(KEY_UPS, reader.nextInt());
+        public void onUps(JsonReader r, int i) throws IOException {
+            data.putInt(KEY_UPS, r.nextInt());
         }
 
         @Override
-        public void onUrl(JsonReader reader, int index) throws IOException {
-            data.putString(KEY_URL, readString(reader, ""));
+        public void onUrl(JsonReader r, int i) throws IOException {
+            data.putString(KEY_URL, readString(r, ""));
         }
 
         private String readFormattedString(JsonReader reader) throws IOException {

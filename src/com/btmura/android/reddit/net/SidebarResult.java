@@ -68,27 +68,27 @@ public class SidebarResult extends JsonParser {
     // JSON attribute parsing methods
 
     @Override
-    public void onDisplayName(JsonReader reader, int index) throws IOException {
-        subreddit = reader.nextString();
+    public void onDisplayName(JsonReader r, int i) throws IOException {
+        subreddit = r.nextString();
     }
 
     @Override
-    public void onHeaderImage(JsonReader reader, int index) throws IOException {
-        headerImage = readString(reader, null);
+    public void onHeaderImage(JsonReader r, int i) throws IOException {
+        headerImage = readString(r, null);
     }
 
     @Override
-    public void onTitle(JsonReader reader, int index) throws IOException {
-        title = formatter.formatNoSpans(context, readString(reader, ""));
+    public void onTitle(JsonReader r, int i) throws IOException {
+        title = formatter.formatNoSpans(context, readString(r, ""));
     }
 
     @Override
-    public void onDescription(JsonReader reader, int index) throws IOException {
-        description = formatter.formatAll(context, readString(reader, ""));
+    public void onDescription(JsonReader r, int i) throws IOException {
+        description = formatter.formatAll(context, readString(r, ""));
     }
 
     @Override
-    public void onSubscribers(JsonReader reader, int index) throws IOException {
-        subscribers = reader.nextInt();
+    public void onSubscribers(JsonReader r, int i) throws IOException {
+        subscribers = r.nextInt();
     }
 }

@@ -194,7 +194,7 @@ class MessageListing extends JsonParser implements Listing {
   }
 
   @Override
-  public void onEntityStart(int index) {
+  public void onEntityStart(int i) {
     values.add(newContentValues(14));
   }
 
@@ -205,64 +205,64 @@ class MessageListing extends JsonParser implements Listing {
   }
 
   @Override
-  public void onAuthor(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_AUTHOR, reader.nextString());
+  public void onAuthor(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_AUTHOR, r.nextString());
   }
 
   @Override
-  public void onBody(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_BODY, reader.nextString());
+  public void onBody(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_BODY, r.nextString());
   }
 
   @Override
-  public void onContext(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_CONTEXT, reader.nextString());
+  public void onContext(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_CONTEXT, r.nextString());
   }
 
   @Override
-  public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_CREATED_UTC, reader.nextLong());
+  public void onCreatedUtc(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_CREATED_UTC, r.nextLong());
   }
 
   @Override
-  public void onDestination(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_DESTINATION, reader.nextString());
+  public void onDestination(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_DESTINATION, r.nextString());
   }
 
   @Override
-  public void onKind(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_KIND,
-        Kinds.parseKind(reader.nextString()));
+  public void onKind(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_KIND,
+        Kinds.parseKind(r.nextString()));
   }
 
   @Override
-  public void onLinkTitle(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_LINK_TITLE, reader.nextString());
+  public void onLinkTitle(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_LINK_TITLE, r.nextString());
   }
 
   @Override
-  public void onName(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_THING_ID, reader.nextString());
+  public void onName(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_THING_ID, r.nextString());
   }
 
   @Override
-  public void onNew(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_NEW, reader.nextBoolean());
+  public void onNew(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_NEW, r.nextBoolean());
   }
 
   @Override
-  public void onSubject(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_SUBJECT, reader.nextString());
+  public void onSubject(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_SUBJECT, r.nextString());
   }
 
   @Override
-  public void onSubreddit(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_SUBREDDIT, readString(reader, null));
+  public void onSubreddit(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_SUBREDDIT, readString(r, null));
   }
 
   @Override
-  public void onWasComment(JsonReader reader, int index) throws IOException {
-    values.get(index).put(Messages.COLUMN_WAS_COMMENT, reader.nextBoolean());
+  public void onWasComment(JsonReader r, int i) throws IOException {
+    values.get(i).put(Messages.COLUMN_WAS_COMMENT, r.nextBoolean());
   }
 
   @Override

@@ -28,12 +28,12 @@ class SubredditParser extends JsonParser {
     ArrayList<String> results = new ArrayList<String>();
 
     @Override
-    public void onEntityStart(int index) {
+    public void onEntityStart(int i) {
         results.add(null);
     }
 
     @Override
-    public void onDisplayName(JsonReader reader, int index) throws IOException {
-        results.set(index, reader.nextString());
+    public void onDisplayName(JsonReader r, int i) throws IOException {
+        results.set(i, r.nextString());
     }
 }
