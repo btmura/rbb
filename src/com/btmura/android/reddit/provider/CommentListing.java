@@ -137,7 +137,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         linkId,
         filter,
         numComments);
-    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, url);
+    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, url, false);
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

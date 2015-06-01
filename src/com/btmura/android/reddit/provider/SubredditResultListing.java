@@ -21,12 +21,10 @@ import android.accounts.OperationCanceledException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.util.JsonReader;
-import android.util.JsonToken;
 
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.JsonParser;
@@ -78,7 +76,7 @@ class SubredditResultListing extends JsonParser implements Listing {
       AuthenticatorException,
       OperationCanceledException {
     CharSequence url = Urls2.subredditSearch(accountName, query);
-    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, url);
+    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, url, false);
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

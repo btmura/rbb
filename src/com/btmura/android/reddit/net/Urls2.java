@@ -49,6 +49,8 @@ public class Urls2 {
       OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
       OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
+  private static final String SUBSCRIBE_URL =
+      OAUTH_REDDIT_COM + "/api/subscribe/";
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
@@ -392,6 +394,18 @@ public class Urls2 {
       sb.append(".json");
     }
     return sb;
+  }
+
+  public static CharSequence subscribe() {
+    return SUBSCRIBE_URL;
+  }
+
+  public static CharSequence subscribeData(
+      String subreddit,
+      boolean subscribe) {
+    return new StringBuilder()
+        .append("action=").append(subscribe ? "sub" : "unsub")
+        .append("&sr_name=").append(encode(subreddit));
   }
 
   public static CharSequence userInfo(String accountName, String user) {

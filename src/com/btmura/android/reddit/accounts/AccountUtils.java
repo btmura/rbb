@@ -38,7 +38,10 @@ public class AccountUtils {
     return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
   }
 
-  public static boolean hasTokens(Context ctx, String accountName) {
+  public static boolean hasTokens(Context ctx, String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
     return getAccessToken(ctx, accountName) != null
         && getRefreshToken(ctx, accountName) != null;
   }

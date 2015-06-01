@@ -32,7 +32,6 @@ import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.net.RedditApi2;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
@@ -146,7 +145,8 @@ class MessageListing extends JsonParser implements Listing {
       IOException,
       AuthenticatorException,
       OperationCanceledException {
-    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, getUrl());
+    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, getUrl(),
+        false);
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

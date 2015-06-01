@@ -27,11 +27,13 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -49,9 +51,12 @@ public class RedditApi2 {
   public static HttpURLConnection connect(
       Context ctx,
       String accountName,
-      CharSequence url)
-      throws IOException, AuthenticatorException, OperationCanceledException {
-    HttpURLConnection conn = innerConnect(ctx, accountName, url);
+      CharSequence url,
+      boolean post) throws
+      IOException,
+      AuthenticatorException,
+      OperationCanceledException {
+    HttpURLConnection conn = innerConnect(ctx, accountName, url, post);
 
     // TODO(btmura): check whether error is scope problem or not
     if (AccountUtils.isAccount(accountName)
@@ -65,7 +70,7 @@ public class RedditApi2 {
       // TODO(btmura): validate access token result
       AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
 
-      conn = innerConnect(ctx, accountName, url);
+      conn = innerConnect(ctx, accountName, url, post);
     }
 
     return conn;
@@ -74,8 +79,11 @@ public class RedditApi2 {
   private static HttpURLConnection innerConnect(
       Context ctx,
       String accountName,
-      CharSequence url)
-      throws IOException, AuthenticatorException, OperationCanceledException {
+      CharSequence url,
+      boolean post) throws
+      AuthenticatorException,
+      IOException,
+      OperationCanceledException {
     HttpURLConnection conn =
         (HttpURLConnection) Urls2.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
@@ -101,7 +109,7 @@ public class RedditApi2 {
       IOException {
     HttpURLConnection conn = null;
     try {
-      conn = connect(ctx, accountName, Urls2.myInfo());
+      conn = connect(ctx, accountName, Urls2.myInfo(), false);
       return AccountInfoResult.getMyInfo(conn.getInputStream());
     } finally {
       close(conn);
@@ -110,15 +118,14 @@ public class RedditApi2 {
 
   public static ArrayList<String> getMySubreddits(
       Context ctx,
-      String accountName)
-      throws
+      String accountName) throws
       AuthenticatorException,
       OperationCanceledException,
       IOException {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
-      conn = connect(ctx, accountName, Urls2.mySubreddits());
+      conn = connect(ctx, accountName, Urls2.mySubreddits(), false);
       in = new BufferedInputStream(conn.getInputStream());
       JsonReader r = new JsonReader(new InputStreamReader(in));
       SubredditParser p = new SubredditParser();
@@ -140,7 +147,7 @@ public class RedditApi2 {
     InputStream in = null;
     try {
       CharSequence url = Urls2.sidebar(accountName, subreddit);
-      conn = connect(ctx, accountName, url);
+      conn = connect(ctx, accountName, url, false);
       in = new BufferedInputStream(conn.getInputStream());
       return SidebarResult
           .fromJsonReader(ctx, new JsonReader(new InputStreamReader(in)));
@@ -158,7 +165,7 @@ public class RedditApi2 {
       IOException {
     HttpURLConnection conn = null;
     try {
-      conn = connect(ctx, accountName, Urls2.userInfo(accountName, user));
+      conn = connect(ctx, accountName, Urls2.userInfo(accountName, user), false);
       return AccountInfoResult.getUserInfo(conn.getInputStream());
     } finally {
       close(conn);
@@ -173,11 +180,42 @@ public class RedditApi2 {
     InputStream in = null;
     try {
       CharSequence url = Urls2.messages(Filter.MESSAGE_INBOX, null, true);
-      conn = connect(ctx, accountName, url);
+      conn = connect(ctx, accountName, url, false);
       in = new BufferedInputStream(conn.getInputStream());
       in.read();
     } finally {
       close(in, conn);
+    }
+  }
+
+  public static Result subscribe(
+      Context ctx,
+      String accountName,
+      String subreddit,
+      boolean subscribe) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    try {
+      conn = connect(ctx, accountName, Urls2.subscribe(), true);
+      writeFormData(conn, Urls2.subscribeData(subreddit, subscribe));
+      return Result.fromInputStream(conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
+
+  private static void writeFormData(HttpURLConnection conn, CharSequence data) throws IOException {
+    OutputStream output = null;
+    try {
+      output = new BufferedOutputStream(conn.getOutputStream());
+      output.write(data.toString().getBytes(RedditApi.CHARSET));
+      output.close();
+    } finally {
+      if (output != null) {
+        output.close();
+      }
     }
   }
 
@@ -193,7 +231,8 @@ public class RedditApi2 {
 
   private static void close(HttpURLConnection conn) throws IOException {
     if (conn != null) {
-      conn.disconnect();;
+      conn.disconnect();
+      ;
     }
   }
 
@@ -201,14 +240,15 @@ public class RedditApi2 {
   }
 
   /**
-   * Logs entire response and returns a fresh InputStream as if nothing happened. Make sure to
-   * delete all usages of this method, since it is only for debugging.
+   * Logs entire response and returns a fresh InputStream as if nothing
+   * happened. Make sure to delete all usages of this method, since it is only
+   * for debugging.
    */
   static InputStream logResponse(InputStream in) throws IOException {
     // Make a copy of the InputStream.
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
-    for (int read = 0; (read = in.read(buffer)) != -1;) {
+    for (int read = 0; (read = in.read(buffer)) != -1; ) {
       out.write(buffer, 0, read);
     }
     in.close();

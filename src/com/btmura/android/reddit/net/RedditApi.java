@@ -113,12 +113,6 @@ public class RedditApi {
         return postData(Urls.save(save), Urls.saveQuery(thingId, modhash), cookie);
     }
 
-    public static Result subscribe(String subreddit, boolean subscribe, String cookie,
-            String modhash) throws IOException {
-        return postData(Urls.subscribe(), Urls.subscribeQuery(subreddit, subscribe, modhash),
-                cookie);
-    }
-
     public static Result compose(String to, String subject, String text, String captchaId,
             String captchaGuess, String cookie, String modhash) throws IOException {
         return postData(Urls.compose(), Urls.composeQuery(to, subject, text,

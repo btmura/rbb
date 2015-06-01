@@ -40,7 +40,6 @@ public class Urls {
     private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
     private static final String API_SAVE_URL = BASE_URL + "/api/save";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-    private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
     private static final String API_UNHIDE_URL = BASE_URL + "/api/unhide";
     private static final String API_UNREAD_MESSAGE = BASE_URL + "/api/unread_message";
     private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
@@ -145,16 +144,6 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence subscribeQuery(String subreddit, boolean subscribe,
-                                              String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("action=").append(subscribe ? "sub" : "unsub");
-        b.append("&uh=").append(encode(modhash));
-        b.append("&sr_name=").append(encode(subreddit));
-        b.append("&api_type=json");
-        return b;
-    }
-
     public static CharSequence perma(String permaLink, String thingId) {
         StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
         if (!TextUtils.isEmpty(thingId)) {
@@ -192,10 +181,6 @@ public class Urls {
         }
         b.append("&api_type=json");
         return b;
-    }
-
-    public static CharSequence subscribe() {
-        return API_SUBSCRIBE_URL;
     }
 
     public static CharSequence unreadMessage() {

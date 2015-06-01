@@ -113,8 +113,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
       // Get database operations required to sync with the server.
       ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
       int[] opCounts = new int[NUM_OPS];
-      syncDatabase(account, provider, cookie, modhash, subreddits, ops,
-          opCounts, syncResult);
+      syncDatabase(account, provider, subreddits, ops, opCounts, syncResult);
 
       // Apply all database ops and then update the stats on success.
       ctx.getContentResolver().applyBatch(SubredditProvider.AUTHORITY, ops);
@@ -143,8 +142,6 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
   private void syncDatabase(
       Account account,
       ContentProviderClient provider,
-      String cookie,
-      String modhash,
       ArrayList<String> subreddits,
       ArrayList<ContentProviderOperation> ops,
       int[] opCounts,
@@ -155,7 +152,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         Subreddits.SELECT_BY_ACCOUNT, Array.of(account.name),
         null);
     while (c.moveToNext()) {
-      syncRow(c, cookie, modhash, subreddits, ops, opCounts, syncResult);
+      syncRow(c, account, subreddits, ops, opCounts, syncResult);
     }
     c.close();
     insertSubredditOps(account, subreddits, ops, opCounts);
@@ -163,8 +160,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
   private void syncRow(
       Cursor c,
-      String cookie,
-      String modhash,
+      Account account,
       ArrayList<String> subreddits,
       ArrayList<ContentProviderOperation> ops,
       int[] opCounts,
@@ -210,7 +206,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         if (expiration == 0) {
           try {
             boolean subscribe = state == Subreddits.STATE_INSERTING;
-            RedditApi.subscribe(name, subscribe, cookie, modhash);
+            RedditApi2.subscribe(getContext(), account.name, name, subscribe);
             long newExpiration =
                 System.currentTimeMillis() + EXPIRATION_PADDING_MS;
             ops.add(ContentProviderOperation.newUpdate(
@@ -221,6 +217,10 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
             opCounts[OP_UPDATES]++;
           } catch (IOException e) {
             syncResult.stats.numIoExceptions++;
+          } catch (AuthenticatorException e) {
+            syncResult.stats.numAuthExceptions++;
+          } catch (OperationCanceledException e) {
+            syncResult.stats.numAuthExceptions++;
           }
         } else if (System.currentTimeMillis() >= expiration) {
           if (state == Subreddits.STATE_INSERTING) {

@@ -17,6 +17,8 @@
 package com.btmura.android.reddit.net;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import android.content.Context;
 import android.util.JsonReader;
@@ -25,8 +27,9 @@ import android.util.Log;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.JsonParser;
 
-public class Result {
+public class Result extends JsonParser {
 
     /** Error for too much user activity. */
     private static final String ERROR_RATELIMIT = "RATELIMIT";
@@ -34,7 +37,7 @@ public class Result {
     /** Error for missing or incorrect captcha guess. */
     private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
 
-    /** Error when necessary credentials are missing from a request. */
+    /** Error when necessary credentials are missing fromInputStream a request. */
     private static final String ERROR_USER_REQUIRED = "USER_REQUIRED";
 
     public double rateLimit;
@@ -133,6 +136,15 @@ public class Result {
                 }
                 Log.d(tag, line.toString());
             }
+        }
+    }
+
+    static Result fromInputStream(InputStream in) throws IOException {
+        JsonReader r = newReader(in);
+        try {
+            return fromJsonReader(r);
+        } finally {
+            r.close();
         }
     }
 
