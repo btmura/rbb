@@ -24,78 +24,98 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.btmura.android.reddit.R;
-
 import java.io.IOException;
 
 public class AccountUtils {
 
-    public static final String NO_ACCOUNT = "";
+  public static final String NO_ACCOUNT = "";
 
-    public static boolean isAccount(String accountName) {
-        return !TextUtils.isEmpty(accountName);
+  public static boolean isAccount(String accountName) {
+    return !TextUtils.isEmpty(accountName);
+  }
+
+  public static Account getAccount(Context ctx, String accountName) {
+    return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
+  }
+
+  // TODO(btmura): remove after OAuth transition
+  public static String getCookie(AccountManager manager, Account account)
+      throws OperationCanceledException, AuthenticatorException, IOException {
+    return manager.blockingGetAuthToken(account,
+        AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+  }
+
+  // TODO(btmura): remove after OAuth transition
+  public static String getCookie(Context context, Account account)
+      throws OperationCanceledException, AuthenticatorException, IOException {
+    return getCookie(AccountManager.get(context), account);
+  }
+
+  // TODO(btmura): remove after OAuth transition
+  public static String getCookie(Context context, String accountName)
+      throws OperationCanceledException, AuthenticatorException, IOException {
+    if (!isAccount(accountName)) {
+      return null;
     }
 
-    public static Account getAccount(Context ctx, String accountName) {
-        return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
-    }
+    Account account = new Account(accountName,
+        AccountAuthenticator.getAccountType(context));
+    return getCookie(context, account);
+  }
 
-    // TODO(btmura): remove after OAuth transition
-    public static String getCookie(AccountManager manager, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-    }
+  // TODO(btmura): remove after OAuth transition
+  public static String getModhash(AccountManager manager, Account account)
+      throws OperationCanceledException, AuthenticatorException, IOException {
+    return manager.blockingGetAuthToken(account,
+        AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+  }
 
-    // TODO(btmura): remove after OAuth transition
-    public static String getCookie(Context context, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        return getCookie(AccountManager.get(context), account);
-    }
+  @Nullable
+  public static String getAccessToken(Context ctx, String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    return getAuthToken(ctx, accountName,
+        AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN);
+  }
 
-    // TODO(btmura): remove after OAuth transition
-    public static String getCookie(Context context, String accountName)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        if (!isAccount(accountName)) {
-            return null;
-        }
+  @Nullable
+  public static String getRefreshToken(Context ctx, String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    return getAuthToken(ctx, accountName,
+        AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN);
+  }
 
-        Account account = new Account(accountName, AccountAuthenticator.getAccountType(context));
-        return getCookie(context, account);
+  @Nullable
+  private static String getAuthToken(
+      Context ctx,
+      String accountName,
+      String authTokenType) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    if (!isAccount(accountName)) {
+      return null;
     }
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    return am.blockingGetAuthToken(a, authTokenType,
+        true /* display notification */);
+  }
 
-    // TODO(btmura): remove after OAuth transition
-    public static String getModhash(AccountManager manager, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
-    }
+  public static void setAccessToken(
+      Context ctx,
+      String accountName,
+      String accessToken) {
+    // TODO(btmura): check accountName is not empty
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN,
+        accessToken);
+  }
 
-    @Nullable
-    public static String getAccessToken(Context ctx, String accountName) throws AuthenticatorException, OperationCanceledException, IOException {
-        return getAuthToken(ctx, accountName, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN);
-    }
-
-    @Nullable
-    public static String getRefreshToken(Context ctx, String accountName) throws AuthenticatorException, OperationCanceledException, IOException {
-        return getAuthToken(ctx, accountName, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN);
-    }
-
-    @Nullable
-    private static String getAuthToken(Context ctx, String accountName, String authTokenType) throws AuthenticatorException, OperationCanceledException, IOException {
-        if (!isAccount(accountName)) {
-            return null;
-        }
-        Account a = getAccount(ctx, accountName);
-        AccountManager am = AccountManager.get(ctx);
-        return am.blockingGetAuthToken(a, authTokenType, true /* display notification */);
-    }
-
-    public static void setAccessToken(Context ctx, String accountName, String accessToken) {
-        // TODO(btmura): check accountName is not empty
-        Account a = getAccount(ctx, accountName);
-        AccountManager am = AccountManager.get(ctx);
-        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN, accessToken);
-    }
-
-    private AccountUtils() {
-    }
+  private AccountUtils() {
+  }
 }
