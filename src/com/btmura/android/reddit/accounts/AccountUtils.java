@@ -38,6 +38,11 @@ public class AccountUtils {
     return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
   }
 
+  public static boolean hasTokens(Context ctx, String accountName) {
+    return getAccessToken(ctx, accountName) != null
+        && getRefreshToken(ctx, accountName) != null;
+  }
+
   // TODO(btmura): remove after OAuth transition
   public static String getCookie(AccountManager manager, Account account)
       throws OperationCanceledException, AuthenticatorException, IOException {

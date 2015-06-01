@@ -111,8 +111,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
       SyncResult syncResult) {
     try {
       Context ctx = getContext();
-      if (AccountUtils.getAccessToken(ctx, account.name) == null
-          || AccountUtils.getRefreshToken(ctx, account.name) == null) {
+      if (!AccountUtils.hasTokens(ctx, account.name)) {
         syncResult.stats.numAuthExceptions++;
         return;
       }

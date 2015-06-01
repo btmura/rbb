@@ -35,6 +35,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi2;
@@ -99,16 +100,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
       SyncResult syncResult) {
     try {
       Context ctx = getContext();
-
-      // Get cookie and modhash needed to subscribe to subreddits.
-      AccountManager manager = AccountManager.get(ctx);
-      String cookie = manager.blockingGetAuthToken(account,
-          AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-      String modhash = manager.blockingGetAuthToken(account,
-          AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
-
       // Quit if there are authentication issues.
-      if (cookie == null || modhash == null) {
+      if (!AccountUtils.hasTokens(ctx, account.name)) {
         syncResult.stats.numAuthExceptions++;
         return;
       }
