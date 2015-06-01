@@ -37,7 +37,7 @@ public class Result extends JsonParser {
     /** Error for missing or incorrect captcha guess. */
     private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
 
-    /** Error when necessary credentials are missing fromInputStream a request. */
+    /** Error when necessary credentials are missing fromJson a request. */
     private static final String ERROR_USER_REQUIRED = "USER_REQUIRED";
 
     public double rateLimit;
@@ -139,7 +139,7 @@ public class Result extends JsonParser {
         }
     }
 
-    static Result fromInputStream(InputStream in) throws IOException {
+    static Result fromJson(InputStream in) throws IOException {
         JsonReader r = newReader(in);
         try {
             return fromJsonReader(r);

@@ -70,7 +70,7 @@ public class Urls2 {
         .append("&response_type=code&state=").append(encode(state))
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
-        .append(encode("history,identity,mysubreddits,privatemessages,read"));
+        .append(encode("history,identity,mysubreddits,privatemessages,read,subscribe"));
   }
 
   public static CharSequence myInfo() {

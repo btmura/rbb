@@ -21,6 +21,7 @@ import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -36,6 +37,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.net.AccessTokenResult;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
 import java.io.IOException;
 
@@ -146,10 +148,10 @@ public class AddAccountFragment extends Fragment {
         // will fall back to the app storage account.
         AccountPrefs.setLastAccount(ctx, username);
 
-//        ContentResolver.setSyncAutomatically(a,
-//            AccountProvider.AUTHORITY, true);
-//        ContentResolver.setSyncAutomatically(a,
-//            SubredditProvider.AUTHORITY, true);
+        ContentResolver.setSyncAutomatically(a,
+            AccountProvider.AUTHORITY, true);
+        ContentResolver.setSyncAutomatically(a,
+            SubredditProvider.AUTHORITY, true);
 //        ContentResolver.setSyncAutomatically(a,
 //            ThingProvider.AUTHORITY, true);
 

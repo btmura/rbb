@@ -25,6 +25,7 @@ import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.JsonParser;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class SidebarResult extends JsonParser {
 
@@ -37,20 +38,25 @@ public class SidebarResult extends JsonParser {
   public Bitmap headerImageBitmap;
 
   private final MarkdownFormatter formatter = new MarkdownFormatter();
-  private final Context context;
+  private final Context ctx;
 
-  public static SidebarResult fromJsonReader(Context context, JsonReader reader)
+  public static SidebarResult fromJson(Context ctx, InputStream in)
       throws IOException {
-    SidebarResult result = new SidebarResult(context);
-    result.parseEntity(reader);
-    if (!TextUtils.isEmpty(result.headerImage)) {
-      result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
+    JsonReader r = newReader(in);
+    try {
+      SidebarResult result = new SidebarResult(ctx);
+      result.parseEntity(r);
+      if (!TextUtils.isEmpty(result.headerImage)) {
+        result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
+      }
+      return result;
+    } finally {
+      r.close();
     }
-    return result;
   }
 
-  private SidebarResult(Context context) {
-    this.context = context.getApplicationContext();
+  private SidebarResult(Context ctx) {
+    this.ctx = ctx.getApplicationContext();
   }
 
   public void recycle() {
@@ -64,26 +70,26 @@ public class SidebarResult extends JsonParser {
 
   @Override
   public void onDisplayName(JsonReader r, int i) throws IOException {
-    subreddit = r.nextString();
+    subreddit = readString(r, "");
   }
 
   @Override
   public void onHeaderImage(JsonReader r, int i) throws IOException {
-    headerImage = readString(r, null);
+    headerImage = readString(r, "");
   }
 
   @Override
   public void onTitle(JsonReader r, int i) throws IOException {
-    title = formatter.formatNoSpans(context, readString(r, ""));
+    title = formatter.formatNoSpans(ctx, readString(r, ""));
   }
 
   @Override
   public void onDescription(JsonReader r, int i) throws IOException {
-    description = formatter.formatAll(context, readString(r, ""));
+    description = formatter.formatAll(ctx, readString(r, ""));
   }
 
   @Override
   public void onSubscribers(JsonReader r, int i) throws IOException {
-    subscribers = r.nextInt();
+    subscribers = readInt(r, 0);
   }
 }

@@ -28,15 +28,12 @@ import com.btmura.android.reddit.app.Filter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 // TODO(btmura): remove RedditApi and replace with this class
 public class RedditApi2 {
@@ -47,6 +44,109 @@ public class RedditApi2 {
   private static final boolean DEBUG = BuildConfig.DEBUG;
 
   private static final int HTTP_UNAUTHORIZED = 401;
+
+  public static AccountInfoResult getMyInfo(
+      Context ctx,
+      String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    try {
+      conn = connect(ctx, accountName, Urls2.myInfo(), false);
+      return AccountInfoResult.fromMyInfoJson(conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
+
+  public static ArrayList<String> getMySubreddits(
+      Context ctx,
+      String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      conn = connect(ctx, accountName, Urls2.mySubreddits(), false);
+      in = new BufferedInputStream(conn.getInputStream());
+      JsonReader r = new JsonReader(new InputStreamReader(in));
+      SubredditParser p = new SubredditParser();
+      p.parseListingObject(r);
+      return p.results;
+    } finally {
+      close(in, conn);
+    }
+  }
+
+  public static SidebarResult getSidebar(
+      Context ctx,
+      String accountName,
+      String subreddit) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    try {
+      CharSequence url = Urls2.sidebar(accountName, subreddit);
+      conn = connect(ctx, accountName, url, false);
+      return SidebarResult.fromJson(ctx, conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
+
+  public static AccountInfoResult getUserInfo(
+      Context ctx,
+      String accountName,
+      String user) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    try {
+      CharSequence url = Urls2.userInfo(accountName, user);
+      conn = connect(ctx, accountName, url, false);
+      return AccountInfoResult.fromUserInfoJson(conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
+
+  public static void markMessagesRead(Context ctx, String accountName) throws
+      IOException,
+      AuthenticatorException,
+      OperationCanceledException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      CharSequence url = Urls2.messages(Filter.MESSAGE_INBOX, null, true);
+      conn = connect(ctx, accountName, url, false);
+      in = conn.getInputStream();
+      in.read();
+    } finally {
+      close(in, conn);
+    }
+  }
+
+  public static Result subscribe(
+      Context ctx,
+      String accountName,
+      String subreddit,
+      boolean subscribe) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    try {
+      conn = connect(ctx, accountName, Urls2.subscribe(), true);
+      writeFormData(conn, Urls2.subscribeData(subreddit, subscribe));
+      return Result.fromJson(conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
 
   public static HttpURLConnection connect(
       Context ctx,
@@ -87,12 +187,9 @@ public class RedditApi2 {
     HttpURLConnection conn =
         (HttpURLConnection) Urls2.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
-    conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
-    conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
-    if (AccountUtils.isAccount(accountName)) {
-      String at = AccountUtils.getAccessToken(ctx, accountName);
-      // TODO(btmura): handle empty access token
-      conn.setRequestProperty("Authorization", "bearer " + at);
+    setCommonHeaders(ctx, accountName, conn);
+    if (post) {
+      setFormDataHeaders(conn);
     }
     conn.connect();
     if (DEBUG) {
@@ -101,112 +198,30 @@ public class RedditApi2 {
     return conn;
   }
 
-  public static AccountInfoResult getMyInfo(
-      Context ctx,
-      String accountName) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
-    HttpURLConnection conn = null;
-    try {
-      conn = connect(ctx, accountName, Urls2.myInfo(), false);
-      return AccountInfoResult.getMyInfo(conn.getInputStream());
-    } finally {
-      close(conn);
-    }
-  }
-
-  public static ArrayList<String> getMySubreddits(
-      Context ctx,
-      String accountName) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
-    HttpURLConnection conn = null;
-    InputStream in = null;
-    try {
-      conn = connect(ctx, accountName, Urls2.mySubreddits(), false);
-      in = new BufferedInputStream(conn.getInputStream());
-      JsonReader r = new JsonReader(new InputStreamReader(in));
-      SubredditParser p = new SubredditParser();
-      p.parseListingObject(r);
-      return p.results;
-    } finally {
-      close(in, conn);
-    }
-  }
-
-  public static SidebarResult getSidebar(
+  private static void setCommonHeaders(
       Context ctx,
       String accountName,
-      String subreddit) throws
+      HttpURLConnection conn) throws
       AuthenticatorException,
       OperationCanceledException,
       IOException {
-    HttpURLConnection conn = null;
-    InputStream in = null;
-    try {
-      CharSequence url = Urls2.sidebar(accountName, subreddit);
-      conn = connect(ctx, accountName, url, false);
-      in = new BufferedInputStream(conn.getInputStream());
-      return SidebarResult
-          .fromJsonReader(ctx, new JsonReader(new InputStreamReader(in)));
-    } finally {
-      close(in, conn);
+    conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
+    conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
+    if (AccountUtils.isAccount(accountName)) {
+      String at = AccountUtils.getAccessToken(ctx, accountName);
+      // TODO(btmura): handle empty access token
+      conn.setRequestProperty("Authorization", "bearer " + at);
     }
   }
 
-  public static AccountInfoResult getUserInfo(
-      Context ctx,
-      String accountName,
-      String user) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
-    HttpURLConnection conn = null;
-    try {
-      conn = connect(ctx, accountName, Urls2.userInfo(accountName, user), false);
-      return AccountInfoResult.getUserInfo(conn.getInputStream());
-    } finally {
-      close(conn);
-    }
+  private static void setFormDataHeaders(HttpURLConnection conn) {
+    conn.setRequestProperty("Content-Type", RedditApi.CONTENT_TYPE);
+    conn.setDoOutput(true);
   }
 
-  public static void markMessagesRead(Context ctx, String accountName) throws
-      IOException,
-      AuthenticatorException,
-      OperationCanceledException {
-    HttpURLConnection conn = null;
-    InputStream in = null;
-    try {
-      CharSequence url = Urls2.messages(Filter.MESSAGE_INBOX, null, true);
-      conn = connect(ctx, accountName, url, false);
-      in = new BufferedInputStream(conn.getInputStream());
-      in.read();
-    } finally {
-      close(in, conn);
-    }
-  }
-
-  public static Result subscribe(
-      Context ctx,
-      String accountName,
-      String subreddit,
-      boolean subscribe) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
-    HttpURLConnection conn = null;
-    try {
-      conn = connect(ctx, accountName, Urls2.subscribe(), true);
-      writeFormData(conn, Urls2.subscribeData(subreddit, subscribe));
-      return Result.fromInputStream(conn.getInputStream());
-    } finally {
-      close(conn);
-    }
-  }
-
-  private static void writeFormData(HttpURLConnection conn, CharSequence data) throws IOException {
+  private static void writeFormData(
+      HttpURLConnection conn,
+      CharSequence data) throws IOException {
     OutputStream output = null;
     try {
       output = new BufferedOutputStream(conn.getOutputStream());
@@ -224,45 +239,15 @@ public class RedditApi2 {
     if (in != null) {
       in.close();
     }
-    if (conn != null) {
-      conn.disconnect();
-    }
+    close(conn);
   }
 
   private static void close(HttpURLConnection conn) throws IOException {
     if (conn != null) {
       conn.disconnect();
-      ;
     }
   }
 
   private RedditApi2() {
   }
-
-  /**
-   * Logs entire response and returns a fresh InputStream as if nothing
-   * happened. Make sure to delete all usages of this method, since it is only
-   * for debugging.
-   */
-  static InputStream logResponse(InputStream in) throws IOException {
-    // Make a copy of the InputStream.
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    byte[] buffer = new byte[1024];
-    for (int read = 0; (read = in.read(buffer)) != -1; ) {
-      out.write(buffer, 0, read);
-    }
-    in.close();
-
-    // Print out the response for debugging purposes.
-    in = new ByteArrayInputStream(out.toByteArray());
-    Scanner sc = new Scanner(in);
-    while (sc.hasNextLine()) {
-      Log.d(TAG, sc.nextLine());
-    }
-    sc.close();
-
-    // Return a new InputStream as if nothing happened...
-    return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
-  }
-
 }

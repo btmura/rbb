@@ -20,10 +20,8 @@ import android.util.JsonReader;
 
 import com.btmura.android.reddit.util.JsonParser;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class AccountInfoResult extends JsonParser {
 
@@ -36,7 +34,8 @@ public class AccountInfoResult extends JsonParser {
   /** True if the account has mail. False otherwise. */
   public boolean hasMail;
 
-  public static AccountInfoResult getMyInfo(InputStream in) throws IOException {
+  public static AccountInfoResult fromMyInfoJson(InputStream in)
+      throws IOException {
     JsonReader r = newReader(in);
     try {
       AccountInfoResult result = new AccountInfoResult();
@@ -47,7 +46,7 @@ public class AccountInfoResult extends JsonParser {
     }
   }
 
-  public static AccountInfoResult getUserInfo(InputStream in)
+  public static AccountInfoResult fromUserInfoJson(InputStream in)
       throws IOException {
     JsonReader r = newReader(in);
     try {
