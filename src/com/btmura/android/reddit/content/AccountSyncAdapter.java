@@ -36,7 +36,6 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.AccountInfoResult;
-import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
@@ -111,8 +110,9 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
       ContentProviderClient provider,
       SyncResult syncResult) {
     try {
-      String cookie = AccountUtils.getCookie(getContext(), account);
-      if (cookie == null) {
+      Context ctx = getContext();
+      if (AccountUtils.getAccessToken(ctx, account.name) == null
+          || AccountUtils.getRefreshToken(ctx, account.name) == null) {
         syncResult.stats.numAuthExceptions++;
         return;
       }
@@ -146,7 +146,8 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
       }
 
       // Update the account row with the latest information if it has changed.
-      AccountInfoResult result = RedditApi.aboutMe(cookie);
+      AccountInfoResult result =
+          RedditApi2.getMyInfo(getContext(), account.name);
       boolean newHasMail = result.hasMail && !markRead;
       c = provider.query(
           AccountProvider.ACCOUNTS_URI,

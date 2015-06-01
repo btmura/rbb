@@ -19,7 +19,10 @@ package com.btmura.android.reddit.util;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class JsonParser {
 
@@ -27,24 +30,31 @@ public class JsonParser {
 
   private int entityIndex;
 
-  public void parseListingArray(JsonReader reader) throws IOException {
+  public void parseListingArray(JsonReader r) throws IOException {
     reset();
     onParseStart();
-    doParseListingArray(reader);
+    doParseListingArray(r);
     onParseEnd();
   }
 
-  public void parseListingObject(JsonReader reader) throws IOException {
+  public void parseListingObject(JsonReader r) throws IOException {
     reset();
     onParseStart();
-    doParseListingObject(reader);
+    doParseListingObject(r);
     onParseEnd();
   }
 
-  public void parseEntity(JsonReader reader) throws IOException {
+  public void parseEntity(JsonReader r) throws IOException {
     reset();
     onParseStart();
-    doParseEntityObject(reader);
+    doParseEntityObject(r);
+    onParseEnd();
+  }
+
+  public void parseEntityData(JsonReader r) throws IOException {
+    reset();
+    onParseStart();
+    doParseEntityData(r, 0);
     onParseEnd();
   }
 
@@ -53,56 +63,56 @@ public class JsonParser {
     replyNesting = 0;
   }
 
-  private void doParseListingArray(JsonReader reader) throws IOException {
-    if (JsonToken.BEGIN_ARRAY == reader.peek()) {
-      reader.beginArray();
-      while (reader.hasNext()) {
-        doParseListingObject(reader);
+  private void doParseListingArray(JsonReader r) throws IOException {
+    if (JsonToken.BEGIN_ARRAY == r.peek()) {
+      r.beginArray();
+      while (r.hasNext()) {
+        doParseListingObject(r);
       }
-      reader.endArray();
+      r.endArray();
     } else {
-      reader.skipValue();
+      r.skipValue();
     }
   }
 
-  private void doParseListingObject(JsonReader reader) throws IOException {
-    if (JsonToken.BEGIN_OBJECT == reader.peek()) {
-      reader.beginObject();
-      while (reader.hasNext()) {
-        String name = reader.nextName();
+  private void doParseListingObject(JsonReader r) throws IOException {
+    if (JsonToken.BEGIN_OBJECT == r.peek()) {
+      r.beginObject();
+      while (r.hasNext()) {
+        String name = r.nextName();
         if ("data".equals(name)) {
-          doParseListingData(reader);
+          doParseListingData(r);
         } else {
-          reader.skipValue();
+          r.skipValue();
         }
       }
-      reader.endObject();
+      r.endObject();
     } else {
-      reader.skipValue();
+      r.skipValue();
     }
   }
 
-  private void doParseListingData(JsonReader reader) throws IOException {
-    reader.beginObject();
-    while (reader.hasNext()) {
-      String name = reader.nextName();
+  private void doParseListingData(JsonReader r) throws IOException {
+    r.beginObject();
+    while (r.hasNext()) {
+      String name = r.nextName();
       if ("children".equals(name)) {
-        doParseListingChildren(reader);
+        doParseListingChildren(r);
       } else if ("after".equals(name)) {
-        onAfter(reader);
+        onAfter(r);
       } else {
-        reader.skipValue();
+        r.skipValue();
       }
     }
-    reader.endObject();
+    r.endObject();
   }
 
-  private void doParseListingChildren(JsonReader reader) throws IOException {
-    reader.beginArray();
-    while (reader.hasNext()) {
-      doParseEntityObject(reader);
+  private void doParseListingChildren(JsonReader r) throws IOException {
+    r.beginArray();
+    while (r.hasNext()) {
+      doParseEntityObject(r);
     }
-    reader.endArray();
+    r.endArray();
   }
 
   private void doParseEntityObject(JsonReader r) throws IOException {
@@ -394,6 +404,10 @@ public class JsonParser {
 
   protected boolean shouldParseReplies() {
     return false;
+  }
+
+  protected static JsonReader newReader(InputStream in) {
+    return new JsonReader(new InputStreamReader(new BufferedInputStream(in)));
   }
 
   protected static boolean readBoolean(JsonReader r, boolean defaultValue)

@@ -27,11 +27,14 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 // TODO(btmura): remove RedditApi and replace with this class
 public class RedditApi2 {
@@ -90,6 +93,21 @@ public class RedditApi2 {
     return conn;
   }
 
+  public static AccountInfoResult getMyInfo(
+      Context ctx,
+      String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    HttpURLConnection conn = null;
+    try {
+      conn = connect(ctx, accountName, Urls2.myInfo());
+      return AccountInfoResult.getMyInfo(conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
+
   public static ArrayList<String> getMySubreddits(
       Context ctx,
       String accountName)
@@ -139,15 +157,11 @@ public class RedditApi2 {
       OperationCanceledException,
       IOException {
     HttpURLConnection conn = null;
-    InputStream in = null;
     try {
-      CharSequence url = Urls2.userInfo(accountName, user);
-      conn = connect(ctx, accountName, url);
-      in = new BufferedInputStream(conn.getInputStream());
-      return AccountInfoResult.fromJsonReader(
-          new JsonReader(new InputStreamReader(in)));
+      conn = connect(ctx, accountName, Urls2.userInfo(accountName, user));
+      return AccountInfoResult.getUserInfo(conn.getInputStream());
     } finally {
-      close(in, conn);
+      close(conn);
     }
   }
 
@@ -177,6 +191,38 @@ public class RedditApi2 {
     }
   }
 
+  private static void close(HttpURLConnection conn) throws IOException {
+    if (conn != null) {
+      conn.disconnect();;
+    }
+  }
+
   private RedditApi2() {
   }
+
+  /**
+   * Logs entire response and returns a fresh InputStream as if nothing happened. Make sure to
+   * delete all usages of this method, since it is only for debugging.
+   */
+  static InputStream logResponse(InputStream in) throws IOException {
+    // Make a copy of the InputStream.
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    byte[] buffer = new byte[1024];
+    for (int read = 0; (read = in.read(buffer)) != -1;) {
+      out.write(buffer, 0, read);
+    }
+    in.close();
+
+    // Print out the response for debugging purposes.
+    in = new ByteArrayInputStream(out.toByteArray());
+    Scanner sc = new Scanner(in);
+    while (sc.hasNextLine()) {
+      Log.d(TAG, sc.nextLine());
+    }
+    sc.close();
+
+    // Return a new InputStream as if nothing happened...
+    return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
+  }
+
 }

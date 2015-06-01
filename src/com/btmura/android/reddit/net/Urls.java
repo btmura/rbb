@@ -37,7 +37,6 @@ public class Urls {
     private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
     private static final String API_HIDE_URL = BASE_URL + "/api/hide";
     private static final String API_INFO_URL = BASE_URL + "/api/info";
-    private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
     private static final String API_SAVE_URL = BASE_URL + "/api/save";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
@@ -48,10 +47,6 @@ public class Urls {
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-
-    public static CharSequence aboutMe() {
-        return new StringBuilder(API_ME_URL).append(".json");
-    }
 
     public static CharSequence captcha(String id) {
         return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");

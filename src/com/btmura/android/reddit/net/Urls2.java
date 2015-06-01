@@ -45,6 +45,8 @@ public class Urls2 {
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
+  private static final String ME_URL =
+      OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
       OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
 
@@ -66,7 +68,11 @@ public class Urls2 {
         .append("&response_type=code&state=").append(encode(state))
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
-        .append(encode("history,mysubreddits,privatemessages,read"));
+        .append(encode("history,identity,mysubreddits,privatemessages,read"));
+  }
+
+  public static CharSequence myInfo() {
+    return ME_URL;
   }
 
   public static CharSequence mySubreddits() {

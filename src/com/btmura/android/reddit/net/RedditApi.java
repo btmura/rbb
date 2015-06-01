@@ -48,23 +48,6 @@ public class RedditApi {
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
-    public static AccountInfoResult aboutMe(String cookie) throws IOException {
-        return getAccountResult(Urls.aboutMe(), cookie);
-    }
-
-    private static AccountInfoResult getAccountResult(CharSequence url, String cookie)
-            throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(url, cookie, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            return AccountInfoResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
-        } finally {
-            close(in, conn);
-        }
-    }
-
     public static Result comment(String thingId, String text, String cookie, String modhash)
             throws IOException {
         return postData(Urls.comments(), Urls.commentsQuery(thingId, text, modhash), cookie);
