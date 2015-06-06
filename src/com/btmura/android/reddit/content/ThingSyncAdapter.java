@@ -190,7 +190,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             for (; c.moveToNext(); count--) {
                 try {
                     // Sync the local action to the server over the network.
-                    Result result = syncer.sync(getContext(), c, cookie, modhash);
+                    Result result = syncer.sync(getContext(), account.name, c, cookie,
+                        modhash);
                     int syncFailures = syncer.getSyncFailures(c);
                     CharSequence syncStatus = result.getErrorCodeMessage();
 
@@ -222,6 +223,12 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     // keep retrying this with exponential back-off.
                     Log.e(TAG, e.getMessage(), e);
                     syncResult.stats.numIoExceptions++;
+                } catch (AuthenticatorException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                    syncResult.stats.numAuthExceptions++;
+                } catch (OperationCanceledException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                    syncResult.stats.numAuthExceptions++;
                 }
             }
 

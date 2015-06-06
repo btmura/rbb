@@ -45,12 +45,12 @@ public class Urls2 {
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
-  private static final String ME_URL =
-      OAUTH_REDDIT_COM + "/api/v1/me";
+  private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
       OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
   private static final String SUBSCRIBE_URL =
       OAUTH_REDDIT_COM + "/api/subscribe/";
+  private static final String VOTE_URL = OAUTH_REDDIT_COM + "/api/vote/";
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
@@ -70,7 +70,8 @@ public class Urls2 {
         .append("&response_type=code&state=").append(encode(state))
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
-        .append(encode("history,identity,mysubreddits,privatemessages,read,subscribe"));
+        .append(encode(
+            "history,identity,mysubreddits,privatemessages,read,subscribe"));
   }
 
   public static CharSequence myInfo() {
@@ -396,6 +397,19 @@ public class Urls2 {
     return sb;
   }
 
+  public static CharSequence userInfo(String accountName, String user) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(USER_PATH)
+        .append(encode(user))
+        .append("/about");
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
+    }
+    return sb;
+  }
+
+  // POST requests
+
   public static CharSequence subscribe() {
     return SUBSCRIBE_URL;
   }
@@ -408,15 +422,14 @@ public class Urls2 {
         .append("&sr_name=").append(encode(subreddit));
   }
 
-  public static CharSequence userInfo(String accountName, String user) {
-    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
-        .append(USER_PATH)
-        .append(encode(user))
-        .append("/about");
-    if (needsJsonExtension(accountName, FORMAT_JSON)) {
-      sb.append(".json");
-    }
-    return sb;
+  public static CharSequence vote() {
+    return VOTE_URL;
+  }
+
+  public static CharSequence voteQuery(String thingId, int vote) {
+    return new StringBuilder()
+        .append("id=").append(thingId)
+        .append("&dir=").append(Integer.toString(vote));
   }
 
   private static String getBaseUrl(String accountName) {

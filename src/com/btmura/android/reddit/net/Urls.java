@@ -191,19 +191,6 @@ public class Urls {
         return thingQuery(thingId, modhash);
     }
 
-    public static CharSequence vote() {
-        return API_VOTE_URL;
-    }
-
-    public static CharSequence voteQuery(String thingId, int vote, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("id=").append(thingId);
-        b.append("&dir=").append(encode(Integer.toString(vote)));
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b;
-    }
-
     public static String encode(String param) {
         try {
             return URLEncoder.encode(param, "UTF-8");

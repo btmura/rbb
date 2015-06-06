@@ -126,11 +126,6 @@ public class RedditApi {
                 captchaGuess, modhash), cookie);
     }
 
-    public static Result vote(String thingId, int vote, String cookie, String modhash)
-            throws IOException {
-        return postData(Urls.vote(), Urls.voteQuery(thingId, vote, modhash), cookie);
-    }
-
     private static Result postData(CharSequence url, CharSequence data, String cookie)
             throws IOException {
         HttpURLConnection conn = null;

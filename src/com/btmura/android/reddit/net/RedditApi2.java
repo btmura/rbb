@@ -44,6 +44,8 @@ public class RedditApi2 {
 
   private static final int HTTP_UNAUTHORIZED = 401;
 
+  // GET requests
+
   public static AccountInfoResult getMyInfo(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
@@ -117,16 +119,37 @@ public class RedditApi2 {
     }
   }
 
+  // POST requests
+
   public static Result subscribe(
       Context ctx,
       String accountName,
       String subreddit,
       boolean subscribe)
       throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.subscribe(),
+        Urls2.subscribeData(subreddit, subscribe));
+  }
+
+  public static Result vote(
+      Context ctx,
+      String accountName,
+      String thingId,
+      int vote)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.vote(), Urls2.voteQuery(thingId, vote));
+  }
+
+  private static Result post(
+      Context ctx,
+      String accountName,
+      CharSequence url,
+      CharSequence data)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
-      conn = connect(ctx, accountName, Urls2.subscribe(), true);
-      writeFormData(conn, Urls2.subscribeData(subreddit, subscribe));
+      conn = connect(ctx, accountName, url, true);
+      writeFormData(conn, data);
       return Result.fromJson(conn.getInputStream());
     } finally {
       close(conn);

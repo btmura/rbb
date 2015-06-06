@@ -66,7 +66,12 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
-    public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
+    public Result sync(
+        Context context,
+        String accountName,
+        Cursor c,
+        String cookie,
+        String modhash) throws IOException {
         String thingId = c.getString(THING_ID);
         int action = c.getInt(ACTION);
         boolean saved = action == SaveActions.ACTION_SAVE;
