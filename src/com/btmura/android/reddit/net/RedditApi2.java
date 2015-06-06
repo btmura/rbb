@@ -121,6 +121,16 @@ public class RedditApi2 {
 
   // POST requests
 
+  public static Result comment(
+      Context ctx,
+      String accountName,
+      String thingId,
+      String text)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.comment(),
+        Urls2.commentQuery(thingId, text));
+  }
+
   public static Result hide(
       Context ctx,
       String accountName,

@@ -31,7 +31,6 @@ public class Urls {
 
   public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
 
-  private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
   private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
   private static final String API_DELETE_URL = BASE_URL + "/api/del";
   private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
@@ -42,17 +41,6 @@ public class Urls {
 
   public static CharSequence captcha(String id) {
     return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
-  }
-
-  public static CharSequence comments() {
-    return API_COMMENTS_URL;
-  }
-
-  public static CharSequence commentsQuery(
-      String thingId,
-      String text,
-      String modhash) {
-    return thingTextQuery(thingId, text, modhash);
   }
 
   public static CharSequence edit() {

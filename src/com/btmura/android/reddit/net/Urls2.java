@@ -45,6 +45,7 @@ public class Urls2 {
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
+  private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
   private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
   private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
@@ -417,6 +418,14 @@ public class Urls2 {
 
   // POST requests
 
+  public static CharSequence comment() {
+    return COMMENT_URL;
+  }
+
+  public static CharSequence commentQuery(String thingId, String text) {
+    return thingTextQuery(thingId, text);
+  }
+
   public static CharSequence hide(boolean hide) {
     return hide ? HIDE_URL : UNHIDE_URL;
   }
@@ -478,6 +487,13 @@ public class Urls2 {
   private static CharSequence thingQuery(String thingId) {
     return new StringBuilder("id=").append(encode(thingId));
   }
+
+  private static CharSequence thingTextQuery(String thingId, String text) {
+    return new StringBuilder()
+        .append("thing_id=").append(encode(thingId))
+        .append("&text=").append(encode(text));
+  }
+
 
   public static URL newUrl(CharSequence url) {
     try {

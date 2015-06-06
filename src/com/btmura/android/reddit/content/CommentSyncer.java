@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.content;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
@@ -26,6 +28,7 @@ import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -34,89 +37,97 @@ import java.io.IOException;
 
 class CommentSyncer implements Syncer {
 
-    private static final String[] PROJECTION = {
-            CommentActions._ID,
-            CommentActions.COLUMN_ACTION,
-            CommentActions.COLUMN_SYNC_FAILURES,
-            CommentActions.COLUMN_TEXT,
-            CommentActions.COLUMN_THING_ID,
-    };
+  private static final String[] PROJECTION = {
+      CommentActions._ID,
+      CommentActions.COLUMN_ACTION,
+      CommentActions.COLUMN_SYNC_FAILURES,
+      CommentActions.COLUMN_TEXT,
+      CommentActions.COLUMN_THING_ID,
+  };
 
-    private static final int ID = 0;
-    private static final int ACTION = 1;
-    private static final int SYNC_FAILURES = 2;
-    private static final int TEXT = 3;
-    private static final int THING_ID = 4;
+  private static final int ID = 0;
+  private static final int ACTION = 1;
+  private static final int SYNC_FAILURES = 2;
+  private static final int TEXT = 3;
+  private static final int THING_ID = 4;
 
-    @Override
-    public String getTag() {
-        return "c";
+  @Override
+  public String getTag() {
+    return "c";
+  }
+
+  @Override
+  public Cursor query(ContentProviderClient provider, String accountName)
+      throws RemoteException {
+    return provider.query(ThingProvider.COMMENT_ACTIONS_URI,
+        PROJECTION,
+        SharedColumns.SELECT_BY_ACCOUNT,
+        Array.of(accountName),
+        SharedColumns.SORT_BY_ID);
+  }
+
+  @Override
+  public int getSyncFailures(Cursor c) {
+    return c.getInt(SYNC_FAILURES);
+  }
+
+  @Override
+  public Result sync(
+      Context context,
+      String accountName,
+      Cursor c,
+      String cookie,
+      String modhash)
+      throws IOException, AuthenticatorException, OperationCanceledException {
+    int action = c.getInt(ACTION);
+    String thingId = c.getString(THING_ID);
+    String text = c.getString(TEXT);
+    switch (action) {
+      case CommentActions.ACTION_INSERT:
+        return RedditApi2.comment(context, accountName, thingId, text);
+
+      case CommentActions.ACTION_DELETE:
+        return RedditApi.delete(thingId, cookie, modhash);
+
+      case CommentActions.ACTION_EDIT:
+        return RedditApi.edit(thingId, text, cookie, modhash);
+
+      default:
+        throw new IllegalArgumentException();
     }
+  }
 
-    @Override
-    public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
-        return provider.query(ThingProvider.COMMENT_ACTIONS_URI,
-                PROJECTION,
-                SharedColumns.SELECT_BY_ACCOUNT,
-                Array.of(accountName),
-                SharedColumns.SORT_BY_ID);
-    }
+  @Override
+  public void addDeleteAction(Cursor c, Ops ops) {
+    long id = c.getLong(ID);
+    ops.addDelete(
+        ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
+            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+            .build());
+    ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+        .withSelection(Comments.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
+        .withValue(Comments.COLUMN_CREATED_UTC,
+            System.currentTimeMillis() / 1000)
+        .build());
+  }
 
-    @Override
-    public int getSyncFailures(Cursor c) {
-        return c.getInt(SYNC_FAILURES);
-    }
+  @Override
+  public void addUpdateAction(
+      Cursor c,
+      Ops ops,
+      int syncFailures,
+      String syncStatus) {
+    long id = c.getLong(ID);
+    ops.addUpdate(
+        ContentProviderOperation.newUpdate(ThingProvider.COMMENT_ACTIONS_URI)
+            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+            .withValue(CommentActions.COLUMN_SYNC_FAILURES, syncFailures)
+            .withValue(CommentActions.COLUMN_SYNC_STATUS, syncStatus)
+            .build());
+  }
 
-    @Override
-    public Result sync(
-        Context context,
-        String accountName,
-        Cursor c,
-        String cookie,
-        String modhash)
-            throws IOException {
-        int action = c.getInt(ACTION);
-        String thingId = c.getString(THING_ID);
-        String text = c.getString(TEXT);
-        switch (action) {
-            case CommentActions.ACTION_INSERT:
-                return RedditApi.comment(thingId, text, cookie, modhash);
-
-            case CommentActions.ACTION_DELETE:
-                return RedditApi.delete(thingId, cookie, modhash);
-
-            case CommentActions.ACTION_EDIT:
-                return RedditApi.edit(thingId, text, cookie, modhash);
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    @Override
-    public void addDeleteAction(Cursor c, Ops ops) {
-        long id = c.getLong(ID);
-        ops.addDelete(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
-                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .build());
-        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                .withSelection(Comments.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
-                .withValue(Comments.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
-                .build());
-    }
-
-    @Override
-    public void addUpdateAction(Cursor c, Ops ops, int syncFailures, String syncStatus) {
-        long id = c.getLong(ID);
-        ops.addUpdate(ContentProviderOperation.newUpdate(ThingProvider.COMMENT_ACTIONS_URI)
-                .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .withValue(CommentActions.COLUMN_SYNC_FAILURES, syncFailures)
-                .withValue(CommentActions.COLUMN_SYNC_STATUS, syncStatus)
-                .build());
-    }
-
-    @Override
-    public int getEstimatedOpCount(int count) {
-        return count * 2;
-    }
+  @Override
+  public int getEstimatedOpCount(int count) {
+    return count * 2;
+  }
 }

@@ -48,11 +48,6 @@ public class RedditApi {
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
-    public static Result comment(String thingId, String text, String cookie, String modhash)
-            throws IOException {
-        return postData(Urls.comments(), Urls.commentsQuery(thingId, text, modhash), cookie);
-    }
-
     public static Result edit(String thingId, String text, String cookie, String modhash)
             throws IOException {
         return postData(Urls.edit(), Urls.editQuery(thingId, text, modhash), cookie);
