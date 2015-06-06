@@ -490,6 +490,16 @@ public class Urls2 {
         .append("&dir=").append(Integer.toString(vote));
   }
 
+  // Other links
+
+  public static CharSequence permaLink(String perma, String thingId) {
+    StringBuilder sb = new StringBuilder(WWW_REDDIT_COM).append(perma);
+    if (!TextUtils.isEmpty(thingId)) {
+      sb.append(ThingIds.removeTag(thingId));
+    }
+    return sb;
+  }
+
   private static String getBaseUrl(String accountName) {
     return isOAuth(accountName) ? OAUTH_REDDIT_COM : WWW_REDDIT_COM;
   }

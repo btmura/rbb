@@ -185,7 +185,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
         // Comment reply messages have a context url we can use.
         String context = getContext(pos);
         if (!TextUtils.isEmpty(context)) {
-            return Urls.perma(context, null);
+            return Urls2.permaLink(context, null);
         }
 
         // Assume this is a raw message.

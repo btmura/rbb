@@ -28,6 +28,7 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.BundleSupport;
 import com.btmura.android.reddit.util.JsonParser;
@@ -245,7 +246,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     }
 
     public CharSequence getCommentsUrl() {
-        return Urls.perma(getPermaLink(), null);
+        return Urls2.permaLink(getPermaLink(), null);
     }
 
     public CharSequence getLinkUrl() {

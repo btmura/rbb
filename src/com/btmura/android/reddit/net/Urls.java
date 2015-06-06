@@ -75,14 +75,6 @@ public class Urls {
     return b;
   }
 
-  public static CharSequence perma(String permaLink, String thingId) {
-    StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
-    if (!TextUtils.isEmpty(thingId)) {
-      b.append(ThingIds.removeTag(thingId));
-    }
-    return b;
-  }
-
   public static CharSequence submit() {
     return API_SUBMIT_URL;
   }
