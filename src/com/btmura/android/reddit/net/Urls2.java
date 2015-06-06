@@ -46,6 +46,7 @@ public class Urls2 {
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
+  private static final String DEL_URL = OAUTH_REDDIT_COM + "/api/del";
   private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
   private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
@@ -79,7 +80,7 @@ public class Urls2 {
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
         .append(encode(
-            "history,identity,mysubreddits,privatemessages,read,report,subscribe,vote"));
+            "edit,history,identity,mysubreddits,privatemessages,read,report,subscribe,vote"));
   }
 
   public static CharSequence myInfo() {
@@ -424,6 +425,14 @@ public class Urls2 {
 
   public static CharSequence commentQuery(String thingId, String text) {
     return thingTextQuery(thingId, text);
+  }
+
+  public static CharSequence delete() {
+    return DEL_URL;
+  }
+
+  public static CharSequence deleteQuery(String thingId) {
+    return thingQuery(thingId);
   }
 
   public static CharSequence hide(boolean hide) {

@@ -32,7 +32,6 @@ public class Urls {
   public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
 
   private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
-  private static final String API_DELETE_URL = BASE_URL + "/api/del";
   private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
   private static final String API_INFO_URL = BASE_URL + "/api/info";
   private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
@@ -87,14 +86,6 @@ public class Urls {
     return b.toString();
   }
 
-  public static CharSequence delete() {
-    return API_DELETE_URL;
-  }
-
-  public static CharSequence deleteQuery(String thingId, String modhash) {
-    return thingQuery(thingId, modhash);
-  }
-
   public static CharSequence info(String thingId) {
     return new StringBuilder(API_INFO_URL)
         .append(".json?id=")
@@ -104,14 +95,6 @@ public class Urls {
   public static CharSequence loginCookie(String cookie) {
     StringBuilder b = new StringBuilder();
     b.append("reddit_session=").append(encode(cookie));
-    return b;
-  }
-
-  private static CharSequence thingQuery(String thingId, String modhash) {
-    StringBuilder b = new StringBuilder();
-    b.append("id=").append(encode(thingId));
-    b.append("&uh=").append(encode(modhash));
-    b.append("&api_type=json");
     return b;
   }
 

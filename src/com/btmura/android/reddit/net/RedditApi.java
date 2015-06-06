@@ -53,10 +53,6 @@ public class RedditApi {
         return postData(Urls.edit(), Urls.editQuery(thingId, text, modhash), cookie);
     }
 
-    public static Result delete(String thingId, String cookie, String modhash) throws IOException {
-        return postData(Urls.delete(), Urls.deleteQuery(thingId, modhash), cookie);
-    }
-
     // TODO(btmura): Not Reddit specific. Move HTTP stuff out to separate helper class.
     public static Bitmap getBitmap(CharSequence url) throws IOException {
         HttpURLConnection conn = null;

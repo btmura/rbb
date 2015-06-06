@@ -73,7 +73,7 @@ class CommentSyncer implements Syncer {
 
   @Override
   public Result sync(
-      Context context,
+      Context ctx,
       String accountName,
       Cursor c,
       String cookie,
@@ -84,10 +84,10 @@ class CommentSyncer implements Syncer {
     String text = c.getString(TEXT);
     switch (action) {
       case CommentActions.ACTION_INSERT:
-        return RedditApi2.comment(context, accountName, thingId, text);
+        return RedditApi2.comment(ctx, accountName, thingId, text);
 
       case CommentActions.ACTION_DELETE:
-        return RedditApi.delete(thingId, cookie, modhash);
+        return RedditApi2.delete(ctx, accountName, thingId);
 
       case CommentActions.ACTION_EDIT:
         return RedditApi.edit(thingId, text, cookie, modhash);

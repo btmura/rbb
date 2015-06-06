@@ -91,7 +91,7 @@ class MessageSyncer implements Syncer {
         return RedditApi2.comment(ctx, accountName, thingId, text);
 
       case MessageActions.ACTION_DELETE:
-        return RedditApi.delete(thingId, cookie, modhash);
+        return RedditApi2.delete(ctx, accountName, thingId);
 
       default:
         throw new IllegalArgumentException();

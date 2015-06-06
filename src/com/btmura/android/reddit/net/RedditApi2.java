@@ -131,6 +131,11 @@ public class RedditApi2 {
         Urls2.commentQuery(thingId, text));
   }
 
+  public static Result delete(Context ctx, String accountName, String thingId)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.delete(), Urls2.deleteQuery(thingId));
+  }
+
   public static Result hide(
       Context ctx,
       String accountName,
