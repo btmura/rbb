@@ -45,11 +45,13 @@ public class Urls2 {
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
+  private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
   private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
       OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
   private static final String SUBSCRIBE_URL =
       OAUTH_REDDIT_COM + "/api/subscribe/";
+  private static final String UNHIDE_URL = OAUTH_REDDIT_COM + "/api/unhide";
   private static final String VOTE_URL = OAUTH_REDDIT_COM + "/api/vote/";
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
@@ -61,7 +63,6 @@ public class Urls2 {
   private static final String U_PATH = "/u/";
   private static final String USER_PATH = "/user/";
 
-
   public static CharSequence authorize(Context ctx, CharSequence state) {
     String clientId = ctx.getString(R.string.key_reddit_client_id);
     return new StringBuilder(WWW_REDDIT_COM)
@@ -71,7 +72,7 @@ public class Urls2 {
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
         .append(encode(
-            "history,identity,mysubreddits,privatemessages,read,subscribe"));
+            "history,identity,mysubreddits,privatemessages,read,report,subscribe,vote"));
   }
 
   public static CharSequence myInfo() {
@@ -410,6 +411,14 @@ public class Urls2 {
 
   // POST requests
 
+  public static CharSequence hide(boolean hide) {
+    return hide ? HIDE_URL : UNHIDE_URL;
+  }
+
+  public static CharSequence hideQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
   public static CharSequence subscribe() {
     return SUBSCRIBE_URL;
   }
@@ -442,6 +451,10 @@ public class Urls2 {
 
   private static boolean isOAuth(String accountName) {
     return AccountUtils.isAccount(accountName);
+  }
+
+  private static CharSequence thingQuery(String thingId) {
+    return new StringBuilder("id=").append(encode(thingId));
   }
 
   public static URL newUrl(CharSequence url) {

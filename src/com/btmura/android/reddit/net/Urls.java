@@ -35,15 +35,12 @@ public class Urls {
     private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
     private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
-    private static final String API_HIDE_URL = BASE_URL + "/api/hide";
     private static final String API_INFO_URL = BASE_URL + "/api/info";
     private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
     private static final String API_SAVE_URL = BASE_URL + "/api/save";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-    private static final String API_UNHIDE_URL = BASE_URL + "/api/unhide";
     private static final String API_UNREAD_MESSAGE = BASE_URL + "/api/unread_message";
     private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
-    private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
 
@@ -101,14 +98,6 @@ public class Urls {
     }
 
     public static CharSequence deleteQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    public static CharSequence hide(boolean hide) {
-        return hide ? API_HIDE_URL : API_UNHIDE_URL;
-    }
-
-    public static CharSequence hideQuery(String thingId, String modhash) {
         return thingQuery(thingId, modhash);
     }
 

@@ -121,6 +121,15 @@ public class RedditApi2 {
 
   // POST requests
 
+  public static Result hide(
+      Context ctx,
+      String accountName,
+      String thingId,
+      boolean hide)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.hide(hide), Urls2.hideQuery(thingId));
+  }
+
   public static Result subscribe(
       Context ctx,
       String accountName,

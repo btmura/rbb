@@ -93,11 +93,6 @@ public class RedditApi {
         }
     }
 
-    public static Result hide(String thingId, boolean hide, String cookie, String modhash)
-            throws IOException {
-        return postData(Urls.hide(hide), Urls.hideQuery(thingId, modhash), cookie);
-    }
-
     public static Result readMessage(String thingId, boolean read, String cookie, String modhash)
             throws IOException {
         if (read) {
