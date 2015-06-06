@@ -49,9 +49,13 @@ public class Urls2 {
   private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
       OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
+  private static final String READ_MESSAGE =
+      OAUTH_REDDIT_COM + "/api/read_message";
   private static final String SUBSCRIBE_URL =
       OAUTH_REDDIT_COM + "/api/subscribe/";
   private static final String UNHIDE_URL = OAUTH_REDDIT_COM + "/api/unhide";
+  private static final String UNREAD_MESSAGE =
+      OAUTH_REDDIT_COM + "/api/unread_message";
   private static final String VOTE_URL = OAUTH_REDDIT_COM + "/api/vote/";
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
@@ -416,6 +420,14 @@ public class Urls2 {
   }
 
   public static CharSequence hideQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
+  public static CharSequence readMessage(boolean read) {
+    return read ? READ_MESSAGE : UNREAD_MESSAGE;
+  }
+
+  public static CharSequence readMessageQuery(String thingId) {
     return thingQuery(thingId);
   }
 

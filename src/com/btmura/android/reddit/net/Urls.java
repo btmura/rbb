@@ -26,165 +26,158 @@ import java.net.URLEncoder;
 
 public class Urls {
 
-    public static final String BASE_URL = "https://www.reddit.com";
-    private static final String BASE_SSL_URL = "https://ssl.reddit.com";
+  public static final String BASE_URL = "https://www.reddit.com";
+  private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
-    public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
+  public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
 
-    private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
-    private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
-    private static final String API_DELETE_URL = BASE_URL + "/api/del";
-    private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
-    private static final String API_INFO_URL = BASE_URL + "/api/info";
-    private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
-    private static final String API_SAVE_URL = BASE_URL + "/api/save";
-    private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-    private static final String API_UNREAD_MESSAGE = BASE_URL + "/api/unread_message";
-    private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
+  private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
+  private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
+  private static final String API_DELETE_URL = BASE_URL + "/api/del";
+  private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
+  private static final String API_INFO_URL = BASE_URL + "/api/info";
+  private static final String API_SAVE_URL = BASE_URL + "/api/save";
+  private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
+  private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
 
-    private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
+  private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
 
-    public static CharSequence captcha(String id) {
-        return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
+  public static CharSequence captcha(String id) {
+    return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
+  }
+
+  public static CharSequence comments() {
+    return API_COMMENTS_URL;
+  }
+
+  public static CharSequence commentsQuery(
+      String thingId,
+      String text,
+      String modhash) {
+    return thingTextQuery(thingId, text, modhash);
+  }
+
+  public static CharSequence edit() {
+    return API_EDIT_URL;
+  }
+
+  public static CharSequence editQuery(
+      String thingId,
+      String text,
+      String modhash) {
+    return thingTextQuery(thingId, text, modhash);
+  }
+
+  private static CharSequence thingTextQuery(
+      String thingId,
+      String text,
+      String modhash) {
+    return new StringBuilder()
+        .append("thing_id=").append(encode(thingId))
+        .append("&text=").append(encode(text))
+        .append("&uh=").append(encode(modhash))
+        .append("&api_type=json");
+  }
+
+  public static CharSequence compose() {
+    return API_COMPOSE_URL;
+  }
+
+  public static String composeQuery(
+      String to, String subject, String text, String captchaId,
+      String captchaGuess, String modhash) {
+    StringBuilder b = new StringBuilder();
+    b.append("to=").append(encode(to));
+    b.append("&subject=").append(encode(subject));
+    b.append("&text=").append(encode(text));
+    if (!TextUtils.isEmpty(captchaId)) {
+      b.append("&iden=").append(encode(captchaId));
     }
-
-    public static CharSequence comments() {
-        return API_COMMENTS_URL;
+    if (!TextUtils.isEmpty(captchaGuess)) {
+      b.append("&captcha=").append(encode(captchaGuess));
     }
+    b.append("&uh=").append(encode(modhash));
+    b.append("&api_type=json");
+    return b.toString();
+  }
 
-    public static CharSequence commentsQuery(String thingId, String text, String modhash) {
-        return thingTextQuery(thingId, text, modhash);
-    }
+  public static CharSequence delete() {
+    return API_DELETE_URL;
+  }
 
-    public static CharSequence edit() {
-        return API_EDIT_URL;
-    }
+  public static CharSequence deleteQuery(String thingId, String modhash) {
+    return thingQuery(thingId, modhash);
+  }
 
-    public static CharSequence editQuery(String thingId, String text, String modhash) {
-        return thingTextQuery(thingId, text, modhash);
-    }
+  public static CharSequence info(String thingId) {
+    return new StringBuilder(API_INFO_URL)
+        .append(".json?id=")
+        .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
+  }
 
-    private static CharSequence thingTextQuery(String thingId, String text, String modhash) {
-        return new StringBuilder()
-                .append("thing_id=").append(encode(thingId))
-                .append("&text=").append(encode(text))
-                .append("&uh=").append(encode(modhash))
-                .append("&api_type=json");
-    }
+  public static CharSequence loginCookie(String cookie) {
+    StringBuilder b = new StringBuilder();
+    b.append("reddit_session=").append(encode(cookie));
+    return b;
+  }
 
-    public static CharSequence compose() {
-        return API_COMPOSE_URL;
-    }
+  public static CharSequence saveQuery(String thingId, String modhash) {
+    return thingQuery(thingId, modhash);
+  }
 
-    public static String composeQuery(String to, String subject, String text, String captchaId,
-                                      String captchaGuess, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("to=").append(encode(to));
-        b.append("&subject=").append(encode(subject));
-        b.append("&text=").append(encode(text));
-        if (!TextUtils.isEmpty(captchaId)) {
-            b.append("&iden=").append(encode(captchaId));
-        }
-        if (!TextUtils.isEmpty(captchaGuess)) {
-            b.append("&captcha=").append(encode(captchaGuess));
-        }
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b.toString();
-    }
+  private static CharSequence thingQuery(String thingId, String modhash) {
+    StringBuilder b = new StringBuilder();
+    b.append("id=").append(encode(thingId));
+    b.append("&uh=").append(encode(modhash));
+    b.append("&api_type=json");
+    return b;
+  }
 
-    public static CharSequence delete() {
-        return API_DELETE_URL;
+  public static CharSequence perma(String permaLink, String thingId) {
+    StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
+    if (!TextUtils.isEmpty(thingId)) {
+      b.append(ThingIds.removeTag(thingId));
     }
+    return b;
+  }
 
-    public static CharSequence deleteQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
+  public static CharSequence save(boolean save) {
+    return save ? API_SAVE_URL : API_UNSAVE_URL;
+  }
 
-    public static CharSequence info(String thingId) {
-        return new StringBuilder(API_INFO_URL)
-                .append(".json?id=")
-                .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
-    }
+  public static CharSequence submit() {
+    return API_SUBMIT_URL;
+  }
 
-    public static CharSequence loginCookie(String cookie) {
-        StringBuilder b = new StringBuilder();
-        b.append("reddit_session=").append(encode(cookie));
-        return b;
+  public static CharSequence submitQuery(
+      String subreddit,
+      String title,
+      String text,
+      boolean link,
+      String captchaId,
+      String captchaGuess,
+      String modhash) {
+    StringBuilder b = new StringBuilder();
+    b.append(link ? "kind=link" : "kind=self");
+    b.append("&uh=").append(encode(modhash));
+    b.append("&sr=").append(encode(subreddit));
+    b.append("&title=").append(encode(title));
+    b.append(link ? "&url=" : "&text=").append(encode(text));
+    if (!TextUtils.isEmpty(captchaId)) {
+      b.append("&iden=").append(encode(captchaId));
     }
+    if (!TextUtils.isEmpty(captchaGuess)) {
+      b.append("&captcha=").append(encode(captchaGuess));
+    }
+    b.append("&api_type=json");
+    return b;
+  }
 
-    public static CharSequence readMessage() {
-        return API_READ_MESSAGE;
+  public static String encode(String param) {
+    try {
+      return URLEncoder.encode(param, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
     }
-
-    public static CharSequence readMessageQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    public static CharSequence saveQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    private static CharSequence thingQuery(String thingId, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("id=").append(encode(thingId));
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b;
-    }
-
-    public static CharSequence perma(String permaLink, String thingId) {
-        StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
-        if (!TextUtils.isEmpty(thingId)) {
-            b.append(ThingIds.removeTag(thingId));
-        }
-        return b;
-    }
-
-    public static CharSequence save(boolean save) {
-        return save ? API_SAVE_URL : API_UNSAVE_URL;
-    }
-
-    public static CharSequence submit() {
-        return API_SUBMIT_URL;
-    }
-
-    public static CharSequence submitQuery(String subreddit,
-                                           String title,
-                                           String text,
-                                           boolean link,
-                                           String captchaId,
-                                           String captchaGuess,
-                                           String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append(link ? "kind=link" : "kind=self");
-        b.append("&uh=").append(encode(modhash));
-        b.append("&sr=").append(encode(subreddit));
-        b.append("&title=").append(encode(title));
-        b.append(link ? "&url=" : "&text=").append(encode(text));
-        if (!TextUtils.isEmpty(captchaId)) {
-            b.append("&iden=").append(encode(captchaId));
-        }
-        if (!TextUtils.isEmpty(captchaGuess)) {
-            b.append("&captcha=").append(encode(captchaGuess));
-        }
-        b.append("&api_type=json");
-        return b;
-    }
-
-    public static CharSequence unreadMessage() {
-        return API_UNREAD_MESSAGE;
-    }
-
-    public static CharSequence unreadMessageQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    public static String encode(String param) {
-        try {
-            return URLEncoder.encode(param, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+  }
 }

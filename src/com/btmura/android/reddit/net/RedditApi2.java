@@ -130,6 +130,16 @@ public class RedditApi2 {
     return post(ctx, accountName, Urls2.hide(hide), Urls2.hideQuery(thingId));
   }
 
+  public static Result readMessage(
+      Context ctx,
+      String accountName,
+      String thingId,
+      boolean read)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.readMessage(read),
+        Urls2.readMessageQuery(thingId));
+  }
+
   public static Result subscribe(
       Context ctx,
       String accountName,
