@@ -20,7 +20,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.util.JsonReader;
-import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
@@ -45,12 +44,8 @@ public class RedditApi2 {
 
   private static final int HTTP_UNAUTHORIZED = 401;
 
-  public static AccountInfoResult getMyInfo(
-      Context ctx,
-      String accountName) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
+  public static AccountInfoResult getMyInfo(Context ctx, String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
       conn = connect(ctx, accountName, Urls2.myInfo(), false);
@@ -62,10 +57,8 @@ public class RedditApi2 {
 
   public static ArrayList<String> getMySubreddits(
       Context ctx,
-      String accountName) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
+      String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
@@ -83,10 +76,8 @@ public class RedditApi2 {
   public static SidebarResult getSidebar(
       Context ctx,
       String accountName,
-      String subreddit) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
+      String subreddit)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
       CharSequence url = Urls2.sidebar(accountName, subreddit);
@@ -100,10 +91,8 @@ public class RedditApi2 {
   public static AccountInfoResult getUserInfo(
       Context ctx,
       String accountName,
-      String user) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
+      String user)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
       CharSequence url = Urls2.userInfo(accountName, user);
@@ -114,10 +103,8 @@ public class RedditApi2 {
     }
   }
 
-  public static void markMessagesRead(Context ctx, String accountName) throws
-      IOException,
-      AuthenticatorException,
-      OperationCanceledException {
+  public static void markMessagesRead(Context ctx, String accountName)
+      throws IOException, AuthenticatorException, OperationCanceledException {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
@@ -134,10 +121,8 @@ public class RedditApi2 {
       Context ctx,
       String accountName,
       String subreddit,
-      boolean subscribe) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
+      boolean subscribe)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
       conn = connect(ctx, accountName, Urls2.subscribe(), true);
@@ -152,10 +137,8 @@ public class RedditApi2 {
       Context ctx,
       String accountName,
       CharSequence url,
-      boolean post) throws
-      IOException,
-      AuthenticatorException,
-      OperationCanceledException {
+      boolean post)
+      throws IOException, AuthenticatorException, OperationCanceledException {
     HttpURLConnection conn = innerConnect(ctx, accountName, url, post);
 
     // TODO(btmura): check whether error is scope problem or not
@@ -180,10 +163,8 @@ public class RedditApi2 {
       Context ctx,
       String accountName,
       CharSequence url,
-      boolean post) throws
-      AuthenticatorException,
-      IOException,
-      OperationCanceledException {
+      boolean post)
+      throws AuthenticatorException, IOException, OperationCanceledException {
     HttpURLConnection conn =
         (HttpURLConnection) Urls2.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
@@ -192,19 +173,14 @@ public class RedditApi2 {
       setFormDataHeaders(conn);
     }
     conn.connect();
-    if (DEBUG) {
-      Log.d(TAG, "url: " + url + " response code: " + conn.getResponseCode());
-    }
     return conn;
   }
 
   private static void setCommonHeaders(
       Context ctx,
       String accountName,
-      HttpURLConnection conn) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
+      HttpURLConnection conn)
+      throws AuthenticatorException, OperationCanceledException, IOException {
     conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
     conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
     if (AccountUtils.isAccount(accountName)) {
@@ -219,14 +195,12 @@ public class RedditApi2 {
     conn.setDoOutput(true);
   }
 
-  private static void writeFormData(
-      HttpURLConnection conn,
-      CharSequence data) throws IOException {
+  private static void writeFormData(HttpURLConnection conn, CharSequence data)
+      throws IOException {
     OutputStream output = null;
     try {
       output = new BufferedOutputStream(conn.getOutputStream());
       output.write(data.toString().getBytes(RedditApi.CHARSET));
-      output.close();
     } finally {
       if (output != null) {
         output.close();
@@ -234,8 +208,8 @@ public class RedditApi2 {
     }
   }
 
-  private static void close(InputStream in, HttpURLConnection conn) throws
-      IOException {
+  private static void close(InputStream in, HttpURLConnection conn)
+      throws IOException {
     if (in != null) {
       in.close();
     }
