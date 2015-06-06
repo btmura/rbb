@@ -136,6 +136,15 @@ public class RedditApi2 {
     return post(ctx, accountName, Urls2.delete(), Urls2.deleteQuery(thingId));
   }
 
+  public static Result edit(
+      Context ctx,
+      String accountName,
+      String thingId,
+      String text)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.edit(), Urls2.editQuery(thingId, text));
+  }
+
   public static Result hide(
       Context ctx,
       String accountName,

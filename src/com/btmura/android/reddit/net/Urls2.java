@@ -47,6 +47,7 @@ public class Urls2 {
 
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
   private static final String DEL_URL = OAUTH_REDDIT_COM + "/api/del";
+  private static final String EDIT_URL = OAUTH_REDDIT_COM + "/api/editusertext";
   private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
   private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
@@ -433,6 +434,14 @@ public class Urls2 {
 
   public static CharSequence deleteQuery(String thingId) {
     return thingQuery(thingId);
+  }
+
+  public static CharSequence edit() {
+    return EDIT_URL;
+  }
+
+  public static CharSequence editQuery(String thingId, String text) {
+    return thingTextQuery(thingId, text);
   }
 
   public static CharSequence hide(boolean hide) {

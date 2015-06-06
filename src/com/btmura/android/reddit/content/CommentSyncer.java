@@ -90,7 +90,7 @@ class CommentSyncer implements Syncer {
         return RedditApi2.delete(ctx, accountName, thingId);
 
       case CommentActions.ACTION_EDIT:
-        return RedditApi.edit(thingId, text, cookie, modhash);
+        return RedditApi2.edit(ctx, accountName, thingId, text);
 
       default:
         throw new IllegalArgumentException();

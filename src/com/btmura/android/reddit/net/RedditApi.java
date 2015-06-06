@@ -48,11 +48,6 @@ public class RedditApi {
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
-    public static Result edit(String thingId, String text, String cookie, String modhash)
-            throws IOException {
-        return postData(Urls.edit(), Urls.editQuery(thingId, text, modhash), cookie);
-    }
-
     // TODO(btmura): Not Reddit specific. Move HTTP stuff out to separate helper class.
     public static Bitmap getBitmap(CharSequence url) throws IOException {
         HttpURLConnection conn = null;
