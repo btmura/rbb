@@ -93,11 +93,6 @@ public class RedditApi {
         }
     }
 
-    public static Result save(String thingId, boolean save, String cookie, String modhash)
-            throws IOException {
-        return postData(Urls.save(save), Urls.saveQuery(thingId, modhash), cookie);
-    }
-
     public static Result compose(String to, String subject, String text, String captchaId,
             String captchaGuess, String cookie, String modhash) throws IOException {
         return postData(Urls.compose(), Urls.composeQuery(to, subject, text,

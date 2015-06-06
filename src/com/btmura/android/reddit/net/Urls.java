@@ -36,9 +36,7 @@ public class Urls {
   private static final String API_DELETE_URL = BASE_URL + "/api/del";
   private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
   private static final String API_INFO_URL = BASE_URL + "/api/info";
-  private static final String API_SAVE_URL = BASE_URL + "/api/save";
   private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-  private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
 
   private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
 
@@ -121,10 +119,6 @@ public class Urls {
     return b;
   }
 
-  public static CharSequence saveQuery(String thingId, String modhash) {
-    return thingQuery(thingId, modhash);
-  }
-
   private static CharSequence thingQuery(String thingId, String modhash) {
     StringBuilder b = new StringBuilder();
     b.append("id=").append(encode(thingId));
@@ -139,10 +133,6 @@ public class Urls {
       b.append(ThingIds.removeTag(thingId));
     }
     return b;
-  }
-
-  public static CharSequence save(boolean save) {
-    return save ? API_SAVE_URL : API_UNSAVE_URL;
   }
 
   public static CharSequence submit() {

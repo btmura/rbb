@@ -140,6 +140,15 @@ public class RedditApi2 {
         Urls2.readMessageQuery(thingId));
   }
 
+  public static Result save(
+      Context ctx,
+      String accountName,
+      String thingId,
+      boolean save)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName, Urls2.save(save), Urls2.saveQuery(thingId));
+  }
+
   public static Result subscribe(
       Context ctx,
       String accountName,

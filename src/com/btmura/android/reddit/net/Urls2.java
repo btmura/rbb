@@ -51,11 +51,13 @@ public class Urls2 {
       OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
   private static final String READ_MESSAGE =
       OAUTH_REDDIT_COM + "/api/read_message";
+  private static final String SAVE_URL = OAUTH_REDDIT_COM + "/api/save";
   private static final String SUBSCRIBE_URL =
       OAUTH_REDDIT_COM + "/api/subscribe/";
   private static final String UNHIDE_URL = OAUTH_REDDIT_COM + "/api/unhide";
   private static final String UNREAD_MESSAGE =
       OAUTH_REDDIT_COM + "/api/unread_message";
+  private static final String UNSAVE_URL = OAUTH_REDDIT_COM + "/api/unsave";
   private static final String VOTE_URL = OAUTH_REDDIT_COM + "/api/vote/";
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
@@ -428,6 +430,14 @@ public class Urls2 {
   }
 
   public static CharSequence readMessageQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
+  public static CharSequence save(boolean save) {
+    return save ? SAVE_URL : UNSAVE_URL;
+  }
+
+  public static CharSequence saveQuery(String thingId) {
     return thingQuery(thingId);
   }
 
