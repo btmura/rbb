@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
 
@@ -45,6 +46,12 @@ public class Urls2 {
   private static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
+  // Normal URLs
+
+  private static final String CAPTCHA_URL = WWW_REDDIT_COM + "/captcha/";
+
+  // OAuth URLs
+
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
   private static final String DEL_URL = OAUTH_REDDIT_COM + "/api/del";
   private static final String EDIT_URL = OAUTH_REDDIT_COM + "/api/editusertext";
@@ -65,6 +72,7 @@ public class Urls2 {
 
   private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
   private static final String COMMENTS_PATH = "/comments/";
+  private static final String INFO_PATH = "/api/info";
   private static final String MESSAGES_PATH = "/message";
   private static final String MESSAGE_THREAD_PATH = "/message/messages/";
   private static final String SUBREDDITS_PATH = "/subreddits";
@@ -86,6 +94,18 @@ public class Urls2 {
 
   public static CharSequence myInfo() {
     return ME_URL;
+  }
+
+  public static CharSequence thingInfo(String accountName, String thingId) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(INFO_PATH);
+
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
+    }
+
+    return sb.append("id=")
+        .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
   }
 
   public static CharSequence mySubreddits() {
@@ -491,6 +511,10 @@ public class Urls2 {
   }
 
   // Other links
+
+  public static CharSequence captcha(String id) {
+    return new StringBuilder(CAPTCHA_URL).append(id).append(".png");
+  }
 
   public static CharSequence permaLink(String perma, String thingId) {
     StringBuilder sb = new StringBuilder(WWW_REDDIT_COM).append(perma);

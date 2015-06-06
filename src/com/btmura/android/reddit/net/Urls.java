@@ -18,9 +18,6 @@ package com.btmura.android.reddit.net;
 
 import android.text.TextUtils;
 
-import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.util.ThingIds;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -32,14 +29,7 @@ public class Urls {
   public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
 
   private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
-  private static final String API_INFO_URL = BASE_URL + "/api/info";
   private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-
-  private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-
-  public static CharSequence captcha(String id) {
-    return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
-  }
 
   public static CharSequence compose() {
     return API_COMPOSE_URL;
@@ -63,11 +53,6 @@ public class Urls {
     return b.toString();
   }
 
-  public static CharSequence info(String thingId) {
-    return new StringBuilder(API_INFO_URL)
-        .append(".json?id=")
-        .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
-  }
 
   public static CharSequence loginCookie(String cookie) {
     StringBuilder b = new StringBuilder();

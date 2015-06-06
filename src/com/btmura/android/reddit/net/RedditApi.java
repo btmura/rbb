@@ -27,16 +27,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Scanner;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.app.ThingBundle;
-import com.btmura.android.reddit.text.MarkdownFormatter;
 
 public class RedditApi {
 
@@ -47,37 +42,6 @@ public class RedditApi {
     static final String USER_AGENT = "falling for reddit v3.4 by /u/btmura";
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
-
-    // TODO(btmura): Not Reddit specific. Move HTTP stuff out to separate helper class.
-    public static Bitmap getBitmap(CharSequence url) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(url, null, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            return BitmapFactory.decodeStream(in);
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    public static Bitmap getCaptcha(String id) throws IOException {
-        return getBitmap(Urls.captcha(id));
-    }
-
-    public static ThingBundle getInfo(Context context, String thingId, String cookie,
-            MarkdownFormatter formatter) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.info(thingId), cookie, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            return ThingBundle.fromJsonReader(context, new JsonReader(new InputStreamReader(in)),
-                    formatter);
-        } finally {
-            close(in, conn);
-        }
-    }
 
     public static Result compose(String to, String subject, String text, String captchaId,
             String captchaGuess, String cookie, String modhash) throws IOException {

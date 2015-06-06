@@ -19,11 +19,15 @@ package com.btmura.android.reddit.net;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
+import com.btmura.android.reddit.app.ThingBundle;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -46,12 +50,46 @@ public class RedditApi2 {
 
   // GET requests
 
+  public static Bitmap getBitmap(CharSequence url) throws IOException {
+    HttpURLConnection conn = null;
+    InputStream in = null;
+    try {
+      conn = noAuthConnect(url);
+      in = new BufferedInputStream(conn.getInputStream());
+      return BitmapFactory.decodeStream(in);
+    } finally {
+      close(in, conn);
+    }
+  }
+
+  public static Bitmap getCaptcha(String id) throws IOException {
+    return getBitmap(Urls2.captcha(id));
+  }
+
   public static AccountInfoResult getMyInfo(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
       conn = connect(ctx, accountName, Urls2.myInfo(), false);
       return AccountInfoResult.fromMyInfoJson(conn.getInputStream());
+    } finally {
+      close(conn);
+    }
+  }
+
+  public static ThingBundle getThingInfo(
+      Context ctx,
+      String accountName,
+      String thingId,
+      MarkdownFormatter formatter)
+      throws IOException, AuthenticatorException, OperationCanceledException {
+    HttpURLConnection conn = null;
+    try {
+      conn = connect(ctx, accountName,
+          Urls2.thingInfo(accountName, thingId), false);
+      return ThingBundle.fromJsonReader(ctx,
+          new JsonReader(new InputStreamReader(conn.getInputStream())),
+          formatter);
     } finally {
       close(conn);
     }
@@ -212,9 +250,9 @@ public class RedditApi2 {
       Context ctx,
       String accountName,
       CharSequence url,
-      boolean post)
+      boolean doPost)
       throws IOException, AuthenticatorException, OperationCanceledException {
-    HttpURLConnection conn = innerConnect(ctx, accountName, url, post);
+    HttpURLConnection conn = innerConnect(ctx, accountName, url, doPost);
 
     // TODO(btmura): check whether error is scope problem or not
     if (AccountUtils.isAccount(accountName)
@@ -228,7 +266,7 @@ public class RedditApi2 {
       // TODO(btmura): validate access token result
       AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
 
-      conn = innerConnect(ctx, accountName, url, post);
+      conn = innerConnect(ctx, accountName, url, doPost);
     }
 
     return conn;
@@ -238,26 +276,40 @@ public class RedditApi2 {
       Context ctx,
       String accountName,
       CharSequence url,
-      boolean post)
+      boolean doPost)
       throws AuthenticatorException, IOException, OperationCanceledException {
     HttpURLConnection conn =
         (HttpURLConnection) Urls2.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
-    setCommonHeaders(ctx, accountName, conn);
-    if (post) {
+    setCommonHeaders(conn);
+    setAuthorizationHeader(ctx, accountName, conn);
+    if (doPost) {
       setFormDataHeaders(conn);
     }
     conn.connect();
     return conn;
   }
 
-  private static void setCommonHeaders(
+  private static HttpURLConnection noAuthConnect(CharSequence url)
+      throws IOException {
+    HttpURLConnection conn =
+        (HttpURLConnection) Urls2.newUrl(url).openConnection();
+    conn.setInstanceFollowRedirects(false);
+    setCommonHeaders(conn);
+    conn.connect();
+    return conn;
+  }
+
+  private static void setCommonHeaders(HttpURLConnection conn) {
+    conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
+    conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
+  }
+
+  private static void setAuthorizationHeader(
       Context ctx,
       String accountName,
       HttpURLConnection conn)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
-    conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
     if (AccountUtils.isAccount(accountName)) {
       String at = AccountUtils.getAccessToken(ctx, accountName);
       // TODO(btmura): handle empty access token

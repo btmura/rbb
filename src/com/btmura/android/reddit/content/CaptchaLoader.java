@@ -16,94 +16,94 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi2;
+
+import java.io.IOException;
 
 public class CaptchaLoader extends AsyncTaskLoader<CaptchaResult> {
 
-    public static final String TAG = "CaptchaLoader";
+  public static final String TAG = "CaptchaLoader";
 
-    public static class CaptchaResult {
-        public String iden;
-        public Bitmap captchaBitmap;
+  public static class CaptchaResult {
+    public String iden;
+    public Bitmap captchaBitmap;
+  }
+
+  private final String captchaId;
+  private CaptchaResult result;
+
+  public CaptchaLoader(Context context, String captchaId) {
+    super(context);
+    this.captchaId = captchaId;
+  }
+
+  @Override
+  public CaptchaResult loadInBackground() {
+    try {
+      CaptchaResult captchaResult = new CaptchaResult();
+      captchaResult.iden = captchaId;
+      captchaResult.captchaBitmap = RedditApi2.getCaptcha(captchaId);
+      return captchaResult;
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return null;
+    }
+  }
+
+  @Override
+  public void deliverResult(CaptchaResult newResult) {
+    if (isReset()) {
+      newResult.captchaBitmap.recycle();
+      return;
     }
 
-    private final String captchaId;
-    private CaptchaResult result;
+    CaptchaResult oldResult = result;
+    result = newResult;
 
-    public CaptchaLoader(Context context, String captchaId) {
-        super(context);
-        this.captchaId = captchaId;
+    if (isStarted()) {
+      super.deliverResult(newResult);
     }
 
-    @Override
-    public CaptchaResult loadInBackground() {
-        try {
-            CaptchaResult captchaResult = new CaptchaResult();
-            captchaResult.iden = captchaId;
-            captchaResult.captchaBitmap = RedditApi.getCaptcha(captchaId);
-            return captchaResult;
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-            return null;
-        }
+    if (oldResult != null && oldResult != newResult && !oldResult.captchaBitmap.isRecycled()) {
+      oldResult.captchaBitmap.recycle();
     }
+  }
 
-    @Override
-    public void deliverResult(CaptchaResult newResult) {
-        if (isReset()) {
-            newResult.captchaBitmap.recycle();
-            return;
-        }
-
-        CaptchaResult oldResult = result;
-        result = newResult;
-
-        if (isStarted()) {
-            super.deliverResult(newResult);
-        }
-
-        if (oldResult != null && oldResult != newResult && !oldResult.captchaBitmap.isRecycled()) {
-            oldResult.captchaBitmap.recycle();
-        }
+  @Override
+  protected void onStartLoading() {
+    if (result != null) {
+      deliverResult(result);
     }
-
-    @Override
-    protected void onStartLoading() {
-        if (result != null) {
-            deliverResult(result);
-        }
-        if (takeContentChanged() || result == null) {
-            forceLoad();
-        }
+    if (takeContentChanged() || result == null) {
+      forceLoad();
     }
+  }
 
-    @Override
-    protected void onStopLoading() {
-        cancelLoad();
-    }
+  @Override
+  protected void onStopLoading() {
+    cancelLoad();
+  }
 
-    @Override
-    public void onCanceled(CaptchaResult result) {
-        if (result != null && !result.captchaBitmap.isRecycled()) {
-            result.captchaBitmap.recycle();
-        }
+  @Override
+  public void onCanceled(CaptchaResult result) {
+    if (result != null && !result.captchaBitmap.isRecycled()) {
+      result.captchaBitmap.recycle();
     }
+  }
 
-    @Override
-    protected void onReset() {
-        super.onReset();
-        onStopLoading();
-        if (result != null && !result.captchaBitmap.isRecycled()) {
-            result.captchaBitmap.recycle();
-        }
-        result = null;
+  @Override
+  protected void onReset() {
+    super.onReset();
+    onStopLoading();
+    if (result != null && !result.captchaBitmap.isRecycled()) {
+      result.captchaBitmap.recycle();
     }
+    result = null;
+  }
 }
