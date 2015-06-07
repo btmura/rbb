@@ -51,12 +51,7 @@ interface Syncer {
   int getEstimatedOpCount(int count);
 
   /** Sync the action to the server over the network. */
-  Result sync(
-      Context context,
-      String accountName,
-      Cursor c,
-      String cookie,
-      String modhash)
+  Result sync(Context context, String accountName, Cursor c)
       throws AuthenticatorException, IOException, OperationCanceledException;
 
   /**

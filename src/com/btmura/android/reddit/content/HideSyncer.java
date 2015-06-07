@@ -68,12 +68,7 @@ class HideSyncer implements Syncer {
   }
 
   @Override
-  public Result sync(
-      Context context,
-      String accountName,
-      Cursor c,
-      String cookie,
-      String modhash)
+  public Result sync(Context context, String accountName, Cursor c)
       throws IOException, AuthenticatorException, OperationCanceledException {
     String thingId = c.getString(THING_ID);
     boolean hide = c.getInt(ACTION) == HideActions.ACTION_HIDE;

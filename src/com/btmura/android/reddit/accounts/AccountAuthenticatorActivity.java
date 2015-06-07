@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.accounts;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -23,56 +25,67 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
-import com.btmura.android.reddit.app.OAuthRedirectFragment;
-import com.btmura.android.reddit.app.OAuthRedirectFragment.OnAccountAddedListener;
+import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.net.Urls;
 
-public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity implements OnAccountAddedListener {
+public class AccountAuthenticatorActivity
+    extends SupportAccountAuthenticatorActivity
+    implements AddAccountFragment.OnAccountAddedListener {
 
-    public static final String EXTRA_USERNAME = "username";
+  public static final String EXTRA_USERNAME = "username";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getDialogTheme(this));
-        setContentView(R.layout.account_authenticator);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setTheme(ThemePrefs.getDialogTheme(this));
+    setContentView(R.layout.account_authenticator);
 
-        if (savedInstanceState == null) {
-            if (!isOAuthCallback()) {
-                setContainer(OAuthRedirectFragment.newInstance(getUsernameExtra()));
-            } else {
-                setContainer(AddAccountFragment.newInstance(getOAuthCallbackUrl()));
-            }
-        }
+    if (savedInstanceState == null) {
+      if (!isOAuthCallback()) {
+        forwardToBrowserLogin();
+      } else {
+        setContainer(AddAccountFragment.newInstance(getOAuthCallbackUrl()));
+      }
     }
+  }
 
-    @Override
-    public void onAccountAdded(Bundle result) {
-        setAccountAuthenticatorResult(result);
-        setResult(RESULT_OK);
-        finish();
-    }
+  private void forwardToBrowserLogin() {
+    StringBuilder state = new StringBuilder("rbb_")
+        .append(System.currentTimeMillis());
+    CharSequence url = Urls.authorize(this, state);
 
-    @Override
-    public void onAccountCancelled() {
-        finish();
+    Intent intent = new Intent(Intent.ACTION_VIEW);
+    intent.setData(Uri.parse(url.toString()));
+    if (!Contexts.startActivity(this, intent)) {
+      // TODO(btmura): handle no browser case
     }
+    finish();
+  }
 
-    private boolean isOAuthCallback() {
-        return !TextUtils.isEmpty(getOAuthCallbackUrl());
-    }
+  @Override
+  public void onAccountAdded(Bundle result) {
+    setAccountAuthenticatorResult(result);
+    setResult(RESULT_OK);
+    finish();
+  }
 
-    private String getUsernameExtra() {
-        return getIntent().getStringExtra(EXTRA_USERNAME);
-    }
+  @Override
+  public void onAccountCancelled() {
+    finish();
+  }
 
-    private String getOAuthCallbackUrl() {
-        return getIntent().getDataString();
-    }
+  private boolean isOAuthCallback() {
+    return !TextUtils.isEmpty(getOAuthCallbackUrl());
+  }
 
-    private void setContainer(Fragment frag) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.account_authenticator_container, frag);
-        ft.commit();
-    }
+  private String getOAuthCallbackUrl() {
+    return getIntent().getDataString();
+  }
+
+  private void setContainer(Fragment frag) {
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    ft.replace(R.id.account_authenticator_container, frag);
+    ft.commit();
+  }
 }

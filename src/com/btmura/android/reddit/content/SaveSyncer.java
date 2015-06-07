@@ -68,12 +68,7 @@ class SaveSyncer implements Syncer {
   }
 
   @Override
-  public Result sync(
-      Context ctx,
-      String accountName,
-      Cursor c,
-      String cookie,
-      String modhash)
+  public Result sync(Context ctx, String accountName, Cursor c)
       throws IOException, AuthenticatorException, OperationCanceledException {
     String thingId = c.getString(THING_ID);
     int action = c.getInt(ACTION);

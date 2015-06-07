@@ -29,6 +29,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -39,18 +46,29 @@ import com.btmura.android.reddit.net.AccessTokenResult;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.text.InputFilters;
 
 import java.io.IOException;
 
-public class AddAccountFragment extends Fragment {
+public class AddAccountFragment extends Fragment implements OnClickListener {
 
   private static final String TAG = "AddAccountFragment";
   private static final boolean DEBUG = BuildConfig.DEBUG;
 
   private static final String ARG_OAUTH_CALLBACK_URL = "oauthCallbackUrl";
 
-  private OAuthRedirectFragment.OnAccountAddedListener listener;
-  private AddAccountTask task;
+  private OnAccountAddedListener listener;
+  private EditText username;
+  private ProgressBar progress;
+  private Button addButton;
+  private Button cancelButton;
+
+  public interface OnAccountAddedListener {
+    void onAccountAdded(Bundle result);
+
+    void onAccountCancelled();
+  }
 
   public static AddAccountFragment newInstance(String oauthCallbackUrl) {
     // TODO(btmura): add precondition check for oauth url
@@ -65,8 +83,8 @@ public class AddAccountFragment extends Fragment {
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-    if (activity instanceof OAuthRedirectFragment.OnAccountAddedListener) {
-      listener = (OAuthRedirectFragment.OnAccountAddedListener) activity;
+    if (activity instanceof OnAccountAddedListener) {
+      listener = (OnAccountAddedListener) activity;
     }
   }
 
@@ -77,22 +95,80 @@ public class AddAccountFragment extends Fragment {
   }
 
   @Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
-    if (task == null) {
-      task = new AddAccountTask();
-      task.execute();
+  public View onCreateView(
+      LayoutInflater inflater,
+      ViewGroup container,
+      Bundle savedInstanceState) {
+    View v = inflater.inflate(R.layout.add_account_frag, container, false);
+
+    username = (EditText) v.findViewById(R.id.username);
+    username.setFilters(InputFilters.NO_SPACE_FILTERS);
+
+    progress = (ProgressBar) v.findViewById(R.id.progress);
+
+    cancelButton = (Button) v.findViewById(R.id.cancel);
+    cancelButton.setOnClickListener(this);
+
+    addButton = (Button) v.findViewById(R.id.ok);
+    addButton.setOnClickListener(this);
+
+    hideProgress();
+
+    return v;
+  }
+
+  @Override
+  public void onClick(View v) {
+    if (v == addButton) {
+      handleAdd();
+    } else if (v == cancelButton) {
+      handleCancel();
     }
+  }
+
+  private void handleAdd() {
+    if (TextUtils.isEmpty(username.getText())) {
+      username.setError(getString(R.string.error_blank_field));
+      return;
+    }
+    if (username.getError() == null && listener != null) {
+      // TODO(btmura): check for existing account
+      new AddAccountTask(username.getText().toString()).execute();
+    }
+  }
+
+  private void handleCancel() {
+    if (listener != null) {
+      listener.onAccountCancelled();
+    }
+  }
+
+  private void showProgress() {
+    progress.setVisibility(View.VISIBLE);
+    username.setEnabled(false);
+    cancelButton.setEnabled(false);
+    addButton.setEnabled(false);
+  }
+
+  private void hideProgress() {
+    progress.setVisibility(View.INVISIBLE);
+    username.setEnabled(true);
+    cancelButton.setEnabled(true);
+    addButton.setEnabled(true);
   }
 
   class AddAccountTask extends AsyncTask<Void, Integer, Bundle> {
 
     private final Context ctx = getActivity().getApplicationContext();
+    private final String username;
+
+    AddAccountTask(String username) {
+      this.username = username;
+    }
 
     @Override
     protected void onPreExecute() {
-      // TODO(btmura): show progress indicator
-      // showProgress();
+      showProgress();
     }
 
     @Override
@@ -100,12 +176,7 @@ public class AddAccountFragment extends Fragment {
       try {
         Uri uri = getOAuthCallbackUri();
         if (DEBUG) {
-          Log.d(TAG, "uri: " + uri);
-        }
-
-        String username = getUsername(uri);
-        if (DEBUG) {
-          Log.d(TAG, "username: " + username);
+          Log.d(TAG, "uri: " + uri + " username: " + username);
         }
         if (!isValidUsername(username)) {
           // TODO(btmura): show error message
@@ -153,8 +224,8 @@ public class AddAccountFragment extends Fragment {
             AccountProvider.AUTHORITY, true);
         ContentResolver.setSyncAutomatically(a,
             SubredditProvider.AUTHORITY, true);
-//        ContentResolver.setSyncAutomatically(a,
-//            ThingProvider.AUTHORITY, true);
+        ContentResolver.setSyncAutomatically(a,
+            ThingProvider.AUTHORITY, true);
 
         Bundle b = new Bundle(2);
         b.putString(AccountManager.KEY_ACCOUNT_NAME, a.name);
@@ -169,14 +240,6 @@ public class AddAccountFragment extends Fragment {
 
     private Uri getOAuthCallbackUri() {
       return Uri.parse(getArguments().getString(ARG_OAUTH_CALLBACK_URL));
-    }
-
-    private String getUsername(Uri uri) {
-      String s = getQueryParameter(uri, "state");
-      if (TextUtils.isEmpty(s)) {
-        return null;
-      }
-      return s.substring(4);
     }
 
     private boolean isValidUsername(String username) {
@@ -250,8 +313,7 @@ public class AddAccountFragment extends Fragment {
 
     @Override
     protected void onCancelled() {
-      // TODO(btmura): hide progress indicator
-      // hideProgress();
+      hideProgress();
     }
 
     @Override
@@ -259,8 +321,7 @@ public class AddAccountFragment extends Fragment {
       String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
       if (error != null) {
         MessageDialogFragment.showMessage(getFragmentManager(), error);
-        // TODO(btmura): hide progress indicator
-        // hideProgress();
+        hideProgress();
       } else if (listener != null) {
         listener.onAccountAdded(result);
       }
