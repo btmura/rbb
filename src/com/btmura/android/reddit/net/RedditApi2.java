@@ -169,6 +169,19 @@ public class RedditApi2 {
         Urls2.commentQuery(thingId, text));
   }
 
+  public static Result compose(
+      Context ctx,
+      String accountName,
+      String to,
+      String subject,
+      String text,
+      String captchaId,
+      String captchaGuess)
+      throws IOException, AuthenticatorException, OperationCanceledException {
+    return post(ctx, accountName, Urls2.compose(),
+        Urls2.composeQuery(to, subject, text, captchaId, captchaGuess));
+  }
+
   public static Result delete(Context ctx, String accountName, String thingId)
       throws AuthenticatorException, OperationCanceledException, IOException {
     return post(ctx, accountName, Urls2.delete(), Urls2.deleteQuery(thingId));
@@ -209,6 +222,21 @@ public class RedditApi2 {
       boolean save)
       throws AuthenticatorException, OperationCanceledException, IOException {
     return post(ctx, accountName, Urls2.save(save), Urls2.saveQuery(thingId));
+  }
+
+  public static Result submit(
+      Context ctx,
+      String accountName,
+      String subreddit,
+      String title,
+      String text,
+      boolean link,
+      String captchaId,
+      String captchaGuess)
+      throws IOException, AuthenticatorException, OperationCanceledException {
+    return post(ctx, accountName, Urls2.submit(),
+        Urls2.submitQuery(subreddit, title, text, link, captchaId,
+            captchaGuess));
   }
 
   public static Result subscribe(

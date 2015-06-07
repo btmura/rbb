@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.net;
 
-import android.text.TextUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -28,65 +26,6 @@ public class Urls {
 
   public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
 
-  private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
-  private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-
-  public static CharSequence compose() {
-    return API_COMPOSE_URL;
-  }
-
-  public static String composeQuery(
-      String to, String subject, String text, String captchaId,
-      String captchaGuess, String modhash) {
-    StringBuilder b = new StringBuilder();
-    b.append("to=").append(encode(to));
-    b.append("&subject=").append(encode(subject));
-    b.append("&text=").append(encode(text));
-    if (!TextUtils.isEmpty(captchaId)) {
-      b.append("&iden=").append(encode(captchaId));
-    }
-    if (!TextUtils.isEmpty(captchaGuess)) {
-      b.append("&captcha=").append(encode(captchaGuess));
-    }
-    b.append("&uh=").append(encode(modhash));
-    b.append("&api_type=json");
-    return b.toString();
-  }
-
-
-  public static CharSequence loginCookie(String cookie) {
-    StringBuilder b = new StringBuilder();
-    b.append("reddit_session=").append(encode(cookie));
-    return b;
-  }
-
-  public static CharSequence submit() {
-    return API_SUBMIT_URL;
-  }
-
-  public static CharSequence submitQuery(
-      String subreddit,
-      String title,
-      String text,
-      boolean link,
-      String captchaId,
-      String captchaGuess,
-      String modhash) {
-    StringBuilder b = new StringBuilder();
-    b.append(link ? "kind=link" : "kind=self");
-    b.append("&uh=").append(encode(modhash));
-    b.append("&sr=").append(encode(subreddit));
-    b.append("&title=").append(encode(title));
-    b.append(link ? "&url=" : "&text=").append(encode(text));
-    if (!TextUtils.isEmpty(captchaId)) {
-      b.append("&iden=").append(encode(captchaId));
-    }
-    if (!TextUtils.isEmpty(captchaGuess)) {
-      b.append("&captcha=").append(encode(captchaGuess));
-    }
-    b.append("&api_type=json");
-    return b;
-  }
 
   public static String encode(String param) {
     try {

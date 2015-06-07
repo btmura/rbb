@@ -53,6 +53,7 @@ public class Urls2 {
   // OAuth URLs
 
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
+  private static final String COMPOSE_URL = OAUTH_REDDIT_COM + "/api/compose";
   private static final String DEL_URL = OAUTH_REDDIT_COM + "/api/del";
   private static final String EDIT_URL = OAUTH_REDDIT_COM + "/api/editusertext";
   private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
@@ -62,6 +63,7 @@ public class Urls2 {
   private static final String READ_MESSAGE =
       OAUTH_REDDIT_COM + "/api/read_message";
   private static final String SAVE_URL = OAUTH_REDDIT_COM + "/api/save";
+  private static final String SUBMIT_URL = OAUTH_REDDIT_COM + "/api/submit/";
   private static final String SUBSCRIBE_URL =
       OAUTH_REDDIT_COM + "/api/subscribe/";
   private static final String UNHIDE_URL = OAUTH_REDDIT_COM + "/api/unhide";
@@ -89,7 +91,7 @@ public class Urls2 {
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
         .append(encode(
-            "edit,history,identity,mysubreddits,privatemessages,read,report,subscribe,vote"));
+            "edit,history,identity,mysubreddits,privatemessages,read,report,submit,subscribe,vote"));
   }
 
   public static CharSequence myInfo() {
@@ -448,6 +450,29 @@ public class Urls2 {
     return thingTextQuery(thingId, text);
   }
 
+  public static CharSequence compose() {
+    return COMPOSE_URL;
+  }
+
+  public static CharSequence composeQuery(
+      String to,
+      String subject,
+      String text,
+      String captchaId,
+      String captchaGuess) {
+    StringBuilder sb = new StringBuilder("api_type=json");
+    if (!TextUtils.isEmpty(captchaGuess)) {
+      sb.append("&captcha=").append(encode(captchaGuess));
+    }
+    if (!TextUtils.isEmpty(captchaId)) {
+      sb.append("&iden=").append(encode(captchaId));
+    }
+    return sb
+        .append("&subject=").append(encode(subject))
+        .append("&text=").append(encode(text))
+        .append("&to=").append(encode(to));
+  }
+
   public static CharSequence delete() {
     return DEL_URL;
   }
@@ -486,6 +511,30 @@ public class Urls2 {
 
   public static CharSequence saveQuery(String thingId) {
     return thingQuery(thingId);
+  }
+
+  public static CharSequence submit() {
+    return SUBMIT_URL;
+  }
+
+  public static CharSequence submitQuery(
+      String subreddit,
+      String title,
+      String text,
+      boolean link,
+      String captchaId,
+      String captchaGuess) {
+    StringBuilder sb = new StringBuilder("api_type=json");
+    if (!TextUtils.isEmpty(captchaGuess)) {
+      sb.append("&captcha=").append(encode(captchaGuess));
+    }
+    if (!TextUtils.isEmpty(captchaId)) {
+      sb.append("&iden=").append(encode(captchaId));
+    }
+    return sb.append("&kind=").append(link ? "link" : "self")
+        .append("&sr=").append(encode(subreddit))
+        .append(link ? "&url=" : "&text=").append(encode(text))
+        .append("&title=").append(encode(title));
   }
 
   public static CharSequence subscribe() {
