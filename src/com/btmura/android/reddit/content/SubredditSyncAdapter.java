@@ -148,10 +148,13 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         PROJECTION,
         Subreddits.SELECT_BY_ACCOUNT, Array.of(account.name),
         null);
-    while (c.moveToNext()) {
-      syncRow(c, account, subreddits, ops, opCounts, syncResult);
+    try {
+      while (c.moveToNext()) {
+        syncRow(c, account, subreddits, ops, opCounts, syncResult);
+      }
+    } finally {
+      c.close();
     }
-    c.close();
     insertSubredditOps(account, subreddits, ops, opCounts);
   }
 

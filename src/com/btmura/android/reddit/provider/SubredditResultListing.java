@@ -71,12 +71,10 @@ class SubredditResultListing extends JsonParser implements Listing {
   }
 
   @Override
-  public ArrayList<ContentValues> getValues() throws
-      IOException,
-      AuthenticatorException,
-      OperationCanceledException {
+  public ArrayList<ContentValues> getValues()
+      throws AuthenticatorException, OperationCanceledException, IOException {
     CharSequence url = Urls.subredditSearch(accountName, query);
-    HttpURLConnection conn = RedditApi.connect(ctx, accountName, url, false);
+    HttpURLConnection conn = RedditApi.connect(ctx, accountName, url);
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

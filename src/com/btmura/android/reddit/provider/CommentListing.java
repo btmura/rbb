@@ -127,17 +127,15 @@ class CommentListing extends JsonParser implements Listing, CommentList {
   }
 
   @Override
-  public ArrayList<ContentValues> getValues() throws
-      IOException,
-      AuthenticatorException,
-      OperationCanceledException {
+  public ArrayList<ContentValues> getValues()
+      throws AuthenticatorException, OperationCanceledException, IOException {
     CharSequence url = Urls.comments(
         accountName,
         thingId,
         linkId,
         filter,
         numComments);
-    HttpURLConnection conn = RedditApi.connect(ctx, accountName, url, false);
+    HttpURLConnection conn = RedditApi.connect(ctx, accountName, url);
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

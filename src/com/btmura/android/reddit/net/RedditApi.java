@@ -89,7 +89,7 @@ public class RedditApi {
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
-      conn = connect(ctx, accountName, Urls.myInfo(), false);
+      conn = connect(ctx, accountName, Urls.myInfo());
       r = newJsonReader(conn.getInputStream());
       return AccountInfoResult.getMyInfo(r);
     } finally {
@@ -106,8 +106,7 @@ public class RedditApi {
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
-      conn = connect(ctx, accountName,
-          Urls.thingInfo(accountName, thingId), false);
+      conn = connect(ctx, accountName, Urls.thingInfo(accountName, thingId));
       r = newJsonReader(conn.getInputStream());
       return ThingBundle.fromJsonReader(r, formatter);
     } finally {
@@ -122,7 +121,7 @@ public class RedditApi {
     HttpURLConnection conn = null;
     InputStream is = null;
     try {
-      conn = connect(ctx, accountName, Urls.mySubreddits(), false);
+      conn = connect(ctx, accountName, Urls.mySubreddits());
       is = new BufferedInputStream(conn.getInputStream());
       JsonReader r = new JsonReader(new InputStreamReader(is));
       SubredditParser p = new SubredditParser();
@@ -141,8 +140,7 @@ public class RedditApi {
     HttpURLConnection conn = null;
     InputStream is = null;
     try {
-      conn = connect(ctx, accountName,
-          Urls.sidebar(accountName, subreddit), false);
+      conn = connect(ctx, accountName, Urls.sidebar(accountName, subreddit));
       is = conn.getInputStream();
       return SidebarResult.fromJson(ctx, is);
     } finally {
@@ -158,8 +156,7 @@ public class RedditApi {
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
-      conn = connect(ctx, accountName, Urls.userInfo(accountName, user),
-          false);
+      conn = connect(ctx, accountName, Urls.userInfo(accountName, user));
       r = newJsonReader(conn.getInputStream());
       return AccountInfoResult.getUserInfo(r);
     } finally {
@@ -173,7 +170,7 @@ public class RedditApi {
     InputStream is = null;
     try {
       CharSequence url = Urls.messages(Filter.MESSAGE_INBOX, null, true);
-      conn = connect(ctx, accountName, url, false);
+      conn = connect(ctx, accountName, url);
       is = conn.getInputStream();
       while (is.read() != -1) {
         // read entire input stream
@@ -299,48 +296,87 @@ public class RedditApi {
         Urls.voteQuery(thingId, vote));
   }
 
-  public static HttpURLConnection connect(
+  private static Result post(
       Context ctx,
       String accountName,
       CharSequence url,
-      boolean doPost)
+      CharSequence data)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    HttpURLConnection conn = null;
+    InputStream is = null;
+    try {
+      conn = authConnect(ctx, accountName, url);
+      writePostData(conn, data);
+
+      if (needTokenUpdate(accountName, conn)) {
+        conn.disconnect();
+        updateToken(ctx, accountName);
+        conn = authConnect(ctx, accountName, url);
+        writePostData(conn, data);
+      }
+
+      is = conn.getInputStream();
+      return Result.fromJson(logResponse(is));
+    } finally {
+      close(is, conn);
+    }
+  }
+
+  public static HttpURLConnection connect(
+      Context ctx,
+      String accountName,
+      CharSequence url)
       throws IOException, AuthenticatorException, OperationCanceledException {
-    HttpURLConnection conn = innerConnect(ctx, accountName, url, doPost);
+    HttpURLConnection conn = authConnect(ctx, accountName, url);
 
     // TODO(btmura): check whether error is scope problem or not
-    if (AccountUtils.isAccount(accountName)
-        && conn.getResponseCode() == HTTP_UNAUTHORIZED) {
+    if (needTokenUpdate(accountName, conn)) {
       conn.disconnect();
-
-      // TODO(btmura): put refresh token code in separate method
-      String rt = AccountUtils.getRefreshToken(ctx, accountName);
-      // TODO(btmura): handle empty refresh token
-      AccessTokenResult atr = refreshToken(ctx, rt);
-      // TODO(btmura): validate access token result
-      AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
-
-      conn = innerConnect(ctx, accountName, url, doPost);
+      updateToken(ctx, accountName);
+      conn = authConnect(ctx, accountName, url);
     }
 
     return conn;
   }
 
-  private static HttpURLConnection innerConnect(
+  private static HttpURLConnection authConnect(
       Context ctx,
       String accountName,
-      CharSequence url,
-      boolean doPost)
+      CharSequence url)
       throws AuthenticatorException, IOException, OperationCanceledException {
     HttpURLConnection conn =
         (HttpURLConnection) Urls.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
     setCommonHeaders(conn);
     setOAuthHeader(ctx, accountName, conn);
-    if (doPost) {
-      setPostDataHeaders(conn);
-    }
-    conn.connect();
     return conn;
+  }
+
+  private static HttpURLConnection noAuthConnect(CharSequence url)
+      throws IOException {
+    HttpURLConnection conn =
+        (HttpURLConnection) Urls.newUrl(url).openConnection();
+    conn.setInstanceFollowRedirects(false);
+    setCommonHeaders(conn);
+    return conn;
+  }
+
+  private static boolean needTokenUpdate(
+      String accountName,
+      HttpURLConnection conn)
+      throws IOException {
+    return AccountUtils.isAccount(accountName)
+        && conn.getResponseCode() == HTTP_UNAUTHORIZED;
+  }
+
+  private static void updateToken(Context ctx, String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    // TODO(btmura): put refresh token code in separate method
+    String rt = AccountUtils.getRefreshToken(ctx, accountName);
+    // TODO(btmura): handle empty refresh token
+    AccessTokenResult atr = refreshToken(ctx, rt);
+    // TODO(btmura): validate access token result
+    AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
   }
 
   private static AccessTokenResult refreshToken(
@@ -357,13 +393,8 @@ public class RedditApi {
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
-      conn = (HttpURLConnection) Urls.newUrl(Urls.accessToken())
-          .openConnection();
-      conn.setInstanceFollowRedirects(false);
-      setCommonHeaders(conn);
+      conn = noAuthConnect(Urls.accessToken());
       setBasicAuthHeader(ctx, conn);
-      setPostDataHeaders(conn);
-      conn.connect();
 
       StringBuilder sb;
       if (!TextUtils.isEmpty(code)) {
@@ -384,18 +415,9 @@ public class RedditApi {
     }
   }
 
-  private static HttpURLConnection noAuthConnect(CharSequence url)
-      throws IOException {
-    HttpURLConnection conn =
-        (HttpURLConnection) Urls.newUrl(url).openConnection();
-    conn.setInstanceFollowRedirects(false);
-    setCommonHeaders(conn);
-    conn.connect();
-    return conn;
-  }
-
   private static void setCommonHeaders(HttpURLConnection conn) {
     conn.setRequestProperty("Accept-Charset", CHARSET);
+    conn.setRequestProperty("Content-Type", CONTENT_TYPE);
     conn.setRequestProperty("User-Agent", USER_AGENT);
   }
 
@@ -423,35 +445,17 @@ public class RedditApi {
     }
   }
 
-  private static void setPostDataHeaders(HttpURLConnection conn) {
-    conn.setRequestProperty("Content-Type", CONTENT_TYPE);
-    conn.setDoOutput(true);
-  }
-
-  private static Result post(
-      Context ctx,
-      String accountName,
-      CharSequence url,
-      CharSequence data)
-      throws AuthenticatorException, OperationCanceledException, IOException {
-    HttpURLConnection conn = null;
-    InputStream is = null;
-    try {
-      conn = connect(ctx, accountName, url, true);
-      writePostData(conn, data);
-      is = conn.getInputStream();
-      return Result.fromJson(logResponse(is));
-    } finally {
-      close(is, conn);
-    }
-  }
-
   private static void writePostData(HttpURLConnection conn, CharSequence data)
       throws IOException {
+    conn.setDoOutput(true);
+
+    byte[] dataBytes = data.toString().getBytes(CHARSET);
+    conn.setFixedLengthStreamingMode(dataBytes.length);
+
     OutputStream output = null;
     try {
       output = new BufferedOutputStream(conn.getOutputStream());
-      output.write(data.toString().getBytes(CHARSET));
+      output.write(dataBytes);
     } finally {
       close(output);
     }

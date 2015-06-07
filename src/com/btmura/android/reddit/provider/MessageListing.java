@@ -141,12 +141,9 @@ class MessageListing extends JsonParser implements Listing {
   }
 
   @Override
-  public ArrayList<ContentValues> getValues() throws
-      IOException,
-      AuthenticatorException,
-      OperationCanceledException {
-    HttpURLConnection conn = RedditApi.connect(ctx, accountName, getUrl(),
-        false);
+  public ArrayList<ContentValues> getValues()
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    HttpURLConnection conn = RedditApi.connect(ctx, accountName, getUrl());
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

@@ -54,7 +54,7 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
     try {
       CharSequence url = Urls.subreddit(accountName, Subreddits.NAME_RANDOM,
           Filter.SUBREDDIT_HOT, null);
-      conn = RedditApi.connect(getContext(), accountName, url, false);
+      conn = RedditApi.connect(getContext(), accountName, url);
       if (conn.getResponseCode() == 302) {
         String location = conn.getHeaderField("Location");
         return UriHelper.getSubreddit(Uri.parse(location));
