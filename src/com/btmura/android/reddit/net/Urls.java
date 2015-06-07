@@ -16,22 +16,10 @@
 
 package com.btmura.android.reddit.net;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 public class Urls {
 
   public static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
   public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
-
-
-  public static String encode(String param) {
-    try {
-      return URLEncoder.encode(param, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-  }
 }
