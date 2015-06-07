@@ -36,6 +36,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.net.AccessTokenResult;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
@@ -192,7 +193,7 @@ public class AddAccountFragment extends Fragment {
 
     private AccessTokenResult getAccessTokenResult(Context ctx, String code)
         throws IOException {
-      return AccessTokenResult.getAccessToken(ctx, code);
+      return RedditApi.getAccessToken(ctx, code);
     }
 
     private boolean isValidAccessTokenResult(AccessTokenResult atr) {

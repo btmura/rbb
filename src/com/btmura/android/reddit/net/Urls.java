@@ -40,9 +40,10 @@ public class Urls {
 
   public static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
+  private static final String SSL_REDDIT_COM = "https://ssl.reddit.com";
 
-  public static final String ACCESS_TOKEN_URL =
-      "https://ssl.reddit.com/api/v1/access_token";
+  private static final String ACCESS_TOKEN_URL =
+      SSL_REDDIT_COM + "/api/v1/access_token";
   private static final String CAPTCHA_URL = WWW_REDDIT_COM + "/captcha/";
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
   private static final String COMPOSE_URL = OAUTH_REDDIT_COM + "/api/compose";
@@ -77,6 +78,10 @@ public class Urls {
   private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
   private static final int FORMAT_HTML = 0;
   private static final int FORMAT_JSON = 1;
+
+  public static CharSequence accessToken() {
+    return ACCESS_TOKEN_URL;
+  }
 
   public static CharSequence authorize(Context ctx, CharSequence state) {
     String clientId = ctx.getString(R.string.key_reddit_client_id);

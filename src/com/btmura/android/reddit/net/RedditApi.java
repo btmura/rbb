@@ -22,10 +22,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
@@ -40,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -59,11 +63,16 @@ public class RedditApi {
 
   // GET requests
 
+  public static AccessTokenResult getAccessToken(Context ctx, CharSequence code)
+      throws IOException {
+    return getToken(ctx, code, null);
+  }
+
   public static Bitmap getBitmap(CharSequence url) throws IOException {
     HttpURLConnection conn = null;
     InputStream is = null;
     try {
-      conn = connect(url);
+      conn = noAuthConnect(url);
       is = conn.getInputStream();
       return BitmapFactory.decodeStream(is);
     } finally {
@@ -151,7 +160,8 @@ public class RedditApi {
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
-      conn = connect(ctx, accountName, Urls.userInfo(accountName, user), false);
+      conn = connect(ctx, accountName, Urls.userInfo(accountName, user),
+          false);
       r = newJsonReader(conn.getInputStream());
       return AccountInfoResult.getUserInfo(r);
     } finally {
@@ -291,24 +301,6 @@ public class RedditApi {
         Urls.voteQuery(thingId, vote));
   }
 
-  private static Result post(
-      Context ctx,
-      String accountName,
-      CharSequence url,
-      CharSequence data)
-      throws AuthenticatorException, OperationCanceledException, IOException {
-    HttpURLConnection conn = null;
-    InputStream is = null;
-    try {
-      conn = connect(ctx, accountName, url, true);
-      writeFormData(conn, data);
-      is = conn.getInputStream();
-      return Result.fromJson(logResponse(is));
-    } finally {
-      close(is, conn);
-    }
-  }
-
   public static HttpURLConnection connect(
       Context ctx,
       String accountName,
@@ -325,7 +317,7 @@ public class RedditApi {
       // TODO(btmura): put refresh token code in separate method
       String rt = AccountUtils.getRefreshToken(ctx, accountName);
       // TODO(btmura): handle empty refresh token
-      AccessTokenResult atr = AccessTokenResult.refreshAccessToken(ctx, rt);
+      AccessTokenResult atr = refreshToken(ctx, rt);
       // TODO(btmura): validate access token result
       AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
 
@@ -345,15 +337,56 @@ public class RedditApi {
         (HttpURLConnection) Urls.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
     setCommonHeaders(conn);
-    setAuthorizationHeader(ctx, accountName, conn);
+    setOAuthHeader(ctx, accountName, conn);
     if (doPost) {
-      setFormDataHeaders(conn);
+      setPostDataHeaders(conn);
     }
     conn.connect();
     return conn;
   }
 
-  private static HttpURLConnection connect(CharSequence url)
+  private static AccessTokenResult refreshToken(
+      Context ctx,
+      CharSequence refreshToken) throws IOException {
+    return getToken(ctx, null, refreshToken);
+  }
+
+  private static AccessTokenResult getToken(
+      Context ctx,
+      @Nullable CharSequence code,
+      @Nullable CharSequence refreshToken)
+      throws IOException {
+    HttpURLConnection conn = null;
+    JsonReader r = null;
+    try {
+      conn = (HttpURLConnection) Urls.newUrl(Urls.accessToken())
+          .openConnection();
+      conn.setInstanceFollowRedirects(false);
+      setCommonHeaders(conn);
+      setBasicAuthHeader(ctx, conn);
+      setPostDataHeaders(conn);
+      conn.connect();
+
+      StringBuilder sb;
+      if (!TextUtils.isEmpty(code)) {
+        sb = new StringBuilder("grant_type=authorization_code&code=")
+            .append(code)
+            .append("&redirect_uri=")
+            .append(Urls.OAUTH_REDIRECT_URL);
+      } else {
+        sb = new StringBuilder("grant_type=refresh_token&refresh_token=")
+            .append(refreshToken);
+      }
+      writePostData(conn, sb);
+
+      r = newJsonReader(conn.getInputStream());
+      return AccessTokenResult.getAccessToken(r);
+    } finally {
+      close(r, conn);
+    }
+  }
+
+  private static HttpURLConnection noAuthConnect(CharSequence url)
       throws IOException {
     HttpURLConnection conn =
         (HttpURLConnection) Urls.newUrl(url).openConnection();
@@ -368,7 +401,19 @@ public class RedditApi {
     conn.setRequestProperty("User-Agent", USER_AGENT);
   }
 
-  private static void setAuthorizationHeader(
+  private static void setBasicAuthHeader(Context ctx, HttpURLConnection conn) {
+    try {
+      String clientId = ctx.getString(R.string.key_reddit_client_id);
+      String data = clientId + ":";
+      String auth = Base64.encodeToString(data.getBytes(CHARSET),
+          Base64.DEFAULT);
+      conn.setRequestProperty("Authorization", "Basic " + auth);
+    } catch (UnsupportedEncodingException e) {
+      Log.wtf(TAG, e);
+    }
+  }
+
+  private static void setOAuthHeader(
       Context ctx,
       String accountName,
       HttpURLConnection conn)
@@ -380,21 +425,37 @@ public class RedditApi {
     }
   }
 
-  private static void setFormDataHeaders(HttpURLConnection conn) {
+  private static void setPostDataHeaders(HttpURLConnection conn) {
     conn.setRequestProperty("Content-Type", CONTENT_TYPE);
     conn.setDoOutput(true);
   }
 
-  private static void writeFormData(HttpURLConnection conn, CharSequence data)
+  private static Result post(
+      Context ctx,
+      String accountName,
+      CharSequence url,
+      CharSequence data)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    HttpURLConnection conn = null;
+    InputStream is = null;
+    try {
+      conn = connect(ctx, accountName, url, true);
+      writePostData(conn, data);
+      is = conn.getInputStream();
+      return Result.fromJson(logResponse(is));
+    } finally {
+      close(is, conn);
+    }
+  }
+
+  private static void writePostData(HttpURLConnection conn, CharSequence data)
       throws IOException {
     OutputStream output = null;
     try {
       output = new BufferedOutputStream(conn.getOutputStream());
       output.write(data.toString().getBytes(CHARSET));
     } finally {
-      if (output != null) {
-        output.close();
-      }
+      close(output);
     }
   }
 
@@ -431,15 +492,19 @@ public class RedditApi {
   private static void close(
       @Nullable Closeable cs,
       @Nullable HttpURLConnection conn) {
+    close(cs);
+    if (conn != null) {
+      conn.disconnect();
+    }
+  }
+
+  private static void close(@Nullable Closeable cs) {
     if (cs != null) {
       try {
         cs.close();
       } catch (IOException e) {
         Log.e(TAG, e.getMessage(), e);
       }
-    }
-    if (conn != null) {
-      conn.disconnect();
     }
   }
 

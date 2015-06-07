@@ -33,13 +33,13 @@ public class AccountInfoResult extends JsonParser {
   /** True if the account has mail. False otherwise. */
   public boolean hasMail;
 
-  public static AccountInfoResult getMyInfo(JsonReader r) throws IOException {
+  static AccountInfoResult getMyInfo(JsonReader r) throws IOException {
     AccountInfoResult result = new AccountInfoResult();
     result.parseEntityData(r);
     return result;
   }
 
-  public static AccountInfoResult getUserInfo(JsonReader r) throws IOException {
+  static AccountInfoResult getUserInfo(JsonReader r) throws IOException {
     AccountInfoResult result = new AccountInfoResult();
     result.parseEntity(r);
     return result;
