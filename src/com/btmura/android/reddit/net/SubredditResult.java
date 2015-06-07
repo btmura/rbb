@@ -16,24 +16,32 @@
 
 package com.btmura.android.reddit.net;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.util.JsonParser;
 
-class SubredditParser extends JsonParser {
+import java.io.IOException;
+import java.text.Collator;
+import java.util.Set;
+import java.util.TreeSet;
 
-    ArrayList<String> results = new ArrayList<String>();
+public class SubredditResult extends JsonParser {
 
-    @Override
-    public void onEntityStart(int i) {
-        results.add(null);
+  public final Set<String> subreddits =
+      new TreeSet<String>(Collator.getInstance());
+
+  public static SubredditResult getSubreddits(JsonReader r) throws IOException {
+    SubredditResult result = new SubredditResult();
+    result.parseListingObject(r);
+    return result;
+  }
+
+  @Override
+  public void onDisplayName(JsonReader r, int i) throws IOException {
+    String subreddit = readString(r, "");
+    if (!TextUtils.isEmpty(subreddit)) {
+      subreddits.add(subreddit);
     }
-
-    @Override
-    public void onDisplayName(JsonReader r, int i) throws IOException {
-        results.set(i, r.nextString());
-    }
+  }
 }

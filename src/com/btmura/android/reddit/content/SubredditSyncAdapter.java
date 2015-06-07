@@ -36,6 +36,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.SubredditResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -104,8 +105,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
       }
 
       // Get subreddits from reddit. These could be a bit stale.
-      ArrayList<String> subreddits =
-          RedditApi.getMySubreddits(ctx, account.name);
+      SubredditResult result = RedditApi.getMySubreddits(ctx, account.name);
+      ArrayList<String> subreddits = new ArrayList<String>(result.subreddits);
 
       // Get database operations required to sync with the server.
       ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
@@ -247,8 +248,10 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
   }
 
   private void insertSubredditOps(
-      Account account, ArrayList<String> subreddits,
-      ArrayList<ContentProviderOperation> ops, int[] opCounts) {
+      Account account,
+      ArrayList<String> subreddits,
+      ArrayList<ContentProviderOperation> ops,
+      int[] opCounts) {
     int size = subreddits.size();
     for (int i = 0; i < size; i++) {
       ops.add(

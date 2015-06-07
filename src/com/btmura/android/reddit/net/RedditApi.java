@@ -45,7 +45,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class RedditApi {
@@ -114,21 +113,18 @@ public class RedditApi {
     }
   }
 
-  public static ArrayList<String> getMySubreddits(
+  public static SubredditResult getMySubreddits(
       Context ctx,
       String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream is = null;
+    JsonReader r = null;
     try {
       conn = connect(ctx, accountName, Urls.mySubreddits());
-      is = new BufferedInputStream(conn.getInputStream());
-      JsonReader r = new JsonReader(new InputStreamReader(is));
-      SubredditParser p = new SubredditParser();
-      p.parseListingObject(r);
-      return p.results;
+      r = newJsonReader(conn.getInputStream());
+      return SubredditResult.getSubreddits(r);
     } finally {
-      close(is, conn);
+      close(r, conn);
     }
   }
 
