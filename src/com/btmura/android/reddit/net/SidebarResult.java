@@ -25,7 +25,6 @@ import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.JsonParser;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class SidebarResult extends JsonParser {
 
@@ -34,25 +33,19 @@ public class SidebarResult extends JsonParser {
   public CharSequence title;
   public CharSequence description;
   public int subscribers;
-
   public Bitmap headerImageBitmap;
 
   private final MarkdownFormatter formatter = new MarkdownFormatter();
   private final Context ctx;
 
-  public static SidebarResult fromJson(Context ctx, InputStream in)
+  public static SidebarResult getSidebar(Context ctx, JsonReader r)
       throws IOException {
-    JsonReader r = newReader(in);
-    try {
-      SidebarResult result = new SidebarResult(ctx);
-      result.parseEntity(r);
-      if (!TextUtils.isEmpty(result.headerImage)) {
-        result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
-      }
-      return result;
-    } finally {
-      r.close();
+    SidebarResult result = new SidebarResult(ctx);
+    result.parseEntity(r);
+    if (!TextUtils.isEmpty(result.headerImage)) {
+      result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
     }
+    return result;
   }
 
   private SidebarResult(Context ctx) {
@@ -65,8 +58,6 @@ public class SidebarResult extends JsonParser {
       headerImageBitmap = null;
     }
   }
-
-  // JSON attribute parsing methods
 
   @Override
   public void onDisplayName(JsonReader r, int i) throws IOException {

@@ -138,13 +138,13 @@ public class RedditApi {
       String subreddit)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream is = null;
+    JsonReader r = null;
     try {
       conn = connect(ctx, accountName, Urls.sidebar(accountName, subreddit));
-      is = conn.getInputStream();
-      return SidebarResult.fromJson(ctx, is);
+      r = newJsonReader(conn.getInputStream());
+      return SidebarResult.getSidebar(ctx, r);
     } finally {
-      close(is, conn);
+      close(r, conn);
     }
   }
 
