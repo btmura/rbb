@@ -21,17 +21,18 @@ import android.test.AndroidTestCase;
 
 public class RedditApiTest extends AndroidTestCase {
 
-    public void testUserAgent() throws Exception {
-        assertEquals(getExpectedUserAgent(), RedditApi.USER_AGENT);
-    }
+  public void testUserAgent() throws Exception {
+    assertEquals(getExpectedUserAgent(), RedditApi2.USER_AGENT);
+  }
 
-    private String getExpectedUserAgent() throws NameNotFoundException {
-        return String.format("falling for reddit v%s by /u/btmura", getVersionName());
-    }
+  private String getExpectedUserAgent() throws NameNotFoundException {
+    return String.format("falling for reddit v%s by /u/btmura",
+        getVersionName());
+  }
 
-    private String getVersionName() throws NameNotFoundException {
-        PackageManager manager = getContext().getPackageManager();
-        String name = getContext().getPackageName();
-        return manager.getPackageInfo(name, 0).versionName;
-    }
+  private String getVersionName() throws NameNotFoundException {
+    PackageManager manager = getContext().getPackageManager();
+    String name = getContext().getPackageName();
+    return manager.getPackageInfo(name, 0).versionName;
+  }
 }

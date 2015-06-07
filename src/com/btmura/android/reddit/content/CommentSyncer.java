@@ -27,7 +27,6 @@ import android.os.RemoteException;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;

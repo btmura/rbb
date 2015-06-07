@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.JsonReader;
+import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
@@ -31,12 +32,15 @@ import com.btmura.android.reddit.text.MarkdownFormatter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 // TODO(btmura): remove RedditApi and replace with this class
 public class RedditApi2 {
@@ -44,7 +48,13 @@ public class RedditApi2 {
   // TODO(btmura): add RedditApiException type
 
   private static final String TAG = "RedditApi2";
-  private static final boolean DEBUG = BuildConfig.DEBUG;
+
+  static final String CHARSET = "UTF-8";
+  static final String CONTENT_TYPE =
+      "application/x-www-form-urlencoded;charset=" + CHARSET;
+  static final String USER_AGENT = "falling for reddit v3.4 by /u/btmura";
+
+  private static final boolean LOG_RESPONSES = BuildConfig.DEBUG;
 
   private static final int HTTP_UNAUTHORIZED = 401;
 
@@ -268,7 +278,7 @@ public class RedditApi2 {
     try {
       conn = connect(ctx, accountName, url, true);
       writeFormData(conn, data);
-      return Result.fromJson(conn.getInputStream());
+      return Result.fromJson(logResponse(conn.getInputStream()));
     } finally {
       close(conn);
     }
@@ -329,8 +339,8 @@ public class RedditApi2 {
   }
 
   private static void setCommonHeaders(HttpURLConnection conn) {
-    conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
-    conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
+    conn.setRequestProperty("Accept-Charset", CHARSET);
+    conn.setRequestProperty("User-Agent", USER_AGENT);
   }
 
   private static void setAuthorizationHeader(
@@ -346,7 +356,7 @@ public class RedditApi2 {
   }
 
   private static void setFormDataHeaders(HttpURLConnection conn) {
-    conn.setRequestProperty("Content-Type", RedditApi.CONTENT_TYPE);
+    conn.setRequestProperty("Content-Type", CONTENT_TYPE);
     conn.setDoOutput(true);
   }
 
@@ -355,12 +365,38 @@ public class RedditApi2 {
     OutputStream output = null;
     try {
       output = new BufferedOutputStream(conn.getOutputStream());
-      output.write(data.toString().getBytes(RedditApi.CHARSET));
+      output.write(data.toString().getBytes(CHARSET));
     } finally {
       if (output != null) {
         output.close();
       }
     }
+  }
+
+  // TODO(btmura): make private
+  static InputStream logResponse(InputStream in) throws IOException {
+    if (!LOG_RESPONSES) {
+      return in;
+    }
+
+    // Make a copy of the InputStream.
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    byte[] buffer = new byte[1024];
+    for (int read = 0; (read = in.read(buffer)) != -1; ) {
+      out.write(buffer, 0, read);
+    }
+    in.close();
+
+    // Print out the response for debugging purposes.
+    in = new ByteArrayInputStream(out.toByteArray());
+    Scanner sc = new Scanner(in);
+    while (sc.hasNextLine()) {
+      Log.d(TAG, sc.nextLine());
+    }
+    sc.close();
+
+    // Return a new InputStream as if nothing happened...
+    return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
 
   private static void close(InputStream in, HttpURLConnection conn)

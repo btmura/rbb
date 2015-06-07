@@ -28,7 +28,6 @@ import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -41,7 +40,6 @@ class MessageSyncer implements Syncer {
   private static final String[] PROJECTION = {
       MessageActions._ID,
       MessageActions.COLUMN_ACTION,
-      MessageActions.COLUMN_EXPIRATION,
       MessageActions.COLUMN_SYNC_FAILURES,
       MessageActions.COLUMN_THING_ID,
       MessageActions.COLUMN_TEXT,
@@ -49,10 +47,9 @@ class MessageSyncer implements Syncer {
 
   private static final int ID = 0;
   private static final int ACTION = 1;
-  private static final int EXPIRATION = 2;
-  private static final int SYNC_FAILURES = 3;
-  private static final int THING_ID = 4;
-  private static final int TEXT = 5;
+  private static final int SYNC_FAILURES = 2;
+  private static final int THING_ID = 3;
+  private static final int TEXT = 4;
 
   @Override
   public String getTag() {
