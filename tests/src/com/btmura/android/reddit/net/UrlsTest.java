@@ -21,7 +21,7 @@ import com.btmura.android.reddit.app.Filter;
 
 import junit.framework.TestCase;
 
-public class Urls2Test extends TestCase {
+public class UrlsTest extends TestCase {
 
   private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
   private static final String NO_SUBREDDIT = null;
@@ -29,7 +29,6 @@ public class Urls2Test extends TestCase {
   private static final String NO_MORE = null;
 
   private static final String ACCOUNT = "account";
-
 
   public void testMySubreddits() {
     assertCharSequenceEquals(
@@ -103,11 +102,11 @@ public class Urls2Test extends TestCase {
 
   public void testSubredditSearch() {
     assertCharSequenceEquals(
-        "https://www.reddit.com/reddits/search.json?q=s2000",
+        "https://www.reddit.com/subreddits/search.json?q=s2000",
         Urls.subredditSearch(NO_ACCOUNT, "s2000"));
 
     assertCharSequenceEquals(
-        "https://oauth.reddit.com/reddits/search?q=s2000",
+        "https://oauth.reddit.com/subreddits/search?q=s2000",
         Urls.subredditSearch(ACCOUNT, "s2000"));
   }
 
