@@ -59,13 +59,13 @@ public class RedditApi {
 
   public static Bitmap getBitmap(CharSequence url) throws IOException {
     HttpURLConnection conn = null;
-    InputStream in = null;
+    InputStream is = null;
     try {
-      conn = noAuthConnect(url);
-      in = new BufferedInputStream(conn.getInputStream());
-      return BitmapFactory.decodeStream(in);
+      conn = connect(url);
+      is = conn.getInputStream();
+      return BitmapFactory.decodeStream(is);
     } finally {
-      close(in, conn);
+      close(is, conn);
     }
   }
 
@@ -76,11 +76,13 @@ public class RedditApi {
   public static AccountInfoResult getMyInfo(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
+    InputStream is = null;
     try {
       conn = connect(ctx, accountName, Urls.myInfo(), false);
-      return AccountInfoResult.fromMyInfoJson(conn.getInputStream());
+      is = conn.getInputStream();
+      return AccountInfoResult.fromMyInfoJson(is);
     } finally {
-      close(conn);
+      close(is, conn);
     }
   }
 
@@ -89,16 +91,18 @@ public class RedditApi {
       String accountName,
       String thingId,
       MarkdownFormatter formatter)
-      throws IOException, AuthenticatorException, OperationCanceledException {
+      throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
+    InputStream is = null;
     try {
       conn = connect(ctx, accountName,
           Urls.thingInfo(accountName, thingId), false);
+      is = conn.getInputStream();
       return ThingBundle.fromJsonReader(ctx,
-          new JsonReader(new InputStreamReader(conn.getInputStream())),
+          new JsonReader(new InputStreamReader(is)),
           formatter);
     } finally {
-      close(conn);
+      close(is, conn);
     }
   }
 
@@ -107,16 +111,16 @@ public class RedditApi {
       String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream in = null;
+    InputStream is = null;
     try {
       conn = connect(ctx, accountName, Urls.mySubreddits(), false);
-      in = new BufferedInputStream(conn.getInputStream());
-      JsonReader r = new JsonReader(new InputStreamReader(in));
+      is = new BufferedInputStream(conn.getInputStream());
+      JsonReader r = new JsonReader(new InputStreamReader(is));
       SubredditParser p = new SubredditParser();
       p.parseListingObject(r);
       return p.results;
     } finally {
-      close(in, conn);
+      close(is, conn);
     }
   }
 
@@ -126,12 +130,14 @@ public class RedditApi {
       String subreddit)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
+    InputStream is = null;
     try {
-      CharSequence url = Urls.sidebar(accountName, subreddit);
-      conn = connect(ctx, accountName, url, false);
-      return SidebarResult.fromJson(ctx, conn.getInputStream());
+      conn = connect(ctx, accountName,
+          Urls.sidebar(accountName, subreddit), false);
+      is = conn.getInputStream();
+      return SidebarResult.fromJson(ctx, is);
     } finally {
-      close(conn);
+      close(is, conn);
     }
   }
 
@@ -141,26 +147,28 @@ public class RedditApi {
       String user)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
+    InputStream is = null;
     try {
-      CharSequence url = Urls.userInfo(accountName, user);
-      conn = connect(ctx, accountName, url, false);
-      return AccountInfoResult.fromUserInfoJson(conn.getInputStream());
+      conn = connect(ctx, accountName, Urls.userInfo(accountName, user), false);
+      is = conn.getInputStream();
+      return AccountInfoResult.fromUserInfoJson(is);
     } finally {
-      close(conn);
+      close(is, conn);
     }
   }
 
   public static void markMessagesRead(Context ctx, String accountName)
       throws IOException, AuthenticatorException, OperationCanceledException {
     HttpURLConnection conn = null;
-    InputStream in = null;
+    InputStream is = null;
     try {
       CharSequence url = Urls.messages(Filter.MESSAGE_INBOX, null, true);
       conn = connect(ctx, accountName, url, false);
-      in = conn.getInputStream();
-      in.read();
+      is = conn.getInputStream();
+      while (is.read() != -1) {
+      }
     } finally {
-      close(in, conn);
+      close(is, conn);
     }
   }
 
@@ -172,7 +180,8 @@ public class RedditApi {
       String thingId,
       String text)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.comment(),
+    return post(ctx, accountName,
+        Urls.comment(),
         Urls.commentQuery(thingId, text));
   }
 
@@ -184,14 +193,17 @@ public class RedditApi {
       String text,
       String captchaId,
       String captchaGuess)
-      throws IOException, AuthenticatorException, OperationCanceledException {
-    return post(ctx, accountName, Urls.compose(),
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return post(ctx, accountName,
+        Urls.compose(),
         Urls.composeQuery(to, subject, text, captchaId, captchaGuess));
   }
 
   public static Result delete(Context ctx, String accountName, String thingId)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.delete(), Urls.deleteQuery(thingId));
+    return post(ctx, accountName,
+        Urls.delete(),
+        Urls.deleteQuery(thingId));
   }
 
   public static Result edit(
@@ -200,7 +212,9 @@ public class RedditApi {
       String thingId,
       String text)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.edit(), Urls.editQuery(thingId, text));
+    return post(ctx, accountName,
+        Urls.edit(),
+        Urls.editQuery(thingId, text));
   }
 
   public static Result hide(
@@ -209,7 +223,9 @@ public class RedditApi {
       String thingId,
       boolean hide)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.hide(hide), Urls.hideQuery(thingId));
+    return post(ctx, accountName,
+        Urls.hide(hide),
+        Urls.hideQuery(thingId));
   }
 
   public static Result readMessage(
@@ -218,7 +234,8 @@ public class RedditApi {
       String thingId,
       boolean read)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.readMessage(read),
+    return post(ctx, accountName,
+        Urls.readMessage(read),
         Urls.readMessageQuery(thingId));
   }
 
@@ -228,7 +245,9 @@ public class RedditApi {
       String thingId,
       boolean save)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.save(save), Urls.saveQuery(thingId));
+    return post(ctx, accountName,
+        Urls.save(save),
+        Urls.saveQuery(thingId));
   }
 
   public static Result submit(
@@ -241,7 +260,8 @@ public class RedditApi {
       String captchaId,
       String captchaGuess)
       throws IOException, AuthenticatorException, OperationCanceledException {
-    return post(ctx, accountName, Urls.submit(),
+    return post(ctx, accountName,
+        Urls.submit(),
         Urls.submitQuery(subreddit, title, text, link, captchaId,
             captchaGuess));
   }
@@ -252,7 +272,8 @@ public class RedditApi {
       String subreddit,
       boolean subscribe)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.subscribe(),
+    return post(ctx, accountName,
+        Urls.subscribe(),
         Urls.subscribeData(subreddit, subscribe));
   }
 
@@ -262,7 +283,9 @@ public class RedditApi {
       String thingId,
       int vote)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls.vote(), Urls.voteQuery(thingId, vote));
+    return post(ctx, accountName,
+        Urls.vote(),
+        Urls.voteQuery(thingId, vote));
   }
 
   private static Result post(
@@ -272,12 +295,14 @@ public class RedditApi {
       CharSequence data)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
+    InputStream is = null;
     try {
       conn = connect(ctx, accountName, url, true);
       writeFormData(conn, data);
-      return Result.fromJson(logResponse(conn.getInputStream()));
+      is = conn.getInputStream();
+      return Result.fromJson(logResponse(is));
     } finally {
-      close(conn);
+      close(is, conn);
     }
   }
 
@@ -325,7 +350,7 @@ public class RedditApi {
     return conn;
   }
 
-  private static HttpURLConnection noAuthConnect(CharSequence url)
+  private static HttpURLConnection connect(CharSequence url)
       throws IOException {
     HttpURLConnection conn =
         (HttpURLConnection) Urls.newUrl(url).openConnection();
@@ -371,40 +396,39 @@ public class RedditApi {
   }
 
   // TODO(btmura): make private
-  static InputStream logResponse(InputStream in) throws IOException {
+  static InputStream logResponse(InputStream is) throws IOException {
     if (!LOG_RESPONSES) {
-      return in;
+      return is;
     }
 
     // Make a copy of the InputStream.
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
-    for (int read = 0; (read = in.read(buffer)) != -1; ) {
-      out.write(buffer, 0, read);
+    for (int read; (read = is.read(buffer)) != -1; ) {
+      os.write(buffer, 0, read);
     }
-    in.close();
+    is.close();
 
     // Print out the response for debugging purposes.
-    in = new ByteArrayInputStream(out.toByteArray());
-    Scanner sc = new Scanner(in);
+    is = new ByteArrayInputStream(os.toByteArray());
+    Scanner sc = new Scanner(is);
     while (sc.hasNextLine()) {
       Log.d(TAG, sc.nextLine());
     }
     sc.close();
 
     // Return a new InputStream as if nothing happened...
-    return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
+    return new BufferedInputStream(new ByteArrayInputStream(os.toByteArray()));
   }
 
-  private static void close(InputStream in, HttpURLConnection conn)
-      throws IOException {
-    if (in != null) {
-      in.close();
+  private static void close(InputStream is, HttpURLConnection conn) {
+    if (is != null) {
+      try {
+        is.close();
+      } catch (IOException e) {
+        Log.e(TAG, e.getMessage(), e);
+      }
     }
-    close(conn);
-  }
-
-  private static void close(HttpURLConnection conn) throws IOException {
     if (conn != null) {
       conn.disconnect();
     }
