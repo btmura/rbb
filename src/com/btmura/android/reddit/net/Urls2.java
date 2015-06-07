@@ -43,7 +43,7 @@ public class Urls2 {
   private static final int FORMAT_HTML = 0;
   private static final int FORMAT_JSON = 1;
 
-  private static final String WWW_REDDIT_COM = "https://www.reddit.com";
+  public static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
   // Normal URLs

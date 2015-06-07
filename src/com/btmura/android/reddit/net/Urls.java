@@ -18,7 +18,6 @@ package com.btmura.android.reddit.net;
 
 public class Urls {
 
-  public static final String BASE_URL = "https://www.reddit.com";
   private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
   public static final String API_ACCESS_TOKEN_URL = BASE_SSL_URL + "/api/v1/access_token";
