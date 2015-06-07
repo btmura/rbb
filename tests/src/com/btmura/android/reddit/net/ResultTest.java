@@ -41,7 +41,7 @@ public class ResultTest extends AndroidTestCase {
     private Result parse(String json) throws IOException {
         InputStream in = new ByteArrayInputStream(json.getBytes());
         try {
-            return Result.fromJsonReader(new JsonReader(new InputStreamReader(in)));
+            return Result.getResult(new JsonReader(new InputStreamReader(in)));
         } finally {
             in.close();
         }

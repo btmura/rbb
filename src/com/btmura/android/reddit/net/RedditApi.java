@@ -303,7 +303,7 @@ public class RedditApi {
       CharSequence data)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream is = null;
+    JsonReader r = null;
     try {
       conn = authConnect(ctx, accountName, url);
       writePostData(conn, data);
@@ -315,10 +315,10 @@ public class RedditApi {
         writePostData(conn, data);
       }
 
-      is = conn.getInputStream();
-      return Result.fromJson(logResponse(is));
+      r = newJsonReader(conn.getInputStream());
+      return Result.getResult(r);
     } finally {
-      close(is, conn);
+      close(r, conn);
     }
   }
 

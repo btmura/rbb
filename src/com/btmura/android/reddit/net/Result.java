@@ -26,7 +26,6 @@ import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class Result extends JsonParser {
 
@@ -138,16 +137,7 @@ public class Result extends JsonParser {
     }
   }
 
-  static Result fromJson(InputStream in) throws IOException {
-    JsonReader r = newReader(in);
-    try {
-      return fromJsonReader(r);
-    } finally {
-      r.close();
-    }
-  }
-
-  static Result fromJsonReader(JsonReader reader) throws IOException {
+  static Result getResult(JsonReader reader) throws IOException {
     Result result = new Result();
     try {
       reader.beginObject();
