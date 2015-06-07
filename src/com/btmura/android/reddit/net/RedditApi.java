@@ -104,16 +104,14 @@ public class RedditApi {
       MarkdownFormatter formatter)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream is = null;
+    JsonReader r = null;
     try {
       conn = connect(ctx, accountName,
           Urls.thingInfo(accountName, thingId), false);
-      is = conn.getInputStream();
-      return ThingBundle.fromJsonReader(ctx,
-          new JsonReader(new InputStreamReader(is)),
-          formatter);
+      r = newJsonReader(conn.getInputStream());
+      return ThingBundle.fromJsonReader(r, formatter);
     } finally {
-      close(is, conn);
+      close(r, conn);
     }
   }
 

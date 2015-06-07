@@ -188,7 +188,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
   @Override
   public void onBody(JsonReader r, int i) throws IOException {
-    CharSequence body = formatter.formatNoSpans(ctx, readString(r, ""));
+    CharSequence body = formatter.formatNoSpans(readString(r, ""));
     values.get(i).put(Comments.COLUMN_BODY, body.toString());
   }
 
@@ -270,7 +270,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
   @Override
   public void onSelfText(JsonReader r, int i) throws IOException {
-    CharSequence body = formatter.formatNoSpans(ctx, readString(r, ""));
+    CharSequence body = formatter.formatNoSpans(readString(r, ""));
     values.get(i).put(Comments.COLUMN_BODY, body.toString());
   }
 
@@ -281,7 +281,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
   @Override
   public void onTitle(JsonReader r, int i) throws IOException {
-    CharSequence title = formatter.formatNoSpans(ctx, readString(r, ""));
+    CharSequence title = formatter.formatNoSpans(readString(r, ""));
     values.get(i).put(Comments.COLUMN_TITLE, title.toString());
   }
 

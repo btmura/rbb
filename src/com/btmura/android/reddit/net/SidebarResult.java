@@ -80,7 +80,7 @@ public class SidebarResult extends JsonParser {
 
   @Override
   public void onTitle(JsonReader r, int i) throws IOException {
-    title = formatter.formatNoSpans(ctx, readString(r, ""));
+    title = formatter.formatNoSpans(readString(r, ""));
   }
 
   @Override

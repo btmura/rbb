@@ -43,15 +43,15 @@ public class MarkdownFormatter {
   private final Matcher matcher = RawLinks.PATTERN.matcher("");
   private final StringBuilder builder = new StringBuilder();
 
-  public CharSequence formatNoSpans(Context ctx, CharSequence c) {
-    if (c != null) {
+  public CharSequence formatNoSpans(CharSequence c) {
+    if (!TextUtils.isEmpty(c)) {
       return Escaped.format(matcher, c);
     }
-    return null;
+    return "";
   }
 
-  public CharSequence formatSpans(Context context, CharSequence c) {
-    if (c != null) {
+  public CharSequence formatSpans(Context ctx, CharSequence c) {
+    if (!TextUtils.isEmpty(c)) {
       c = CodeBlock.format(matcher, c);
       c = Styles.format(matcher, c, Styles.STYLE_BOLD);
       c = Styles.format(matcher, c, Styles.STYLE_ITALIC);
@@ -60,18 +60,18 @@ public class MarkdownFormatter {
       c = Bullets.format(matcher, c);
       c = NamedLinks.format(c, builder);
       c = RawLinks.format(matcher, c);
-      c = Tables.format(context, matcher, c);
+      c = Tables.format(ctx, matcher, c);
       return RelativeLinks.format(matcher, c);
     }
-    return null;
+    return "";
   }
 
-  public CharSequence formatAll(Context context, CharSequence c) {
-    if (c != null) {
-      c = formatNoSpans(context, c);
-      return formatSpans(context, c);
+  public CharSequence formatAll(Context ctx, CharSequence c) {
+    if (!TextUtils.isEmpty(c)) {
+      c = formatNoSpans(c);
+      return formatSpans(ctx, c);
     }
-    return null;
+    return "";
   }
 
   static class Escaped {

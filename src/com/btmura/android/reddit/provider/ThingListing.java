@@ -170,7 +170,7 @@ class ThingListing extends JsonParser implements Listing {
     private static final int VOTE_UPS = 16;
     private static final int VOTE_URL = 17;
 
-    private final Context context;
+    private final Context ctx;
     private final SQLiteOpenHelper dbHelper;
     private final int sessionType;
     private final String accountName;
@@ -248,7 +248,7 @@ class ThingListing extends JsonParser implements Listing {
             String profileUser,
             int filter,
             String more) {
-        this.context = context;
+        this.ctx = context;
         this.dbHelper = dbHelper;
         this.sessionType = sessionType;
         this.accountName = accountName;
@@ -271,7 +271,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public List<ContentValues> getValues() throws IOException, AuthenticatorException, OperationCanceledException {
-        HttpURLConnection conn = RedditApi.connect(context, accountName,
+        HttpURLConnection conn = RedditApi.connect(ctx, accountName,
             getUrl(),
             false);
         InputStream input = null;
@@ -449,7 +449,7 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private CharSequence readFormattedString(JsonReader reader) throws IOException {
-        return formatter.formatNoSpans(context, readString(reader, ""));
+        return formatter.formatNoSpans(readString(reader, ""));
     }
 
     @Override
