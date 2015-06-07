@@ -63,7 +63,7 @@ public class AccessTokenResult extends JsonParser {
     InputStream in = null;
 
     try {
-      URL url = Urls2.newUrl(Urls2.ACCESS_TOKEN_URL);
+      URL url = Urls.newUrl(Urls.ACCESS_TOKEN_URL);
       conn = (HttpURLConnection) url.openConnection();
       conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
       conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
@@ -84,7 +84,7 @@ public class AccessTokenResult extends JsonParser {
         sb.append("grant_type=authorization_code&code=")
             .append(code)
             .append("&redirect_uri=")
-            .append(Urls2.OAUTH_REDIRECT_URL);
+            .append(Urls.OAUTH_REDIRECT_URL);
       } else {
         sb.append("grant_type=refresh_token&refresh_token=")
             .append(refreshToken);

@@ -27,7 +27,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
@@ -185,11 +184,11 @@ public class MessageThingActionModeController implements ThingActionModeControll
         // Comment reply messages have a context url we can use.
         String context = getContext(pos);
         if (!TextUtils.isEmpty(context)) {
-            return Urls2.permaLink(context, null);
+            return Urls.permaLink(context, null);
         }
 
         // Assume this is a raw message.
-        return Urls2.messageThreadLink(getThingId(pos));
+        return Urls.messageThreadLink(getThingId(pos));
     }
 
     private boolean isCheckedCount(ListView listView, int checkedItemCount) {

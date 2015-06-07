@@ -32,7 +32,7 @@ import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.net.RedditApi2;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
 
@@ -166,10 +166,10 @@ class MessageListing extends JsonParser implements Listing {
   private CharSequence getUrl() {
     switch (sessionType) {
       case Sessions.TYPE_MESSAGES:
-        return Urls2.messages(filter, more, mark);
+        return Urls.messages(filter, more, mark);
 
       case Sessions.TYPE_MESSAGE_THREAD:
-        return Urls2.messageThread(thingId);
+        return Urls.messageThread(thingId);
 
       default:
         throw new IllegalArgumentException();

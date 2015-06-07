@@ -30,7 +30,6 @@ import com.btmura.android.reddit.content.ThingProjection;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
@@ -162,7 +161,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         }
 
         // Comment references just provide a thing and link id.
-        return Urls2.commentsLink(getThingId(position), getLinkId(position));
+        return Urls.commentsLink(getThingId(position), getLinkId(position));
     }
 
     private void prepareSubredditActionItem(Menu menu, ListView listView, int position) {

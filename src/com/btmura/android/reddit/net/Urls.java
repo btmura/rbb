@@ -32,7 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class Urls2 {
+public class Urls {
 
   // TODO(btmura): make count a parameter
 

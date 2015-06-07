@@ -63,14 +63,14 @@ public class RedditApi2 {
   }
 
   public static Bitmap getCaptcha(String id) throws IOException {
-    return getBitmap(Urls2.captcha(id));
+    return getBitmap(Urls.captcha(id));
   }
 
   public static AccountInfoResult getMyInfo(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
-      conn = connect(ctx, accountName, Urls2.myInfo(), false);
+      conn = connect(ctx, accountName, Urls.myInfo(), false);
       return AccountInfoResult.fromMyInfoJson(conn.getInputStream());
     } finally {
       close(conn);
@@ -86,7 +86,7 @@ public class RedditApi2 {
     HttpURLConnection conn = null;
     try {
       conn = connect(ctx, accountName,
-          Urls2.thingInfo(accountName, thingId), false);
+          Urls.thingInfo(accountName, thingId), false);
       return ThingBundle.fromJsonReader(ctx,
           new JsonReader(new InputStreamReader(conn.getInputStream())),
           formatter);
@@ -102,7 +102,7 @@ public class RedditApi2 {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
-      conn = connect(ctx, accountName, Urls2.mySubreddits(), false);
+      conn = connect(ctx, accountName, Urls.mySubreddits(), false);
       in = new BufferedInputStream(conn.getInputStream());
       JsonReader r = new JsonReader(new InputStreamReader(in));
       SubredditParser p = new SubredditParser();
@@ -120,7 +120,7 @@ public class RedditApi2 {
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
-      CharSequence url = Urls2.sidebar(accountName, subreddit);
+      CharSequence url = Urls.sidebar(accountName, subreddit);
       conn = connect(ctx, accountName, url, false);
       return SidebarResult.fromJson(ctx, conn.getInputStream());
     } finally {
@@ -135,7 +135,7 @@ public class RedditApi2 {
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     try {
-      CharSequence url = Urls2.userInfo(accountName, user);
+      CharSequence url = Urls.userInfo(accountName, user);
       conn = connect(ctx, accountName, url, false);
       return AccountInfoResult.fromUserInfoJson(conn.getInputStream());
     } finally {
@@ -148,7 +148,7 @@ public class RedditApi2 {
     HttpURLConnection conn = null;
     InputStream in = null;
     try {
-      CharSequence url = Urls2.messages(Filter.MESSAGE_INBOX, null, true);
+      CharSequence url = Urls.messages(Filter.MESSAGE_INBOX, null, true);
       conn = connect(ctx, accountName, url, false);
       in = conn.getInputStream();
       in.read();
@@ -165,8 +165,8 @@ public class RedditApi2 {
       String thingId,
       String text)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.comment(),
-        Urls2.commentQuery(thingId, text));
+    return post(ctx, accountName, Urls.comment(),
+        Urls.commentQuery(thingId, text));
   }
 
   public static Result compose(
@@ -178,13 +178,13 @@ public class RedditApi2 {
       String captchaId,
       String captchaGuess)
       throws IOException, AuthenticatorException, OperationCanceledException {
-    return post(ctx, accountName, Urls2.compose(),
-        Urls2.composeQuery(to, subject, text, captchaId, captchaGuess));
+    return post(ctx, accountName, Urls.compose(),
+        Urls.composeQuery(to, subject, text, captchaId, captchaGuess));
   }
 
   public static Result delete(Context ctx, String accountName, String thingId)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.delete(), Urls2.deleteQuery(thingId));
+    return post(ctx, accountName, Urls.delete(), Urls.deleteQuery(thingId));
   }
 
   public static Result edit(
@@ -193,7 +193,7 @@ public class RedditApi2 {
       String thingId,
       String text)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.edit(), Urls2.editQuery(thingId, text));
+    return post(ctx, accountName, Urls.edit(), Urls.editQuery(thingId, text));
   }
 
   public static Result hide(
@@ -202,7 +202,7 @@ public class RedditApi2 {
       String thingId,
       boolean hide)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.hide(hide), Urls2.hideQuery(thingId));
+    return post(ctx, accountName, Urls.hide(hide), Urls.hideQuery(thingId));
   }
 
   public static Result readMessage(
@@ -211,8 +211,8 @@ public class RedditApi2 {
       String thingId,
       boolean read)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.readMessage(read),
-        Urls2.readMessageQuery(thingId));
+    return post(ctx, accountName, Urls.readMessage(read),
+        Urls.readMessageQuery(thingId));
   }
 
   public static Result save(
@@ -221,7 +221,7 @@ public class RedditApi2 {
       String thingId,
       boolean save)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.save(save), Urls2.saveQuery(thingId));
+    return post(ctx, accountName, Urls.save(save), Urls.saveQuery(thingId));
   }
 
   public static Result submit(
@@ -234,8 +234,8 @@ public class RedditApi2 {
       String captchaId,
       String captchaGuess)
       throws IOException, AuthenticatorException, OperationCanceledException {
-    return post(ctx, accountName, Urls2.submit(),
-        Urls2.submitQuery(subreddit, title, text, link, captchaId,
+    return post(ctx, accountName, Urls.submit(),
+        Urls.submitQuery(subreddit, title, text, link, captchaId,
             captchaGuess));
   }
 
@@ -245,8 +245,8 @@ public class RedditApi2 {
       String subreddit,
       boolean subscribe)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.subscribe(),
-        Urls2.subscribeData(subreddit, subscribe));
+    return post(ctx, accountName, Urls.subscribe(),
+        Urls.subscribeData(subreddit, subscribe));
   }
 
   public static Result vote(
@@ -255,7 +255,7 @@ public class RedditApi2 {
       String thingId,
       int vote)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    return post(ctx, accountName, Urls2.vote(), Urls2.voteQuery(thingId, vote));
+    return post(ctx, accountName, Urls.vote(), Urls.voteQuery(thingId, vote));
   }
 
   private static Result post(
@@ -307,7 +307,7 @@ public class RedditApi2 {
       boolean doPost)
       throws AuthenticatorException, IOException, OperationCanceledException {
     HttpURLConnection conn =
-        (HttpURLConnection) Urls2.newUrl(url).openConnection();
+        (HttpURLConnection) Urls.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
     setCommonHeaders(conn);
     setAuthorizationHeader(ctx, accountName, conn);
@@ -321,7 +321,7 @@ public class RedditApi2 {
   private static HttpURLConnection noAuthConnect(CharSequence url)
       throws IOException {
     HttpURLConnection conn =
-        (HttpURLConnection) Urls2.newUrl(url).openConnection();
+        (HttpURLConnection) Urls.newUrl(url).openConnection();
     conn.setInstanceFollowRedirects(false);
     setCommonHeaders(conn);
     conn.connect();

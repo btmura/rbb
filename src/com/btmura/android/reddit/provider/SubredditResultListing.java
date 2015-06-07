@@ -26,7 +26,7 @@ import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi2;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
 
 import java.io.BufferedInputStream;
@@ -75,7 +75,7 @@ class SubredditResultListing extends JsonParser implements Listing {
       IOException,
       AuthenticatorException,
       OperationCanceledException {
-    CharSequence url = Urls2.subredditSearch(accountName, query);
+    CharSequence url = Urls.subredditSearch(accountName, query);
     HttpURLConnection conn = RedditApi2.connect(ctx, accountName, url, false);
     InputStream input = null;
     try {

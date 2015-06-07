@@ -27,7 +27,7 @@ import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi2;
 import com.btmura.android.reddit.net.UriHelper;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -52,7 +52,7 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
     HttpURLConnection conn = null;
     try {
-      CharSequence url = Urls2.subreddit(accountName, Subreddits.NAME_RANDOM,
+      CharSequence url = Urls.subreddit(accountName, Subreddits.NAME_RANDOM,
           Filter.SUBREDDIT_HOT, null);
       conn = RedditApi2.connect(getContext(), accountName, url, false);
       if (conn.getResponseCode() == 302) {

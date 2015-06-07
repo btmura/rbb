@@ -37,7 +37,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -152,7 +152,7 @@ public class MenuHelper {
 
     public static void startProfileActivity(Context context, String user) {
         Intent intent = new Intent(context, UserProfileActivity.class);
-        intent.setData(Uri.parse(Urls2.profileLink(user).toString()));
+        intent.setData(Uri.parse(Urls.profileLink(user).toString()));
         context.startActivity(intent);
     }
 
@@ -165,7 +165,7 @@ public class MenuHelper {
     public static void startSubredditActivity(Context context, String subreddit) {
         // TODO: Remove duplication with SubredditSpan.
         Intent intent = new Intent(context, BrowserActivity.class);
-        intent.setData(Uri.parse(Urls2.subredditLink(subreddit).toString()));
+        intent.setData(Uri.parse(Urls.subredditLink(subreddit).toString()));
         context.startActivity(intent);
     }
 

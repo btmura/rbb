@@ -29,7 +29,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
@@ -195,7 +194,7 @@ class SubredditActionModeController implements ActionModeController {
     }
 
     private CharSequence getClipText(ListView lv) {
-        return Urls2.subredditLink(getFirstCheckedSubreddit(lv));
+        return Urls.subredditLink(getFirstCheckedSubreddit(lv));
     }
 
     @Override

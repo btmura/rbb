@@ -33,7 +33,7 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi2;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
@@ -131,7 +131,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
       IOException,
       AuthenticatorException,
       OperationCanceledException {
-    CharSequence url = Urls2.comments(
+    CharSequence url = Urls.comments(
         accountName,
         thingId,
         linkId,

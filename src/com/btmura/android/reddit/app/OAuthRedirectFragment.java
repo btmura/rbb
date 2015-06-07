@@ -32,7 +32,7 @@ import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.Contexts;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class OAuthRedirectFragment extends Fragment implements OnClickListener {
@@ -144,7 +144,7 @@ public class OAuthRedirectFragment extends Fragment implements OnClickListener {
 
   private void forwardToBrowserLogin(CharSequence username) {
     StringBuilder state = new StringBuilder("rbb_").append(username);
-    CharSequence url = Urls2.authorize(getActivity(), state);
+    CharSequence url = Urls.authorize(getActivity(), state);
 
     Intent intent = new Intent(Intent.ACTION_VIEW);
     intent.setData(Uri.parse(url.toString()));

@@ -46,7 +46,6 @@ import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.content.RandomSubredditLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.Objects;
@@ -590,7 +589,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private CharSequence getClipText() {
-        return Urls2.subredditLink(getFirstCheckedSubreddit());
+        return Urls.subredditLink(getFirstCheckedSubreddit());
     }
 
     @Override

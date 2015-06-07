@@ -34,23 +34,23 @@ public class Urls2Test extends TestCase {
   public void testMySubreddits() {
     assertCharSequenceEquals(
         "https://oauth.reddit.com/subreddits/mine/subscriber?limit=1000",
-        Urls2.mySubreddits());
+        Urls.mySubreddits());
   }
 
   public void testSubreddit() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/android/hot.json",
-        Urls2.subreddit(NO_ACCOUNT, "android", Filter.SUBREDDIT_HOT, NO_MORE));
+        Urls.subreddit(NO_ACCOUNT, "android", Filter.SUBREDDIT_HOT, NO_MORE));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/r/android/new",
-        Urls2.subreddit(ACCOUNT, "android", Filter.SUBREDDIT_NEW, NO_MORE));
+        Urls.subreddit(ACCOUNT, "android", Filter.SUBREDDIT_NEW, NO_MORE));
   }
 
   public void testSubredditLink() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/androiddev",
-        Urls2.subredditLink("androiddev"));
+        Urls.subredditLink("androiddev"));
   }
 
   // TODO(btmura): add test for comment URLs
@@ -58,77 +58,77 @@ public class Urls2Test extends TestCase {
   public void testProfile() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/overview.json",
-        Urls2.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, NO_MORE));
+        Urls.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, NO_MORE));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/user/btmura/comments",
-        Urls2.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, NO_MORE));
+        Urls.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, NO_MORE));
   }
 
   public void testProfileLink() {
     assertCharSequenceEquals(
         "https://www.reddit.com/u/btmura",
-        Urls2.profileLink("btmura"));
+        Urls.profileLink("btmura"));
   }
 
   public void testMessageThread() {
     assertCharSequenceEquals(
         "https://oauth.reddit.com/message/messages/123abc",
-        Urls2.messageThread("123abc"));
+        Urls.messageThread("123abc"));
   }
 
   public void testMessageThreadLink() {
     assertCharSequenceEquals(
         "https://www.reddit.com/message/messages/123abc",
-        Urls2.messageThreadLink("123abc"));
+        Urls.messageThreadLink("123abc"));
   }
 
   public void testSearch() {
     assertCharSequenceEquals(
         "https://www.reddit.com/search.json?q=s2000",
-        Urls2.search(NO_ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
+        Urls.search(NO_ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/search?q=s2000",
-        Urls2.search(ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
+        Urls.search(ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
 
     assertCharSequenceEquals(
         "https://www.reddit.com/r/cars/search.json?q=s2000&restrict_sr=on",
-        Urls2.search(NO_ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
+        Urls.search(NO_ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/r/cars/search?q=s2000&restrict_sr=on",
-        Urls2.search(ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
+        Urls.search(ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
   }
 
   public void testSubredditSearch() {
     assertCharSequenceEquals(
         "https://www.reddit.com/reddits/search.json?q=s2000",
-        Urls2.subredditSearch(NO_ACCOUNT, "s2000"));
+        Urls.subredditSearch(NO_ACCOUNT, "s2000"));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/reddits/search?q=s2000",
-        Urls2.subredditSearch(ACCOUNT, "s2000"));
+        Urls.subredditSearch(ACCOUNT, "s2000"));
   }
 
   public void testSidebar() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/cars/about.json",
-        Urls2.sidebar(NO_ACCOUNT, "cars"));
+        Urls.sidebar(NO_ACCOUNT, "cars"));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/r/cars/about",
-        Urls2.sidebar(ACCOUNT, "cars"));
+        Urls.sidebar(ACCOUNT, "cars"));
   }
 
   public void testUserInfo() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/about.json",
-        Urls2.userInfo(NO_ACCOUNT, "btmura"));
+        Urls.userInfo(NO_ACCOUNT, "btmura"));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/user/btmura/about",
-        Urls2.userInfo(ACCOUNT, "btmura"));
+        Urls.userInfo(ACCOUNT, "btmura"));
   }
 
   private void assertCharSequenceEquals(

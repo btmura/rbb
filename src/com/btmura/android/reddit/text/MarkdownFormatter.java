@@ -28,7 +28,7 @@ import android.text.style.TypefaceSpan;
 import android.util.Patterns;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.net.Urls2;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.style.MarkdownTableSpan;
 import com.btmura.android.reddit.text.style.SubredditSpan;
 import com.btmura.android.reddit.text.style.URLSpan;
@@ -534,7 +534,7 @@ public class MarkdownFormatter {
   static Object getUrlSpan(String url, StringBuilder builder) {
     if (url.startsWith("/")) {
       url = builder.delete(0, builder.length())
-          .append(Urls2.WWW_REDDIT_COM)
+          .append(Urls.WWW_REDDIT_COM)
           .append(url)
           .toString();
       return new URLSpan(url);

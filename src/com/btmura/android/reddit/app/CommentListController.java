@@ -34,7 +34,6 @@ import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.net.Urls2;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.CommentAdapter;
@@ -115,7 +114,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     private CharSequence getCommentUrl(int position) {
         String permaLink = getPermaLink(0);
         String thingId = position != 0 ? getThingId(position) : null;
-        return Urls2.permaLink(permaLink, thingId);
+        return Urls.permaLink(permaLink, thingId);
     }
 
     public void delete(ListView listView) {
