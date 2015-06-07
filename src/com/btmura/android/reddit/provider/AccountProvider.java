@@ -44,7 +44,7 @@ import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.util.Array;
 
 public class AccountProvider extends BaseProvider {
@@ -122,7 +122,7 @@ public class AccountProvider extends BaseProvider {
     private Bundle initializeAccount(String accountName) {
         ArrayList<String> subreddits;
         try {
-            subreddits = RedditApi2.getMySubreddits(getContext(), accountName);
+            subreddits = RedditApi.getMySubreddits(getContext(), accountName);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             return null;

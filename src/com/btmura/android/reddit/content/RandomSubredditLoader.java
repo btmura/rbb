@@ -25,7 +25,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.net.Urls;
 
@@ -54,7 +54,7 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
     try {
       CharSequence url = Urls.subreddit(accountName, Subreddits.NAME_RANDOM,
           Filter.SUBREDDIT_HOT, null);
-      conn = RedditApi2.connect(getContext(), accountName, url, false);
+      conn = RedditApi.connect(getContext(), accountName, url, false);
       if (conn.getResponseCode() == 302) {
         String location = conn.getHeaderField("Location");
         return UriHelper.getSubreddit(Uri.parse(location));

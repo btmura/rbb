@@ -28,7 +28,7 @@ import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -85,10 +85,10 @@ class MessageSyncer implements Syncer {
 
     switch (action) {
       case MessageActions.ACTION_INSERT:
-        return RedditApi2.comment(ctx, accountName, thingId, text);
+        return RedditApi.comment(ctx, accountName, thingId, text);
 
       case MessageActions.ACTION_DELETE:
-        return RedditApi2.delete(ctx, accountName, thingId);
+        return RedditApi.delete(ctx, accountName, thingId);
 
       default:
         throw new IllegalArgumentException();

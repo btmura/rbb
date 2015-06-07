@@ -35,7 +35,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -105,7 +105,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
       // Get subreddits from reddit. These could be a bit stale.
       ArrayList<String> subreddits =
-          RedditApi2.getMySubreddits(ctx, account.name);
+          RedditApi.getMySubreddits(ctx, account.name);
 
       // Get database operations required to sync with the server.
       ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
@@ -203,7 +203,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         if (expiration == 0) {
           try {
             boolean subscribe = state == Subreddits.STATE_INSERTING;
-            RedditApi2.subscribe(getContext(), account.name, name, subscribe);
+            RedditApi.subscribe(getContext(), account.name, name, subscribe);
             long newExpiration =
                 System.currentTimeMillis() + EXPIRATION_PADDING_MS;
             ops.add(ContentProviderOperation.newUpdate(

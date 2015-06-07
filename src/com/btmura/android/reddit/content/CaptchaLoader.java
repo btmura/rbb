@@ -22,7 +22,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 
 import java.io.IOException;
 
@@ -48,7 +48,7 @@ public class CaptchaLoader extends AsyncTaskLoader<CaptchaResult> {
     try {
       CaptchaResult captchaResult = new CaptchaResult();
       captchaResult.iden = captchaId;
-      captchaResult.captchaBitmap = RedditApi2.getCaptcha(captchaId);
+      captchaResult.captchaBitmap = RedditApi.getCaptcha(captchaId);
       return captchaResult;
     } catch (IOException e) {
       Log.e(TAG, e.getMessage(), e);

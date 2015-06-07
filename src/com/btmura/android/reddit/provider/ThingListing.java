@@ -44,7 +44,7 @@ import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
@@ -271,7 +271,8 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public List<ContentValues> getValues() throws IOException, AuthenticatorException, OperationCanceledException {
-        HttpURLConnection conn = RedditApi2.connect(context, accountName, getUrl(),
+        HttpURLConnection conn = RedditApi.connect(context, accountName,
+            getUrl(),
             false);
         InputStream input = null;
         try {

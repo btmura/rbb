@@ -21,7 +21,7 @@ import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.util.Log;
 
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.SidebarResult;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class SidebarLoader extends BaseAsyncTaskLoader<SidebarResult> {
   @Override
   public SidebarResult loadInBackground() {
     try {
-      return RedditApi2.getSidebar(getContext(), accountName, subreddit);
+      return RedditApi.getSidebar(getContext(), accountName, subreddit);
     } catch (IOException e) {
       Log.e(TAG, e.getMessage(), e);
     } catch (AuthenticatorException e) {

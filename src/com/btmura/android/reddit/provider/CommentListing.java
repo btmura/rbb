@@ -32,7 +32,7 @@ import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Sessions;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
@@ -137,7 +137,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         linkId,
         filter,
         numComments);
-    HttpURLConnection conn = RedditApi2.connect(ctx, accountName, url, false);
+    HttpURLConnection conn = RedditApi.connect(ctx, accountName, url, false);
     InputStream input = null;
     try {
       input = new BufferedInputStream(conn.getInputStream());

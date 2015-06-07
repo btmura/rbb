@@ -22,7 +22,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.btmura.android.reddit.net.AccountInfoResult;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 
 import java.io.IOException;
 
@@ -46,7 +46,7 @@ public class UserInfoLoader extends BaseAsyncTaskLoader<AccountInfoResult> {
   @Override
   public AccountInfoResult loadInBackground() {
     try {
-      return RedditApi2.getUserInfo(getContext(), accountName, user);
+      return RedditApi.getUserInfo(getContext(), accountName, user);
     } catch (IOException e) {
       Log.e(TAG, e.getMessage(), e);
     } catch (AuthenticatorException e) {

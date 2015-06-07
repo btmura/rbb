@@ -36,7 +36,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.AccountInfoResult;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -128,7 +128,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
           switch (c.getInt(ACTION)) {
             case AccountActions.ACTION_MARK_MESSAGES_READ:
               if (!markRead) {
-                RedditApi2.markMessagesRead(getContext(), account.name);
+                RedditApi.markMessagesRead(getContext(), account.name);
                 markRead = true;
               }
               int deleted = provider.delete(
@@ -146,7 +146,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
       // Update the account row with the latest information if it has changed.
       AccountInfoResult result =
-          RedditApi2.getMyInfo(getContext(), account.name);
+          RedditApi.getMyInfo(getContext(), account.name);
       boolean newHasMail = result.hasMail && !markRead;
       c = provider.query(
           AccountProvider.ACCOUNTS_URI,

@@ -65,16 +65,16 @@ public class AccessTokenResult extends JsonParser {
     try {
       URL url = Urls.newUrl(Urls.ACCESS_TOKEN_URL);
       conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestProperty("Accept-Charset", RedditApi2.CHARSET);
-      conn.setRequestProperty("User-Agent", RedditApi2.USER_AGENT);
+      conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
+      conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);
 
       String clientId = ctx.getString(R.string.key_reddit_client_id);
       StringBuilder sb = new StringBuilder(clientId).append(":");
       String auth = Base64.encodeToString(
-          sb.toString().getBytes(RedditApi2.CHARSET), Base64.DEFAULT);
+          sb.toString().getBytes(RedditApi.CHARSET), Base64.DEFAULT);
       conn.setRequestProperty("Authorization", "Basic " + auth);
 
-      conn.setRequestProperty("Content-Type", RedditApi2.CONTENT_TYPE);
+      conn.setRequestProperty("Content-Type", RedditApi.CONTENT_TYPE);
       conn.setDoOutput(true);
       conn.connect();
 
@@ -91,10 +91,10 @@ public class AccessTokenResult extends JsonParser {
       }
 
       out = conn.getOutputStream();
-      out.write(sb.toString().getBytes(RedditApi2.CHARSET));
+      out.write(sb.toString().getBytes(RedditApi.CHARSET));
 
       in = conn.getInputStream();
-      in = RedditApi2.logResponse(in);
+      in = RedditApi.logResponse(in);
       return fromJson(new JsonReader(new InputStreamReader(in)));
     } finally {
       if (in != null) {

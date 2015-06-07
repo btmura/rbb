@@ -29,7 +29,7 @@ import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
@@ -104,22 +104,22 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
         break;
 
       case ThingBundle.TYPE_COMMENT:
-        parent = RedditApi2.getThingInfo(getContext(), accountName,
+        parent = RedditApi.getThingInfo(getContext(), accountName,
             thingBundle.getLinkId(), newFormatter());
         child = thingBundle;
         break;
 
       case ThingBundle.TYPE_LINK_REFERENCE:
-        parent = RedditApi2.getThingInfo(getContext(), accountName,
+        parent = RedditApi.getThingInfo(getContext(), accountName,
             thingBundle.getThingId(), newFormatter());
         child = null;
         break;
 
       case ThingBundle.TYPE_COMMENT_REFERENCE:
         MarkdownFormatter formatter = newFormatter();
-        parent = RedditApi2.getThingInfo(getContext(), accountName,
+        parent = RedditApi.getThingInfo(getContext(), accountName,
             thingBundle.getLinkId(), formatter);
-        child = RedditApi2.getThingInfo(getContext(), accountName,
+        child = RedditApi.getThingInfo(getContext(), accountName,
             thingBundle.getThingId(), formatter);
         break;
 

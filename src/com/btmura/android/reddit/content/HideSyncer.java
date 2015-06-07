@@ -26,7 +26,7 @@ import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -77,7 +77,7 @@ class HideSyncer implements Syncer {
       throws IOException, AuthenticatorException, OperationCanceledException {
     String thingId = c.getString(THING_ID);
     boolean hide = c.getInt(ACTION) == HideActions.ACTION_HIDE;
-    return RedditApi2.hide(context, accountName, thingId, hide);
+    return RedditApi.hide(context, accountName, thingId, hide);
   }
 
   @Override

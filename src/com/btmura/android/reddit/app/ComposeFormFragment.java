@@ -54,7 +54,7 @@ import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
@@ -685,11 +685,11 @@ public class ComposeFormFragment extends Fragment implements
 
         switch (getType()) {
           case ComposeActivity.TYPE_POST:
-            return RedditApi2.submit(ctx, accountName, destination, title,
+            return RedditApi.submit(ctx, accountName, destination, title,
                 text, isLink, captchaId, captchaGuess);
 
           case ComposeActivity.TYPE_MESSAGE:
-            return RedditApi2.compose(ctx, accountName, destination, title,
+            return RedditApi.compose(ctx, accountName, destination, title,
                 text, captchaId, captchaGuess);
 
           default:

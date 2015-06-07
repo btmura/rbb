@@ -26,7 +26,7 @@ import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.VoteActions;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -77,7 +77,7 @@ class VoteSyncer implements Syncer {
       throws IOException, AuthenticatorException, OperationCanceledException {
     String thingId = c.getString(THING_ID);
     int action = c.getInt(ACTION);
-    return RedditApi2.vote(context, accountName, thingId, action);
+    return RedditApi.vote(context, accountName, thingId, action);
   }
 
   @Override

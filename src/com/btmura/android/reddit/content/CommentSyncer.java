@@ -27,7 +27,7 @@ import android.os.RemoteException;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -83,13 +83,13 @@ class CommentSyncer implements Syncer {
     String text = c.getString(TEXT);
     switch (action) {
       case CommentActions.ACTION_INSERT:
-        return RedditApi2.comment(ctx, accountName, thingId, text);
+        return RedditApi.comment(ctx, accountName, thingId, text);
 
       case CommentActions.ACTION_DELETE:
-        return RedditApi2.delete(ctx, accountName, thingId);
+        return RedditApi.delete(ctx, accountName, thingId);
 
       case CommentActions.ACTION_EDIT:
-        return RedditApi2.edit(ctx, accountName, thingId, text);
+        return RedditApi.edit(ctx, accountName, thingId, text);
 
       default:
         throw new IllegalArgumentException();

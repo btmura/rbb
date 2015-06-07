@@ -25,7 +25,7 @@ import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.util.Array;
 
@@ -65,7 +65,7 @@ public class RelatedSubredditLoader extends CursorLoader {
   public Cursor loadInBackground() {
     try {
       SidebarResult result =
-          RedditApi2.getSidebar(getContext(), accountName, subreddit);
+          RedditApi.getSidebar(getContext(), accountName, subreddit);
       result.recycle();
       return buildCursor(findSubreddits(result.description));
     } catch (IOException e) {

@@ -22,7 +22,7 @@ import android.test.AndroidTestCase;
 public class RedditApiTest extends AndroidTestCase {
 
   public void testUserAgent() throws Exception {
-    assertEquals(getExpectedUserAgent(), RedditApi2.USER_AGENT);
+    assertEquals(getExpectedUserAgent(), RedditApi.USER_AGENT);
   }
 
   private String getExpectedUserAgent() throws NameNotFoundException {

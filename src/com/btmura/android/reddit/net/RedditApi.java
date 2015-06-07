@@ -42,10 +42,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// TODO(btmura): remove RedditApi and replace with this class
-public class RedditApi2 {
-
-  // TODO(btmura): add RedditApiException type
+public class RedditApi {
 
   private static final String TAG = "RedditApi2";
 
@@ -413,6 +410,6 @@ public class RedditApi2 {
     }
   }
 
-  private RedditApi2() {
+  private RedditApi() {
   }
 }

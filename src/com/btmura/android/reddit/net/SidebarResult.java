@@ -47,7 +47,7 @@ public class SidebarResult extends JsonParser {
       SidebarResult result = new SidebarResult(ctx);
       result.parseEntity(r);
       if (!TextUtils.isEmpty(result.headerImage)) {
-        result.headerImageBitmap = RedditApi2.getBitmap(result.headerImage);
+        result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
       }
       return result;
     } finally {

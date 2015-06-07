@@ -26,7 +26,7 @@ import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.net.RedditApi2;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -78,7 +78,7 @@ class SaveSyncer implements Syncer {
     String thingId = c.getString(THING_ID);
     int action = c.getInt(ACTION);
     boolean save = action == SaveActions.ACTION_SAVE;
-    return RedditApi2.save(ctx, accountName, thingId, save);
+    return RedditApi.save(ctx, accountName, thingId, save);
   }
 
   @Override
