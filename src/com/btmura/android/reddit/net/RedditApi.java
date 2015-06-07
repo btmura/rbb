@@ -21,6 +21,7 @@ import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.Nullable;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -34,6 +35,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -76,13 +78,13 @@ public class RedditApi {
   public static AccountInfoResult getMyInfo(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream is = null;
+    JsonReader r = null;
     try {
       conn = connect(ctx, accountName, Urls.myInfo(), false);
-      is = conn.getInputStream();
-      return AccountInfoResult.fromMyInfoJson(is);
+      r = newJsonReader(conn.getInputStream());
+      return AccountInfoResult.getMyInfo(r);
     } finally {
-      close(is, conn);
+      close(r, conn);
     }
   }
 
@@ -147,13 +149,13 @@ public class RedditApi {
       String user)
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
-    InputStream is = null;
+    JsonReader r = null;
     try {
       conn = connect(ctx, accountName, Urls.userInfo(accountName, user), false);
-      is = conn.getInputStream();
-      return AccountInfoResult.fromUserInfoJson(is);
+      r = newJsonReader(conn.getInputStream());
+      return AccountInfoResult.getUserInfo(r);
     } finally {
-      close(is, conn);
+      close(r, conn);
     }
   }
 
@@ -166,6 +168,7 @@ public class RedditApi {
       conn = connect(ctx, accountName, url, false);
       is = conn.getInputStream();
       while (is.read() != -1) {
+        // read entire input stream
       }
     } finally {
       close(is, conn);
@@ -395,6 +398,10 @@ public class RedditApi {
     }
   }
 
+  protected static JsonReader newJsonReader(InputStream in) {
+    return new JsonReader(new InputStreamReader(new BufferedInputStream(in)));
+  }
+
   // TODO(btmura): make private
   static InputStream logResponse(InputStream is) throws IOException {
     if (!LOG_RESPONSES) {
@@ -421,10 +428,12 @@ public class RedditApi {
     return new BufferedInputStream(new ByteArrayInputStream(os.toByteArray()));
   }
 
-  private static void close(InputStream is, HttpURLConnection conn) {
-    if (is != null) {
+  private static void close(
+      @Nullable Closeable cs,
+      @Nullable HttpURLConnection conn) {
+    if (cs != null) {
       try {
-        is.close();
+        cs.close();
       } catch (IOException e) {
         Log.e(TAG, e.getMessage(), e);
       }
