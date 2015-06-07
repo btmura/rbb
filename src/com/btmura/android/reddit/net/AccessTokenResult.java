@@ -63,7 +63,7 @@ public class AccessTokenResult extends JsonParser {
     InputStream in = null;
 
     try {
-      URL url = Urls2.newUrl(Urls.API_ACCESS_TOKEN_URL);
+      URL url = Urls2.newUrl(Urls2.ACCESS_TOKEN_URL);
       conn = (HttpURLConnection) url.openConnection();
       conn.setRequestProperty("Accept-Charset", RedditApi.CHARSET);
       conn.setRequestProperty("User-Agent", RedditApi.USER_AGENT);

@@ -38,20 +38,12 @@ public class Urls2 {
 
   public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
-  private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
-
-  private static final int FORMAT_HTML = 0;
-  private static final int FORMAT_JSON = 1;
-
   public static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
-  // Normal URLs
-
+  public static final String ACCESS_TOKEN_URL =
+      "https://ssl.reddit.com/api/v1/access_token";
   private static final String CAPTCHA_URL = WWW_REDDIT_COM + "/captcha/";
-
-  // OAuth URLs
-
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
   private static final String COMPOSE_URL = OAUTH_REDDIT_COM + "/api/compose";
   private static final String DEL_URL = OAUTH_REDDIT_COM + "/api/del";
@@ -81,6 +73,10 @@ public class Urls2 {
   private static final String R_PATH = "/r/";
   private static final String U_PATH = "/u/";
   private static final String USER_PATH = "/user/";
+
+  private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+  private static final int FORMAT_HTML = 0;
+  private static final int FORMAT_JSON = 1;
 
   public static CharSequence authorize(Context ctx, CharSequence state) {
     String clientId = ctx.getString(R.string.key_reddit_client_id);
