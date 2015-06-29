@@ -18,6 +18,7 @@
 
     <string name="account_app_storage">App storage</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
+    <string name="add_account_fragment_title">Add Account</string>
     <string name="add_account">Add account</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="add_subreddits">Add subreddits</string>

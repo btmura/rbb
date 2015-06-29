@@ -30,6 +30,8 @@ public class AccountAuthenticatorActivity
     implements LoginFragment.OnLoginListener,
     AddAccountFragment.OnAccountAddedListener {
 
+  private static final String TAG_ADD_ACCOUNT = "AddAccount";
+
   public static final String EXTRA_USERNAME = "username";
 
   @Override
@@ -38,14 +40,11 @@ public class AccountAuthenticatorActivity
     setTheme(ThemePrefs.getTheme(this));
     setContentView(R.layout.account_authenticator);
     if (savedInstanceState == null) {
-      setContainer(LoginFragment.newInstance(newStateToken()));
+      LoginFragment frag = LoginFragment.newInstance(newStateToken());
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.account_authenticator_container, frag);
+      ft.commit();
     }
-  }
-
-  private void setContainer(Fragment frag) {
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    ft.replace(R.id.account_authenticator_container, frag);
-    ft.commit();
   }
 
   private static CharSequence newStateToken() {
@@ -55,7 +54,9 @@ public class AccountAuthenticatorActivity
   @Override
   public void onLogin(String oauthCallbackUrl) {
     // TODO(btmura): compare state tokens
-    setContainer(AddAccountFragment.newInstance(oauthCallbackUrl));
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    AddAccountFragment.newInstance(oauthCallbackUrl)
+        .show(ft, TAG_ADD_ACCOUNT);
   }
 
   @Override

@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.Urls;
 
@@ -77,7 +79,9 @@ public class LoginFragment extends Fragment {
 
   private void setupWebView() {
     // Clear reddit cookie to present a fresh login form.
-    CookieManager.getInstance().setCookie(".reddit.com", "reddit_session=");
+    if (!BuildConfig.DEBUG) {
+      CookieManager.getInstance().setCookie(".reddit.com", "reddit_session=");
+    }
 
     // Don't save usernames entered into the login forms.
     webView.getSettings().setSaveFormData(false);

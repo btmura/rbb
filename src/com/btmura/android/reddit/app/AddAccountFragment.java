@@ -26,7 +26,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,7 +51,8 @@ import com.btmura.android.reddit.text.InputFilters;
 
 import java.io.IOException;
 
-public class AddAccountFragment extends Fragment implements OnClickListener {
+public class AddAccountFragment extends DialogFragment
+    implements OnClickListener {
 
   private static final String TAG = "AddAccountFragment";
   private static final boolean DEBUG = BuildConfig.DEBUG;
@@ -99,6 +100,8 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
       LayoutInflater inflater,
       ViewGroup container,
       Bundle savedInstanceState) {
+    getDialog().setTitle(R.string.add_account_fragment_title);
+
     View v = inflater.inflate(R.layout.add_account_frag, container, false);
 
     username = (EditText) v.findViewById(R.id.username);
@@ -155,6 +158,17 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     username.setEnabled(true);
     cancelButton.setEnabled(true);
     addButton.setEnabled(true);
+  }
+
+  @Override
+  public void onDestroyView() {
+    // Workaround to prevent the dialog from disappearing.
+    // https://code.google.com/p/android/issues/detail?id=17423
+    // TODO(btmura): try using loader to add account instead
+    if (getDialog() != null && getRetainInstance()) {
+      getDialog().setDismissMessage(null);
+    }
+    super.onDestroyView();
   }
 
   class AddAccountTask extends AsyncTask<Void, Integer, Bundle> {
