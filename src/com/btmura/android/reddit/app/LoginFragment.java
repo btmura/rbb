@@ -16,9 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
-import android.content.Intent;
+import android.app.Activity;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -33,13 +32,35 @@ import android.widget.ProgressBar;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.Urls;
 
+/**
+ * Fragment that presents a Reddit login screen inside a WebView.
+ */
 public class LoginFragment extends Fragment {
 
+  private static final String ARG_STATE_TOKEN = "stateToken";
+
+  private OnLoginListener listener;
   private WebView webView;
   private ProgressBar progressBar;
 
-  public static LoginFragment newInstance() {
-    return new LoginFragment();
+  public interface OnLoginListener {
+    void onLogin(String oauthCallbackUrl);
+  }
+
+  public static LoginFragment newInstance(CharSequence stateToken) {
+    Bundle args = new Bundle(1);
+    args.putCharSequence(ARG_STATE_TOKEN, stateToken);
+    LoginFragment frag = new LoginFragment();
+    frag.setArguments(args);
+    return frag;
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (activity instanceof OnLoginListener) {
+      listener = (OnLoginListener) activity;
+    }
   }
 
   @Override
@@ -57,6 +78,9 @@ public class LoginFragment extends Fragment {
   private void setupWebView() {
     // Clear reddit cookie to present a fresh login form.
     CookieManager.getInstance().setCookie(".reddit.com", "reddit_session=");
+
+    // Don't save usernames entered into the login forms.
+    webView.getSettings().setSaveFormData(false);
 
     webView.setWebViewClient(new WebViewClient() {
       @Override
@@ -78,11 +102,9 @@ public class LoginFragment extends Fragment {
         // WebView will show an unrecognized scheme error unless we intercept
         // the OAuth callback URL and fire off an intent instead.
         if (url != null && url.startsWith(Urls.OAUTH_REDIRECT_URL)) {
-          Intent intent = new Intent(Intent.ACTION_VIEW);
-          intent.setData(Uri.parse(url));
-
-          // Allow ActivityNotFoundException because rbb must handle this.
-          startActivity(intent);
+          if (listener != null) {
+            listener.onLogin(url);
+          }
           return true;
         }
         return false;
@@ -108,8 +130,7 @@ public class LoginFragment extends Fragment {
   }
 
   private void loadLoginUrl() {
-    StringBuilder stateToken = new StringBuilder("rbb_")
-        .append(System.currentTimeMillis());
+    CharSequence stateToken = getArguments().getCharSequence(ARG_STATE_TOKEN);
     CharSequence url = Urls.authorize(getActivity(), stateToken);
     webView.loadUrl(url.toString());
   }

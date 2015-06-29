@@ -19,7 +19,6 @@ package com.btmura.android.reddit.accounts;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
@@ -28,7 +27,8 @@ import com.btmura.android.reddit.content.ThemePrefs;
 
 public class AccountAuthenticatorActivity
     extends SupportAccountAuthenticatorActivity
-    implements AddAccountFragment.OnAccountAddedListener {
+    implements LoginFragment.OnLoginListener,
+    AddAccountFragment.OnAccountAddedListener {
 
   public static final String EXTRA_USERNAME = "username";
 
@@ -37,14 +37,25 @@ public class AccountAuthenticatorActivity
     super.onCreate(savedInstanceState);
     setTheme(ThemePrefs.getTheme(this));
     setContentView(R.layout.account_authenticator);
-
     if (savedInstanceState == null) {
-      if (!isOAuthCallback()) {
-        setContainer(LoginFragment.newInstance());
-      } else {
-        setContainer(AddAccountFragment.newInstance(getOAuthCallbackUrl()));
-      }
+      setContainer(LoginFragment.newInstance(newStateToken()));
     }
+  }
+
+  private void setContainer(Fragment frag) {
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    ft.replace(R.id.account_authenticator_container, frag);
+    ft.commit();
+  }
+
+  private static CharSequence newStateToken() {
+    return new StringBuilder("rbb_").append(System.currentTimeMillis());
+  }
+
+  @Override
+  public void onLogin(String oauthCallbackUrl) {
+    // TODO(btmura): compare state tokens
+    setContainer(AddAccountFragment.newInstance(oauthCallbackUrl));
   }
 
   @Override
@@ -57,19 +68,5 @@ public class AccountAuthenticatorActivity
   @Override
   public void onAccountCancelled() {
     finish();
-  }
-
-  private boolean isOAuthCallback() {
-    return !TextUtils.isEmpty(getOAuthCallbackUrl());
-  }
-
-  private String getOAuthCallbackUrl() {
-    return getIntent().getDataString();
-  }
-
-  private void setContainer(Fragment frag) {
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    ft.replace(R.id.account_authenticator_container, frag);
-    ft.commit();
   }
 }
