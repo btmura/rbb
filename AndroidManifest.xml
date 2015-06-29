@@ -40,19 +40,7 @@
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
-            android:theme="@android:style/Theme.Holo.Dialog">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="oauth"
-                    android:pathPrefix="/"
-                    android:scheme="rbb"/>
-            </intent-filter>
-        </activity>
+            android:theme="@android:style/Theme.Holo.Dialog"/>
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
             android:label="@string/label_accounts">
