@@ -39,8 +39,7 @@
         android:theme="@style/Theme.Transition">
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
-            android:label="@string/add_account"
-            android:theme="@android:style/Theme.Holo.Dialog"/>
+            android:label="@string/add_account"/>
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
             android:label="@string/label_accounts">
