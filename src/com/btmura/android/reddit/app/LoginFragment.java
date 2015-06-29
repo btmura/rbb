@@ -124,8 +124,11 @@ public class LoginFragment extends Fragment {
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
+    getActivity().setTitle(R.string.login_fragment_title);
     if (savedInstanceState == null) {
       loadLoginUrl();
+    } else {
+      webView.restoreState(savedInstanceState);
     }
   }
 
