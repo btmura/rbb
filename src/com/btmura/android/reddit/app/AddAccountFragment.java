@@ -16,19 +16,13 @@
 
 package com.btmura.android.reddit.app;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,27 +31,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.AccountPrefs;
-import com.btmura.android.reddit.net.AccessTokenResult;
-import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.content.AddAccountLoader;
 import com.btmura.android.reddit.text.InputFilters;
 
-import java.io.IOException;
-
 public class AddAccountFragment extends DialogFragment
-    implements OnClickListener {
-
-  private static final String TAG = "AddAccountFragment";
-  private static final boolean DEBUG = BuildConfig.DEBUG;
+    implements OnClickListener, LoaderManager.LoaderCallbacks<Bundle> {
 
   private static final String ARG_OAUTH_CALLBACK_URL = "oauthCallbackUrl";
+
+  private static final String LOADER_ARG_USERNAME = "username";
+  private static final String LOADER_ARG_OAUTH_CALLBACK_URL =
+      "oauthCallbackUrl";
+
+  // TODO(btmura): add state variables to restore loader properly
 
   private OnAccountAddedListener listener;
   private EditText username;
@@ -90,12 +77,6 @@ public class AddAccountFragment extends DialogFragment
   }
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setRetainInstance(true);
-  }
-
-  @Override
   public View onCreateView(
       LayoutInflater inflater,
       ViewGroup container,
@@ -115,9 +96,23 @@ public class AddAccountFragment extends DialogFragment
     addButton = (Button) v.findViewById(R.id.ok);
     addButton.setOnClickListener(this);
 
-    hideProgress();
+    hideProgressBar();
 
     return v;
+  }
+
+  private void showProgressBar() {
+    progress.setVisibility(View.VISIBLE);
+    username.setEnabled(false);
+    cancelButton.setEnabled(false);
+    addButton.setEnabled(false);
+  }
+
+  private void hideProgressBar() {
+    progress.setVisibility(View.INVISIBLE);
+    username.setEnabled(true);
+    cancelButton.setEnabled(true);
+    addButton.setEnabled(true);
   }
 
   @Override
@@ -136,7 +131,11 @@ public class AddAccountFragment extends DialogFragment
     }
     if (username.getError() == null && listener != null) {
       // TODO(btmura): check for existing account
-      new AddAccountTask(username.getText().toString()).execute();
+      Bundle args = new Bundle(2);
+      args.putString(LOADER_ARG_USERNAME, username.getText().toString());
+      args.putString(LOADER_ARG_OAUTH_CALLBACK_URL,
+          getArguments().getString(ARG_OAUTH_CALLBACK_URL));
+      getLoaderManager().initLoader(0, args, this);
     }
   }
 
@@ -146,199 +145,28 @@ public class AddAccountFragment extends DialogFragment
     }
   }
 
-  private void showProgress() {
-    progress.setVisibility(View.VISIBLE);
-    username.setEnabled(false);
-    cancelButton.setEnabled(false);
-    addButton.setEnabled(false);
-  }
-
-  private void hideProgress() {
-    progress.setVisibility(View.INVISIBLE);
-    username.setEnabled(true);
-    cancelButton.setEnabled(true);
-    addButton.setEnabled(true);
+  @Override
+  public Loader<Bundle> onCreateLoader(int i, Bundle args) {
+    showProgressBar();
+    return new AddAccountLoader(
+        getActivity(),
+        args.getString(LOADER_ARG_USERNAME),
+        args.getString(LOADER_ARG_OAUTH_CALLBACK_URL));
   }
 
   @Override
-  public void onDestroyView() {
-    // Workaround to prevent the dialog from disappearing.
-    // https://code.google.com/p/android/issues/detail?id=17423
-    // TODO(btmura): try using loader to add account instead
-    if (getDialog() != null && getRetainInstance()) {
-      getDialog().setDismissMessage(null);
+  public void onLoadFinished(Loader<Bundle> loader, Bundle result) {
+    String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
+    if (error != null) {
+      MessageDialogFragment.showMessage(getFragmentManager(), error);
+      hideProgressBar();
+    } else if (listener != null) {
+      listener.onAccountAdded(result);
     }
-    super.onDestroyView();
   }
 
-  class AddAccountTask extends AsyncTask<Void, Integer, Bundle> {
-
-    private final Context ctx = getActivity().getApplicationContext();
-    private final String username;
-
-    AddAccountTask(String username) {
-      this.username = username;
-    }
-
-    @Override
-    protected void onPreExecute() {
-      showProgress();
-    }
-
-    @Override
-    protected Bundle doInBackground(Void... params) {
-      try {
-        Uri uri = getOAuthCallbackUri();
-        if (DEBUG) {
-          Log.d(TAG, "uri: " + uri + " username: " + username);
-        }
-        if (!isValidUsername(username)) {
-          // TODO(btmura): show error message
-          return Bundle.EMPTY;
-        }
-
-        String code = getCode(uri);
-        if (DEBUG) {
-          Log.d(TAG, "code: " + code);
-        }
-        if (!isValidCode(code)) {
-          // TODO(btmura): show error message
-          return Bundle.EMPTY;
-        }
-
-        AccessTokenResult atr = getAccessTokenResult(ctx, code);
-        if (DEBUG) {
-          Log.d(TAG, "atr: " + atr);
-        }
-        if (!isValidAccessTokenResult(atr)) {
-          // TODO(btmura): show error message
-          return Bundle.EMPTY;
-        }
-
-        Account a = AccountUtils.getAccount(ctx, username);
-        AccountManager am = AccountManager.get(ctx);
-        if (!addAccount(am, a, atr)) {
-          // TODO(btmura): show error message
-          return Bundle.EMPTY;
-        }
-
-        if (!AccountProvider.initializeAccount(ctx, username)) {
-          // TODO(btmura): show error message
-          removeAccount(am, a);
-          return Bundle.EMPTY;
-        }
-
-        // Set this account as the last account to make the UI switch to the
-        // new account after the user returns to the app. If somehow we crash
-        // before the account is added, that is ok, because the AccountLoader
-        // will fall back to the app storage account.
-        AccountPrefs.setLastAccount(ctx, username);
-
-        ContentResolver.setSyncAutomatically(a,
-            AccountProvider.AUTHORITY, true);
-        ContentResolver.setSyncAutomatically(a,
-            SubredditProvider.AUTHORITY, true);
-        ContentResolver.setSyncAutomatically(a,
-            ThingProvider.AUTHORITY, true);
-
-        Bundle b = new Bundle(2);
-        b.putString(AccountManager.KEY_ACCOUNT_NAME, a.name);
-        b.putString(AccountManager.KEY_ACCOUNT_TYPE, a.type);
-        return b;
-      } catch (IOException e) {
-        // TODO(btmura): show error message to user
-        Log.e(TAG, "error getting access token", e);
-        return errorBundle(R.string.login_error, e.getMessage());
-      }
-    }
-
-    private Uri getOAuthCallbackUri() {
-      return Uri.parse(getArguments().getString(ARG_OAUTH_CALLBACK_URL));
-    }
-
-    private boolean isValidUsername(String username) {
-      return !TextUtils.isEmpty(username);
-    }
-
-    private String getCode(Uri uri) {
-      return getQueryParameter(uri, "code");
-    }
-
-    private boolean isValidCode(String code) {
-      return !TextUtils.isEmpty(code);
-    }
-
-    private AccessTokenResult getAccessTokenResult(Context ctx, String code)
-        throws IOException {
-      return RedditApi.getAccessToken(ctx, code);
-    }
-
-    private boolean isValidAccessTokenResult(AccessTokenResult atr) {
-      return !TextUtils.isEmpty(atr.accessToken)
-          && !TextUtils.isEmpty(atr.refreshToken);
-    }
-
-    private String getQueryParameter(Uri uri, String key) {
-      try {
-        return uri.getQueryParameter(key);
-      } catch (UnsupportedOperationException e) {
-        Log.e(TAG, "error parsing callback url", e);
-        return null;
-      }
-    }
-
-    private boolean addAccount(
-        AccountManager am,
-        Account a,
-        AccessTokenResult atr) {
-      if (am.addAccountExplicitly(a, null /* pw */, null /* userdata */)) {
-        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN,
-            atr.accessToken);
-        am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN,
-            atr.refreshToken);
-        return true;
-      }
-      return false;
-    }
-
-    private boolean removeAccount(AccountManager am, Account a) {
-      // TODO(btmura): use new API to remove account when possible
-      // TODO(btmura): removed code duplication with AccountListFragment
-      try {
-        return am.removeAccount(a, null, null).getResult();
-      } catch (OperationCanceledException e) {
-        Log.e(TAG, "error removing account", e);
-        return false;
-      } catch (IOException e) {
-        Log.e(TAG, "error removing account", e);
-        return false;
-      } catch (AuthenticatorException e) {
-        Log.e(TAG, "error removing account", e);
-        return false;
-      }
-    }
-
-    private Bundle errorBundle(int resId, String... formatArgs) {
-      Bundle b = new Bundle(1);
-      b.putString(AccountManager.KEY_ERROR_MESSAGE,
-          getString(resId, (Object[]) formatArgs));
-      return b;
-    }
-
-    @Override
-    protected void onCancelled() {
-      hideProgress();
-    }
-
-    @Override
-    protected void onPostExecute(Bundle result) {
-      String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
-      if (error != null) {
-        MessageDialogFragment.showMessage(getFragmentManager(), error);
-        hideProgress();
-      } else if (listener != null) {
-        listener.onAccountAdded(result);
-      }
-    }
+  @Override
+  public void onLoaderReset(Loader loader) {
+    hideProgressBar();
   }
 }
