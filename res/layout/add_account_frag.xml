@@ -19,7 +19,7 @@
     android:layout_height="wrap_content" >
 
     <ProgressBar
-        android:id="@+id/progress"
+        android:id="@+id/progress_bar"
         style="@android:style/Widget.Holo.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/progress"
+        android:layout_below="@+id/progress_bar"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginBottom="@dimen/padding"

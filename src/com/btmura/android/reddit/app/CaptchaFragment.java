@@ -92,7 +92,7 @@ public class CaptchaFragment extends DialogFragment
         getDialog().setTitle(R.string.captcha_title);
         View v = inflater.inflate(R.layout.captcha, container, false);
 
-        progress = v.findViewById(R.id.progress);
+        progress = v.findViewById(R.id.progress_bar);
         errorStub = (ViewStub) v.findViewById(R.id.error_stub);
         captcha = (ImageView) v.findViewById(R.id.captcha);
 

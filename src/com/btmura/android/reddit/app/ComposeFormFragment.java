@@ -196,7 +196,7 @@ public class ComposeFormFragment extends Fragment implements
       Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.compose_form, container, false);
 
-    progressView = v.findViewById(R.id.progress);
+    progressView = v.findViewById(R.id.progress_bar);
     noAccountView = v.findViewById(R.id.no_account);
     accountView = v.findViewById(R.id.has_account);
 

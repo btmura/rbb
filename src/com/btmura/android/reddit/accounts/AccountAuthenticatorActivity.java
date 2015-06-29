@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.accounts;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -25,9 +23,8 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
-import com.btmura.android.reddit.content.Contexts;
+import com.btmura.android.reddit.app.LoginFragment;
 import com.btmura.android.reddit.content.ThemePrefs;
-import com.btmura.android.reddit.net.Urls;
 
 public class AccountAuthenticatorActivity
     extends SupportAccountAuthenticatorActivity
@@ -38,29 +35,16 @@ public class AccountAuthenticatorActivity
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setTheme(ThemePrefs.getDialogTheme(this));
+    setTheme(ThemePrefs.getTheme(this));
     setContentView(R.layout.account_authenticator);
 
     if (savedInstanceState == null) {
       if (!isOAuthCallback()) {
-        forwardToBrowserLogin();
+        setContainer(LoginFragment.newInstance());
       } else {
         setContainer(AddAccountFragment.newInstance(getOAuthCallbackUrl()));
       }
     }
-  }
-
-  private void forwardToBrowserLogin() {
-    StringBuilder state = new StringBuilder("rbb_")
-        .append(System.currentTimeMillis());
-    CharSequence url = Urls.authorize(this, state);
-
-    Intent intent = new Intent(Intent.ACTION_VIEW);
-    intent.setData(Uri.parse(url.toString()));
-    if (!Contexts.startActivity(this, intent)) {
-      // TODO(btmura): handle no browser case
-    }
-    finish();
   }
 
   @Override

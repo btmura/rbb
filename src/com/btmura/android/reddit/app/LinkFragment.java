@@ -64,7 +64,7 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
       Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.link, container, false);
     webView = (WebView) view.findViewById(R.id.link);
-    progress = (ProgressBar) view.findViewById(R.id.progress);
+    progress = (ProgressBar) view.findViewById(R.id.progress_bar);
     setupWebView(webView);
     return view;
   }

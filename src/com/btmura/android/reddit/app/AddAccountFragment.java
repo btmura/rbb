@@ -104,7 +104,7 @@ public class AddAccountFragment extends Fragment implements OnClickListener {
     username = (EditText) v.findViewById(R.id.username);
     username.setFilters(InputFilters.NO_SPACE_FILTERS);
 
-    progress = (ProgressBar) v.findViewById(R.id.progress);
+    progress = (ProgressBar) v.findViewById(R.id.progress_bar);
 
     cancelButton = (Button) v.findViewById(R.id.cancel);
     cancelButton.setOnClickListener(this);
