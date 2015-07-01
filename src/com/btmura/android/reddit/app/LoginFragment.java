@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -83,8 +84,15 @@ public class LoginFragment extends Fragment {
       CookieManager.getInstance().setCookie(".reddit.com", "reddit_session=");
     }
 
+    WebSettings settings = webView.getSettings();
+    settings.setBuiltInZoomControls(true);
+    settings.setDisplayZoomControls(false);
+    settings.setLoadWithOverviewMode(true);
+    settings.setSupportZoom(true);
+    settings.setUseWideViewPort(true);
+
     // Don't save usernames entered into the login forms.
-    webView.getSettings().setSaveFormData(false);
+    settings.setSaveFormData(false);
 
     webView.setWebViewClient(new WebViewClient() {
       @Override
