@@ -17,8 +17,8 @@
 package com.btmura.android.reddit.accounts;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
@@ -39,6 +39,7 @@ public class AccountAuthenticatorActivity
     super.onCreate(savedInstanceState);
     setTheme(ThemePrefs.getTheme(this));
     setContentView(R.layout.account_authenticator);
+    getActionBar().setDisplayHomeAsUpEnabled(true);
     if (savedInstanceState == null) {
       LoginFragment frag = LoginFragment.newInstance(newStateToken());
       FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -69,5 +70,21 @@ public class AccountAuthenticatorActivity
   @Override
   public void onAccountCancelled() {
     finish();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        return handleHome();
+
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
+
+  private boolean handleHome() {
+    finish();
+    return true;
   }
 }
