@@ -124,6 +124,7 @@ public class AddAccountFragment extends DialogFragment
   private void reset() {
     submittedUsername = null;
     hideProgressBar();
+    getLoaderManager().destroyLoader(0);
   }
 
   private void showProgressBar() {
