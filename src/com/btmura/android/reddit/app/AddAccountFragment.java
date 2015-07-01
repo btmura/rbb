@@ -40,15 +40,13 @@ public class AddAccountFragment extends DialogFragment
 
   private static final String ARG_OAUTH_CALLBACK_URL = "oauthCallbackUrl";
 
-  private static final String LOADER_ARG_USERNAME = "username";
-  private static final String LOADER_ARG_OAUTH_CALLBACK_URL =
-      "oauthCallbackUrl";
-
-  // TODO(btmura): add state variables to restore loader properly
+  private static final String STATE_SUBMITTED_USERNAME = "submittedUsername";
 
   private OnAccountAddedListener listener;
-  private EditText username;
-  private ProgressBar progress;
+  private String submittedUsername;
+
+  private EditText usernameText;
+  private ProgressBar progressBar;
   private Button addButton;
   private Button cancelButton;
 
@@ -59,7 +57,6 @@ public class AddAccountFragment extends DialogFragment
   }
 
   public static AddAccountFragment newInstance(String oauthCallbackUrl) {
-    // TODO(btmura): add precondition check for oauth url
     Bundle args = new Bundle(1);
     args.putString(ARG_OAUTH_CALLBACK_URL, oauthCallbackUrl);
 
@@ -77,6 +74,15 @@ public class AddAccountFragment extends DialogFragment
   }
 
   @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    if (savedInstanceState != null) {
+      submittedUsername =
+          savedInstanceState.getString(STATE_SUBMITTED_USERNAME);
+    }
+  }
+
+  @Override
   public View onCreateView(
       LayoutInflater inflater,
       ViewGroup container,
@@ -85,10 +91,10 @@ public class AddAccountFragment extends DialogFragment
 
     View v = inflater.inflate(R.layout.add_account_frag, container, false);
 
-    username = (EditText) v.findViewById(R.id.username);
-    username.setFilters(InputFilters.NO_SPACE_FILTERS);
+    usernameText = (EditText) v.findViewById(R.id.username);
+    usernameText.setFilters(InputFilters.NO_SPACE_FILTERS);
 
-    progress = (ProgressBar) v.findViewById(R.id.progress_bar);
+    progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
 
     cancelButton = (Button) v.findViewById(R.id.cancel);
     cancelButton.setOnClickListener(this);
@@ -96,21 +102,40 @@ public class AddAccountFragment extends DialogFragment
     addButton = (Button) v.findViewById(R.id.ok);
     addButton.setOnClickListener(this);
 
-    hideProgressBar();
-
     return v;
   }
 
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    if (!TextUtils.isEmpty(submittedUsername)) {
+      submit(submittedUsername);
+    } else {
+      reset();
+    }
+  }
+
+  private void submit(String username) {
+    submittedUsername = username;
+    showProgressBar();
+    getLoaderManager().initLoader(0, null, this);
+  }
+
+  private void reset() {
+    submittedUsername = null;
+    hideProgressBar();
+  }
+
   private void showProgressBar() {
-    progress.setVisibility(View.VISIBLE);
-    username.setEnabled(false);
+    progressBar.setVisibility(View.VISIBLE);
+    usernameText.setEnabled(false);
     cancelButton.setEnabled(false);
     addButton.setEnabled(false);
   }
 
   private void hideProgressBar() {
-    progress.setVisibility(View.INVISIBLE);
-    username.setEnabled(true);
+    progressBar.setVisibility(View.INVISIBLE);
+    usernameText.setEnabled(true);
     cancelButton.setEnabled(true);
     addButton.setEnabled(true);
   }
@@ -125,17 +150,13 @@ public class AddAccountFragment extends DialogFragment
   }
 
   private void handleAdd() {
-    if (TextUtils.isEmpty(username.getText())) {
-      username.setError(getString(R.string.error_blank_field));
+    if (TextUtils.isEmpty(usernameText.getText())) {
+      usernameText.setError(getString(R.string.error_blank_field));
       return;
     }
-    if (username.getError() == null && listener != null) {
+    if (usernameText.getError() == null) {
       // TODO(btmura): check for existing account
-      Bundle args = new Bundle(2);
-      args.putString(LOADER_ARG_USERNAME, username.getText().toString());
-      args.putString(LOADER_ARG_OAUTH_CALLBACK_URL,
-          getArguments().getString(ARG_OAUTH_CALLBACK_URL));
-      getLoaderManager().initLoader(0, args, this);
+      submit(usernameText.getText().toString());
     }
   }
 
@@ -147,11 +168,8 @@ public class AddAccountFragment extends DialogFragment
 
   @Override
   public Loader<Bundle> onCreateLoader(int i, Bundle args) {
-    showProgressBar();
-    return new AddAccountLoader(
-        getActivity(),
-        args.getString(LOADER_ARG_USERNAME),
-        args.getString(LOADER_ARG_OAUTH_CALLBACK_URL));
+    return new AddAccountLoader(getActivity(), submittedUsername,
+        getOAuthCallbackUrl());
   }
 
   @Override
@@ -159,14 +177,24 @@ public class AddAccountFragment extends DialogFragment
     String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
     if (error != null) {
       MessageDialogFragment.showMessage(getFragmentManager(), error);
-      hideProgressBar();
+      reset();
     } else if (listener != null) {
       listener.onAccountAdded(result);
     }
   }
 
   @Override
-  public void onLoaderReset(Loader loader) {
-    hideProgressBar();
+  public void onLoaderReset(Loader<Bundle> loader) {
+    reset();
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putString(STATE_SUBMITTED_USERNAME, submittedUsername);
+  }
+
+  private String getOAuthCallbackUrl() {
+    return getArguments().getString(ARG_OAUTH_CALLBACK_URL);
   }
 }
