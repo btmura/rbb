@@ -137,7 +137,6 @@ public class LoginFragment extends Fragment {
 
     String error = uri.getQueryParameter("error");
     if (!TextUtils.isEmpty(error)) {
-      // Only error should be permission denied.
       if (listener != null) {
         listener.onLoginCancelled();
       }

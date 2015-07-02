@@ -18,6 +18,8 @@ package com.btmura.android.reddit.app;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
@@ -40,15 +42,18 @@ public class AddAccountFragment extends DialogFragment
 
   private static final String ARG_CODE = "code";
 
-  private static final String STATE_SUBMITTED_USERNAME = "submittedUsername";
+  private static final String STATE_SUBMIT_USERNAME = "submitUsername";
+  private static final String STATE_SUBMIT_ERROR = "submitError";
 
   private OnAddAccountListener listener;
-  private String submittedUsername;
+  private String submitUsername;
+  private String submitError;
 
   private EditText usernameText;
   private ProgressBar progressBar;
   private Button addButton;
   private Button cancelButton;
+  private AlertDialog errorDialog;
 
   public interface OnAddAccountListener {
     void onAddAccountSuccess(Bundle result);
@@ -77,8 +82,8 @@ public class AddAccountFragment extends DialogFragment
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     if (savedInstanceState != null) {
-      submittedUsername =
-          savedInstanceState.getString(STATE_SUBMITTED_USERNAME);
+      submitUsername = savedInstanceState.getString(STATE_SUBMIT_USERNAME);
+      submitError = savedInstanceState.getString(STATE_SUBMIT_ERROR);
     }
   }
 
@@ -108,23 +113,23 @@ public class AddAccountFragment extends DialogFragment
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    if (!TextUtils.isEmpty(submittedUsername)) {
-      submit(submittedUsername);
-    } else {
-      reset();
+    refresh();
+    if (!TextUtils.isEmpty(submitUsername)) {
+      getLoaderManager().initLoader(0, null, this);
     }
   }
 
-  private void submit(String username) {
-    submittedUsername = username;
-    showProgressBar();
-    getLoaderManager().initLoader(0, null, this);
-  }
-
-  private void reset() {
-    submittedUsername = null;
-    hideProgressBar();
-    getLoaderManager().destroyLoader(0);
+  private void refresh() {
+    if (!TextUtils.isEmpty(submitUsername)) {
+      showProgressBar();
+    } else {
+      hideProgressBar();
+    }
+    if (!TextUtils.isEmpty(submitError)) {
+      showErrorDialog();
+    } else {
+      hideErrorDialog();
+    }
   }
 
   private void showProgressBar() {
@@ -139,6 +144,48 @@ public class AddAccountFragment extends DialogFragment
     usernameText.setEnabled(true);
     cancelButton.setEnabled(true);
     addButton.setEnabled(true);
+  }
+
+  private void showErrorDialog() {
+    if (errorDialog == null) {
+      errorDialog = new AlertDialog.Builder(getActivity())
+          .setPositiveButton(android.R.string.ok,
+              new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                  reset();
+                }
+              })
+          .setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              reset();
+            }
+          })
+          .create();
+    }
+    errorDialog.setMessage(submitError);
+    errorDialog.show();
+  }
+
+  private void hideErrorDialog() {
+    if (errorDialog != null) {
+      errorDialog.hide();
+    }
+  }
+
+  private void submit(String username) {
+    submitUsername = username;
+    submitError = null;
+    refresh();
+    getLoaderManager().initLoader(0, null, this);
+  }
+
+  private void reset() {
+    submitUsername = null;
+    submitError = null;
+    refresh();
+    getLoaderManager().destroyLoader(0);
   }
 
   @Override
@@ -169,29 +216,28 @@ public class AddAccountFragment extends DialogFragment
 
   @Override
   public Loader<Bundle> onCreateLoader(int i, Bundle args) {
-    return new AddAccountLoader(getActivity(), submittedUsername, getCode());
+    return new AddAccountLoader(getActivity(), submitUsername, getCode());
   }
 
   @Override
   public void onLoadFinished(Loader<Bundle> loader, Bundle result) {
-    String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
-    if (error != null) {
-      MessageDialogFragment.showMessage(getFragmentManager(), error);
-      reset();
-    } else if (listener != null) {
+    submitError = result.getString(AccountManager.KEY_ERROR_MESSAGE);
+    refresh();
+    if (TextUtils.isEmpty(submitError) && listener != null) {
       listener.onAddAccountSuccess(result);
     }
   }
 
   @Override
   public void onLoaderReset(Loader<Bundle> loader) {
-    reset();
+    refresh();
   }
 
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putString(STATE_SUBMITTED_USERNAME, submittedUsername);
+    outState.putString(STATE_SUBMIT_USERNAME, submitUsername);
+    outState.putString(STATE_SUBMIT_ERROR, submitError);
   }
 
   private String getCode() {

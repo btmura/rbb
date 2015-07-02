@@ -81,6 +81,7 @@
         <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser"/>
+
         <activity
             android:name=".app.MarkdownTableActivity"
             android:theme="@style/Theme.Transition.DialogWhenLarge">

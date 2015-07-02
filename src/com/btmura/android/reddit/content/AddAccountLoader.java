@@ -22,7 +22,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -67,26 +66,20 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
       }
 
       Context ctx = getContext();
-      AccessTokenResult atr = getAccessTokenResult(ctx, code);
-      if (DEBUG) {
-        Log.d(TAG, "atr: " + atr);
-      }
-      if (!isValidAccessTokenResult(atr)) {
-        // TODO(btmura): show error message
-        return Bundle.EMPTY;
+      AccessTokenResult atr = RedditApi.getAccessToken(ctx, code);
+      if (!hasRequiredTokens(atr)) {
+        return errorBundle(R.string.error_bad_access_token);
       }
 
       Account a = AccountUtils.getAccount(ctx, username);
       AccountManager am = AccountManager.get(ctx);
       if (!addAccount(am, a, atr)) {
-        // TODO(btmura): show error message
-        return Bundle.EMPTY;
+        return errorBundle(R.string.error_adding_account);
       }
 
       if (!AccountProvider.initializeAccount(ctx, username)) {
-        // TODO(btmura): show error message
         removeAccount(am, a);
-        return Bundle.EMPTY;
+        return errorBundle(R.string.error_initializing_account);
       }
 
       // Set this account as the last account to make the UI switch to the
@@ -107,29 +100,14 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
       b.putString(AccountManager.KEY_ACCOUNT_TYPE, a.type);
       return b;
     } catch (IOException e) {
-      // TODO(btmura): show error message to user
-      Log.e(TAG, "error getting access token", e);
-      return errorBundle(R.string.login_error, e.getMessage());
+      Log.e(TAG, e.getMessage(), e);
+      return errorBundle(R.string.error_io);
     }
   }
 
-  private AccessTokenResult getAccessTokenResult(Context ctx, String code)
-      throws IOException {
-    return RedditApi.getAccessToken(ctx, code);
-  }
-
-  private boolean isValidAccessTokenResult(AccessTokenResult atr) {
+  private boolean hasRequiredTokens(AccessTokenResult atr) {
     return !TextUtils.isEmpty(atr.accessToken)
         && !TextUtils.isEmpty(atr.refreshToken);
-  }
-
-  private String getQueryParameter(Uri uri, String key) {
-    try {
-      return uri.getQueryParameter(key);
-    } catch (UnsupportedOperationException e) {
-      Log.e(TAG, "error parsing callback url", e);
-      return null;
-    }
   }
 
   private boolean addAccount(
@@ -152,21 +130,21 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
     try {
       return am.removeAccount(a, null, null).getResult();
     } catch (OperationCanceledException e) {
-      Log.e(TAG, "error removing account", e);
+      Log.e(TAG, e.getMessage(), e);
       return false;
     } catch (IOException e) {
-      Log.e(TAG, "error removing account", e);
+      Log.e(TAG, e.getMessage(), e);
       return false;
     } catch (AuthenticatorException e) {
-      Log.e(TAG, "error removing account", e);
+      Log.e(TAG, e.getMessage(), e);
       return false;
     }
   }
 
-  private Bundle errorBundle(int resId, String... formatArgs) {
+  private Bundle errorBundle(int resId) {
     Bundle b = new Bundle(1);
     b.putString(AccountManager.KEY_ERROR_MESSAGE,
-        getContext().getString(resId, (Object[]) formatArgs));
+        getContext().getString(resId));
     return b;
   }
 }
