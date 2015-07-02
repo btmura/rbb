@@ -60,11 +60,6 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
   @Override
   public Bundle loadInBackground() {
     try {
-      // TODO(btmura): remove this once dialog is properly restored
-      if (DEBUG) {
-        SystemClock.sleep(10 * 1000);
-      }
-
       Context ctx = getContext();
       AccessTokenResult atr = RedditApi.getAccessToken(ctx, code);
       if (!hasRequiredTokens(atr)) {
