@@ -40,6 +40,9 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
   public static final String AUTH_TOKEN_ACCESS_TOKEN = "accessToken";
   public static final String AUTH_TOKEN_REFRESH_TOKEN = "refreshToken";
 
+  public static final String USER_DATA_EXPIRES_IN = "expiresIn";
+  public static final String USER_DATA_SCOPE = "scope";
+
   private final Context context;
 
   public static String getAccountType(Context context) {
