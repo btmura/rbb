@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
@@ -47,150 +45,165 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountResultAdapter;
 
-public class AccountListFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
-        MultiChoiceModeListener {
+import java.io.IOException;
 
-    public static final String TAG = "AccountListFragment";
+public class AccountListFragment extends ListFragment
+    implements LoaderCallbacks<AccountResult>,
+    MultiChoiceModeListener {
 
-    public interface OnAccountEventListener {
-        void onAccountSelected(String accountName);
+  public static final String TAG = "AccountListFragment";
 
-        void onAccountsRemoved(String[] accountNames);
+  public interface OnAccountEventListener {
+    void onAccountSelected(String accountName);
+
+    void onAccountsRemoved(String[] accountNames);
+  }
+
+  private OnAccountEventListener listener;
+  private AccountResultAdapter adapter;
+
+  public static AccountListFragment newInstance() {
+    return new AccountListFragment();
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (activity instanceof OnAccountEventListener) {
+      listener = (OnAccountEventListener) activity;
     }
+  }
 
-    private OnAccountEventListener listener;
-    private AccountResultAdapter adapter;
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    adapter = AccountResultAdapter.newAccountListInstance(getActivity());
+  }
 
-    public static AccountListFragment newInstance() {
-        return new AccountListFragment();
+  @Override
+  public View onCreateView(
+      LayoutInflater inflater, ViewGroup container,
+      Bundle savedInstanceState) {
+    View v = super.onCreateView(inflater, container, savedInstanceState);
+    ListView l = (ListView) v.findViewById(android.R.id.list);
+    l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+    l.setMultiChoiceModeListener(this);
+    return v;
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    setListAdapter(adapter);
+    setListShown(false);
+    getLoaderManager().initLoader(0, null, this);
+  }
+
+  @Override
+  public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+    return new AccountLoader(getActivity(), false, true);
+  }
+
+  @Override
+  public void onLoadFinished(
+      Loader<AccountResult> loader,
+      AccountResult result) {
+    adapter.setAccountResult(result);
+    setEmptyText(getString(result != null
+        ? R.string.empty_accounts
+        : R.string.error));
+    setListShown(true);
+  }
+
+  @Override
+  public void onLoaderReset(Loader<AccountResult> loader) {
+  }
+
+  @Override
+  public void onListItemClick(ListView l, View v, int position, long id) {
+    if (listener != null) {
+      listener.onAccountSelected(adapter.getItem(position).getAccountName());
     }
+  }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnAccountEventListener) {
-            listener = (OnAccountEventListener) activity;
-        }
-    }
+  @Override
+  public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+    mode.getMenuInflater().inflate(R.menu.account_action_menu, menu);
+    return true;
+  }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        adapter = AccountResultAdapter.newAccountListInstance(getActivity());
-    }
+  @Override
+  public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+    int count = getListView().getCheckedItemCount();
+    mode.setTitle(getResources()
+        .getQuantityString(R.plurals.accounts, count, count));
+    return true;
+  }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        ListView l = (ListView) v.findViewById(android.R.id.list);
-        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        l.setMultiChoiceModeListener(this);
-        return v;
-    }
+  @Override
+  public void onItemCheckedStateChanged(
+      ActionMode mode,
+      int position,
+      long id,
+      boolean checked) {
+    mode.invalidate();
+  }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setListAdapter(adapter);
-        setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(getActivity(), false, true);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.setAccountResult(result);
-        setEmptyText(getString(result != null ? R.string.empty_accounts : R.string.error));
-        setListShown(true);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        if (listener != null) {
-            listener.onAccountSelected(adapter.getItem(position).getAccountName());
-        }
-    }
-
-    @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        mode.getMenuInflater().inflate(R.menu.account_action_menu, menu);
+  @Override
+  public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.menu_delete:
+        handleDelete(mode);
         return true;
+
+      default:
+        return false;
     }
+  }
 
-    @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        int count = getListView().getCheckedItemCount();
-        mode.setTitle(getResources().getQuantityString(R.plurals.accounts, count, count));
-        return true;
+  private void handleDelete(ActionMode mode) {
+    SparseBooleanArray checked = getListView().getCheckedItemPositions();
+    int count = adapter.getCount();
+    for (int i = 0; i < count; i++) {
+      if (checked.get(i)) {
+        removeAccount(adapter.getItem(i).getAccountName());
+      }
     }
+    mode.finish();
+  }
 
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        mode.invalidate();
-    }
-
-    @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_delete:
-                handleDelete(mode);
-                return true;
-
-            default:
-                return false;
+  private void removeAccount(String accountName) {
+    AccountManager manager = AccountManager.get(getActivity());
+    String accountType = AccountAuthenticator.getAccountType(getActivity());
+    Account account = new Account(accountName, accountType);
+    final AccountManagerFuture<Boolean> result =
+        manager.removeAccount(account, null, null);
+    new AsyncTask<Void, Void, Boolean>() {
+      @Override
+      protected Boolean doInBackground(Void... params) {
+        try {
+          return result.getResult();
+        } catch (OperationCanceledException e) {
+          Log.e(TAG, "handleRemoveAccount", e);
+        } catch (AuthenticatorException e) {
+          Log.e(TAG, "handleRemoveAccount", e);
+        } catch (IOException e) {
+          Log.e(TAG, "handleRemoveAccount", e);
         }
-    }
+        return false;
+      }
 
-    private void handleDelete(ActionMode mode) {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            if (checked.get(i)) {
-                removeAccount(adapter.getItem(i).getAccountName());
-            }
+      @Override
+      protected void onPostExecute(Boolean result) {
+        if (!result) {
+          Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT)
+              .show();
         }
-        mode.finish();
-    }
+      }
+    }.execute();
+  }
 
-    private void removeAccount(String accountName) {
-        AccountManager manager = AccountManager.get(getActivity());
-        String accountType = AccountAuthenticator.getAccountType(getActivity());
-        Account account = new Account(accountName, accountType);
-        final AccountManagerFuture<Boolean> result = manager.removeAccount(account, null, null);
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                try {
-                    return result.getResult();
-                } catch (OperationCanceledException e) {
-                    Log.e(TAG, "handleRemoveAccount", e);
-                } catch (AuthenticatorException e) {
-                    Log.e(TAG, "handleRemoveAccount", e);
-                } catch (IOException e) {
-                    Log.e(TAG, "handleRemoveAccount", e);
-                }
-                return false;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-                if (!result) {
-                    Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }.execute();
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-    }
+  @Override
+  public void onDestroyActionMode(ActionMode mode) {
+  }
 }
