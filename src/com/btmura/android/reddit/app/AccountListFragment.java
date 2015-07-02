@@ -22,6 +22,8 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -40,7 +42,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountResultAdapter;
@@ -51,15 +53,13 @@ public class AccountListFragment extends ListFragment
     implements LoaderCallbacks<AccountResult>,
     MultiChoiceModeListener {
 
-  public static final String TAG = "AccountListFragment";
+  private static final String TAG = "AccountListFragment";
 
-  public interface OnAccountEventListener {
+  public interface OnAccountSelectedListener {
     void onAccountSelected(String accountName);
-
-    void onAccountsRemoved(String[] accountNames);
   }
 
-  private OnAccountEventListener listener;
+  private OnAccountSelectedListener listener;
   private AccountResultAdapter adapter;
 
   public static AccountListFragment newInstance() {
@@ -69,8 +69,8 @@ public class AccountListFragment extends ListFragment
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-    if (activity instanceof OnAccountEventListener) {
-      listener = (OnAccountEventListener) activity;
+    if (activity instanceof OnAccountSelectedListener) {
+      listener = (OnAccountSelectedListener) activity;
     }
   }
 
@@ -163,42 +163,51 @@ public class AccountListFragment extends ListFragment
 
   private void handleDelete(ActionMode mode) {
     SparseBooleanArray checked = getListView().getCheckedItemPositions();
+    int checkedCount = getListView().getCheckedItemCount();
+    String[] accountNames = new String[checkedCount];
     int count = adapter.getCount();
+    int j = 0;
     for (int i = 0; i < count; i++) {
       if (checked.get(i)) {
-        removeAccount(adapter.getItem(i).getAccountName());
+        accountNames[j++] = adapter.getItem(i).getAccountName();
       }
     }
+    removeAccounts(accountNames);
     mode.finish();
   }
 
-  private void removeAccount(String accountName) {
-    AccountManager manager = AccountManager.get(getActivity());
-    String accountType = AccountAuthenticator.getAccountType(getActivity());
-    Account account = new Account(accountName, accountType);
-    final AccountManagerFuture<Boolean> result =
-        manager.removeAccount(account, null, null);
-    new AsyncTask<Void, Void, Boolean>() {
+  private void removeAccounts(final String[] accountNames) {
+    final Context ctx = getActivity().getApplicationContext();
+    new AsyncTask<Void, Void, Integer>() {
       @Override
-      protected Boolean doInBackground(Void... params) {
-        try {
-          return result.getResult();
-        } catch (OperationCanceledException e) {
-          Log.e(TAG, "handleRemoveAccount", e);
-        } catch (AuthenticatorException e) {
-          Log.e(TAG, "handleRemoveAccount", e);
-        } catch (IOException e) {
-          Log.e(TAG, "handleRemoveAccount", e);
+      protected Integer doInBackground(Void... voidRay) {
+        AccountManager manager = AccountManager.get(ctx);
+        int removed = 0;
+        int length = accountNames.length;
+        for (int i = 0; i < length; i++) {
+          Account account = AccountUtils.getAccount(ctx, accountNames[i]);
+          AccountManagerFuture<Boolean> result =
+              manager.removeAccount(account, null, null);
+          try {
+            if (result.getResult()) {
+              removed++;
+            }
+          } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+          } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+          } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+          }
         }
-        return false;
+        return removed;
       }
 
       @Override
-      protected void onPostExecute(Boolean result) {
-        if (!result) {
-          Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT)
-              .show();
-        }
+      protected void onPostExecute(Integer removed) {
+        String text = getResources()
+            .getQuantityString(R.plurals.accounts_removed, removed, removed);
+        Toast.makeText(ctx, text, Toast.LENGTH_SHORT).show();
       }
     }.execute();
   }
