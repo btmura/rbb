@@ -38,11 +38,11 @@ import com.btmura.android.reddit.text.InputFilters;
 public class AddAccountFragment extends DialogFragment
     implements OnClickListener, LoaderManager.LoaderCallbacks<Bundle> {
 
-  private static final String ARG_OAUTH_CALLBACK_URL = "oauthCallbackUrl";
+  private static final String ARG_CODE = "code";
 
   private static final String STATE_SUBMITTED_USERNAME = "submittedUsername";
 
-  private OnAccountAddedListener listener;
+  private OnAddAccountListener listener;
   private String submittedUsername;
 
   private EditText usernameText;
@@ -50,15 +50,15 @@ public class AddAccountFragment extends DialogFragment
   private Button addButton;
   private Button cancelButton;
 
-  public interface OnAccountAddedListener {
-    void onAccountAdded(Bundle result);
+  public interface OnAddAccountListener {
+    void onAddAccountSuccess(Bundle result);
 
-    void onAccountCancelled();
+    void onAddAccountCancelled();
   }
 
-  public static AddAccountFragment newInstance(String oauthCallbackUrl) {
+  public static AddAccountFragment newInstance(String code) {
     Bundle args = new Bundle(1);
-    args.putString(ARG_OAUTH_CALLBACK_URL, oauthCallbackUrl);
+    args.putString(ARG_CODE, code);
 
     AddAccountFragment frag = new AddAccountFragment();
     frag.setArguments(args);
@@ -68,8 +68,8 @@ public class AddAccountFragment extends DialogFragment
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-    if (activity instanceof OnAccountAddedListener) {
-      listener = (OnAccountAddedListener) activity;
+    if (activity instanceof OnAddAccountListener) {
+      listener = (OnAddAccountListener) activity;
     }
   }
 
@@ -156,21 +156,19 @@ public class AddAccountFragment extends DialogFragment
       return;
     }
     if (usernameText.getError() == null) {
-      // TODO(btmura): check for existing account
       submit(usernameText.getText().toString());
     }
   }
 
   private void handleCancel() {
     if (listener != null) {
-      listener.onAccountCancelled();
+      listener.onAddAccountCancelled();
     }
   }
 
   @Override
   public Loader<Bundle> onCreateLoader(int i, Bundle args) {
-    return new AddAccountLoader(getActivity(), submittedUsername,
-        getOAuthCallbackUrl());
+    return new AddAccountLoader(getActivity(), submittedUsername, getCode());
   }
 
   @Override
@@ -180,7 +178,7 @@ public class AddAccountFragment extends DialogFragment
       MessageDialogFragment.showMessage(getFragmentManager(), error);
       reset();
     } else if (listener != null) {
-      listener.onAccountAdded(result);
+      listener.onAddAccountSuccess(result);
     }
   }
 
@@ -195,7 +193,7 @@ public class AddAccountFragment extends DialogFragment
     outState.putString(STATE_SUBMITTED_USERNAME, submittedUsername);
   }
 
-  private String getOAuthCallbackUrl() {
-    return getArguments().getString(ARG_OAUTH_CALLBACK_URL);
+  private String getCode() {
+    return getArguments().getString(ARG_CODE);
   }
 }

@@ -50,15 +50,12 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
   private static final boolean DEBUG = BuildConfig.DEBUG;
 
   private final String username;
-  private final String oauthCallbackUrl;
+  private final String code;
 
-  public AddAccountLoader(
-      Context context,
-      String username,
-      String oauthCallbackUrl) {
+  public AddAccountLoader(Context context, String username, String code) {
     super(context.getApplicationContext());
     this.username = username;
-    this.oauthCallbackUrl = oauthCallbackUrl;
+    this.code = code;
   }
 
   @Override
@@ -67,24 +64,6 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
       // TODO(btmura): remove this once dialog is properly restored
       if (DEBUG) {
         SystemClock.sleep(10 * 1000);
-      }
-
-      Uri uri = Uri.parse(oauthCallbackUrl);
-      if (DEBUG) {
-        Log.d(TAG, "uri: " + uri + " username: " + username);
-      }
-      if (!isValidUsername(username)) {
-        // TODO(btmura): show error message
-        return Bundle.EMPTY;
-      }
-
-      String code = getCode(uri);
-      if (DEBUG) {
-        Log.d(TAG, "code: " + code);
-      }
-      if (!isValidCode(code)) {
-        // TODO(btmura): show error message
-        return Bundle.EMPTY;
       }
 
       Context ctx = getContext();
@@ -132,18 +111,6 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
       Log.e(TAG, "error getting access token", e);
       return errorBundle(R.string.login_error, e.getMessage());
     }
-  }
-
-  private boolean isValidUsername(String username) {
-    return !TextUtils.isEmpty(username);
-  }
-
-  private String getCode(Uri uri) {
-    return getQueryParameter(uri, "code");
-  }
-
-  private boolean isValidCode(String code) {
-    return !TextUtils.isEmpty(code);
   }
 
   private AccessTokenResult getAccessTokenResult(Context ctx, String code)

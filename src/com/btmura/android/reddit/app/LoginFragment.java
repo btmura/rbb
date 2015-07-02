@@ -18,9 +18,10 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,19 +41,21 @@ import com.btmura.android.reddit.net.Urls;
  */
 public class LoginFragment extends Fragment {
 
-  private static final String ARG_STATE_TOKEN = "stateToken";
+  private static final String ARG_EXPECTED_STATE_TOKEN = "expectedStateToken";
 
   private OnLoginListener listener;
   private WebView webView;
   private ProgressBar progressBar;
 
   public interface OnLoginListener {
-    void onLogin(String oauthCallbackUrl);
+    void onLoginSuccess(String code);
+
+    void onLoginCancelled();
   }
 
-  public static LoginFragment newInstance(CharSequence stateToken) {
+  public static LoginFragment newInstance(CharSequence expectedStateToken) {
     Bundle args = new Bundle(1);
-    args.putCharSequence(ARG_STATE_TOKEN, stateToken);
+    args.putCharSequence(ARG_EXPECTED_STATE_TOKEN, expectedStateToken);
     LoginFragment frag = new LoginFragment();
     frag.setArguments(args);
     return frag;
@@ -113,13 +116,9 @@ public class LoginFragment extends Fragment {
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
         // WebView will show an unrecognized scheme error unless we intercept
         // the OAuth callback URL and fire off an intent instead.
-        if (url != null && url.startsWith(Urls.OAUTH_REDIRECT_URL)) {
-          if (listener != null) {
-            listener.onLogin(url);
-          }
-          return true;
-        }
-        return false;
+        return url != null
+            && url.startsWith(Urls.OAUTH_REDIRECT_URL)
+            && handleOAuthRedirectUrl(url);
       }
     });
 
@@ -131,6 +130,31 @@ public class LoginFragment extends Fragment {
         }
       }
     });
+  }
+
+  boolean handleOAuthRedirectUrl(String url) {
+    Uri uri = Uri.parse(url);
+
+    String error = uri.getQueryParameter("error");
+    if (!TextUtils.isEmpty(error)) {
+      // Only error should be permission denied.
+      if (listener != null) {
+        listener.onLoginCancelled();
+      }
+      return true;
+    }
+
+    String state = uri.getQueryParameter("state");
+    String code = uri.getQueryParameter("code");
+    if (TextUtils.equals(state, getExpectedStateToken())
+        && !TextUtils.isEmpty(code)) {
+      if (listener != null) {
+        listener.onLoginSuccess(code);
+      }
+      return true;
+    }
+
+    return false;
   }
 
   @Override
@@ -145,8 +169,7 @@ public class LoginFragment extends Fragment {
   }
 
   private void loadLoginUrl() {
-    CharSequence stateToken = getArguments().getCharSequence(ARG_STATE_TOKEN);
-    CharSequence url = Urls.authorize(getActivity(), stateToken);
+    CharSequence url = Urls.authorize(getActivity(), getExpectedStateToken());
     webView.loadUrl(url.toString());
   }
 
@@ -172,5 +195,9 @@ public class LoginFragment extends Fragment {
   public void onDetach() {
     webView.destroy();
     super.onDetach();
+  }
+
+  private CharSequence getExpectedStateToken() {
+    return getArguments().getCharSequence(ARG_EXPECTED_STATE_TOKEN);
   }
 }

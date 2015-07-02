@@ -28,7 +28,7 @@ import com.btmura.android.reddit.content.ThemePrefs;
 public class AccountAuthenticatorActivity
     extends SupportAccountAuthenticatorActivity
     implements LoginFragment.OnLoginListener,
-    AddAccountFragment.OnAccountAddedListener {
+    AddAccountFragment.OnAddAccountListener {
 
   private static final String TAG_ADD_ACCOUNT = "AddAccount";
 
@@ -53,22 +53,25 @@ public class AccountAuthenticatorActivity
   }
 
   @Override
-  public void onLogin(String oauthCallbackUrl) {
-    // TODO(btmura): compare state tokens
+  public void onLoginSuccess(String code) {
     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    AddAccountFragment.newInstance(oauthCallbackUrl)
-        .show(ft, TAG_ADD_ACCOUNT);
+    AddAccountFragment.newInstance(code).show(ft, TAG_ADD_ACCOUNT);
   }
 
   @Override
-  public void onAccountAdded(Bundle result) {
+  public void onLoginCancelled() {
+    finish();
+  }
+
+  @Override
+  public void onAddAccountSuccess(Bundle result) {
     setAccountAuthenticatorResult(result);
     setResult(RESULT_OK);
     finish();
   }
 
   @Override
-  public void onAccountCancelled() {
+  public void onAddAccountCancelled() {
     finish();
   }
 
