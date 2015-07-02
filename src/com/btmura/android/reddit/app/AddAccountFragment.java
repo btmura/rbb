@@ -50,7 +50,7 @@ public class AddAccountFragment extends DialogFragment
   private String submittedAccountName;
   private String submitError;
 
-  private EditText usernameText;
+  private EditText accountNameText;
   private ProgressBar progressBar;
   private Button addButton;
   private Button cancelButton;
@@ -97,17 +97,17 @@ public class AddAccountFragment extends DialogFragment
       LayoutInflater inflater,
       ViewGroup container,
       Bundle savedInstanceState) {
-    getDialog().setTitle(R.string.add_account_fragment_title);
+    getDialog().setTitle(R.string.title_add_account);
 
     View v = inflater.inflate(R.layout.add_account_frag, container, false);
 
-    usernameText = (EditText) v.findViewById(R.id.username);
-    usernameText.setFilters(InputFilters.NO_SPACE_FILTERS);
+    accountNameText = (EditText) v.findViewById(R.id.account_name_text);
+    accountNameText.setFilters(InputFilters.NO_SPACE_FILTERS);
 
     // Don't allow editing if re-adding an existing account.
     if (hasFixedAccountName()) {
-      usernameText.setText(getFixedAccountName());
-      usernameText.setEnabled(false);
+      accountNameText.setText(getFixedAccountName());
+      accountNameText.setEnabled(false);
     }
 
     progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
@@ -145,14 +145,14 @@ public class AddAccountFragment extends DialogFragment
 
   private void showProgressBar() {
     progressBar.setVisibility(View.VISIBLE);
-    usernameText.setEnabled(false);
+    accountNameText.setEnabled(false);
     cancelButton.setEnabled(false);
     addButton.setEnabled(false);
   }
 
   private void hideProgressBar() {
     progressBar.setVisibility(View.INVISIBLE);
-    usernameText.setEnabled(!hasFixedAccountName());
+    accountNameText.setEnabled(!hasFixedAccountName());
     cancelButton.setEnabled(true);
     addButton.setEnabled(true);
   }
@@ -209,12 +209,12 @@ public class AddAccountFragment extends DialogFragment
   }
 
   private void handleAdd() {
-    if (TextUtils.isEmpty(usernameText.getText())) {
-      usernameText.setError(getString(R.string.error_blank_field));
+    if (TextUtils.isEmpty(accountNameText.getText())) {
+      accountNameText.setError(getString(R.string.error_blank_field));
       return;
     }
-    if (usernameText.getError() == null) {
-      submit(usernameText.getText().toString());
+    if (accountNameText.getError() == null) {
+      submit(accountNameText.getText().toString());
     }
   }
 

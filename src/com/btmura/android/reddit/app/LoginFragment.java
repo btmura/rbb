@@ -74,7 +74,7 @@ public class LoginFragment extends Fragment {
       LayoutInflater inflater,
       ViewGroup container,
       Bundle savedInstanceState) {
-    View v = inflater.inflate(R.layout.login_fragment, container, false);
+    View v = inflater.inflate(R.layout.login_frag, container, false);
     webView = (WebView) v.findViewById(R.id.web_view);
     progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
     setupWebView();
@@ -159,7 +159,7 @@ public class LoginFragment extends Fragment {
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    getActivity().setTitle(R.string.login_fragment_title);
+    getActivity().setTitle(R.string.title_login);
     if (savedInstanceState == null) {
       loadLoginUrl();
     } else {

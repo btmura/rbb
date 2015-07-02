@@ -15,12 +15,8 @@
      limitations under the License.
 -->
 <resources>
-
-
-
     <string name="account_app_storage">App storage</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
-    <string name="add_account_fragment_title">Add Account</string>
     <string name="add_account">Add account</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="add_subreddits">Add subreddits</string>
@@ -97,7 +93,6 @@
     <string name="karma_count">%1$,d</string>
     <string name="label_accounts">Accounts</string>
     <string name="loading">Loading…</string>
-    <string name="login_fragment_title">Login</string>
     <string name="login_error">There was a problem: %1$s</string>
     <string name="login_importing_error">There was a problem importing your subreddits…</string>
     <string name="menu_accounts">Accounts</string>
@@ -150,6 +145,7 @@
     <string name="tab_posts">Posts</string>
     <string name="tab_related">Related</string>
     <string name="tab_subreddits">Subreddits</string>
+    <string name="title_add_account">Add Account</string>
+    <string name="title_login">Login</string>
     <string name="view_table">View table</string>
-
 </resources>

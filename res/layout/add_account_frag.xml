@@ -28,7 +28,7 @@
         android:visibility="invisible" />
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/account_name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/progress_bar"
@@ -44,7 +44,7 @@
         android:id="@+id/ok_button_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/username"
+        android:layout_below="@+id/account_name_text"
         layout="@layout/ok_button_bar" />
 
 </RelativeLayout>
