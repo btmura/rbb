@@ -143,12 +143,13 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
   private Bundle createIntentResult(
       AccountAuthenticatorResponse response,
-      String login) {
+      String accountName) {
     Intent intent = new Intent(context, AccountAuthenticatorActivity.class);
     intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE,
         response);
-    if (!TextUtils.isEmpty(login)) {
-      intent.putExtra(AccountAuthenticatorActivity.EXTRA_USERNAME, login);
+    if (!TextUtils.isEmpty(accountName)) {
+      intent.putExtra(AccountAuthenticatorActivity.EXTRA_ACCOUNT_NAME,
+          accountName);
     }
 
     Bundle result = new Bundle(1);

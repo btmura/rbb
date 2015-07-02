@@ -40,13 +40,14 @@ import com.btmura.android.reddit.text.InputFilters;
 public class AddAccountFragment extends DialogFragment
     implements OnClickListener, LoaderManager.LoaderCallbacks<Bundle> {
 
-  private static final String ARG_CODE = "code";
+  private static final String ARG_FIXED_ACCOUNT_NAME = "fan";
+  private static final String ARG_CODE = "c";
 
-  private static final String STATE_SUBMIT_USERNAME = "submitUsername";
-  private static final String STATE_SUBMIT_ERROR = "submitError";
+  private static final String STATE_SUBMITTED_ACCOUNT_NAME = "san";
+  private static final String STATE_SUBMIT_ERROR = "se";
 
   private OnAddAccountListener listener;
-  private String submitUsername;
+  private String submittedAccountName;
   private String submitError;
 
   private EditText usernameText;
@@ -61,8 +62,11 @@ public class AddAccountFragment extends DialogFragment
     void onAddAccountCancelled();
   }
 
-  public static AddAccountFragment newInstance(String code) {
-    Bundle args = new Bundle(1);
+  public static AddAccountFragment newInstance(
+      String fixedAccountName,
+      String code) {
+    Bundle args = new Bundle(2);
+    args.putString(ARG_FIXED_ACCOUNT_NAME, fixedAccountName);
     args.putString(ARG_CODE, code);
 
     AddAccountFragment frag = new AddAccountFragment();
@@ -82,7 +86,8 @@ public class AddAccountFragment extends DialogFragment
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     if (savedInstanceState != null) {
-      submitUsername = savedInstanceState.getString(STATE_SUBMIT_USERNAME);
+      submittedAccountName =
+          savedInstanceState.getString(STATE_SUBMITTED_ACCOUNT_NAME);
       submitError = savedInstanceState.getString(STATE_SUBMIT_ERROR);
     }
   }
@@ -99,6 +104,12 @@ public class AddAccountFragment extends DialogFragment
     usernameText = (EditText) v.findViewById(R.id.username);
     usernameText.setFilters(InputFilters.NO_SPACE_FILTERS);
 
+    // Don't allow editing if re-adding an existing account.
+    if (hasFixedAccountName()) {
+      usernameText.setText(getFixedAccountName());
+      usernameText.setEnabled(false);
+    }
+
     progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
 
     cancelButton = (Button) v.findViewById(R.id.cancel);
@@ -114,13 +125,13 @@ public class AddAccountFragment extends DialogFragment
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
     refresh();
-    if (!TextUtils.isEmpty(submitUsername)) {
+    if (!TextUtils.isEmpty(submittedAccountName)) {
       getLoaderManager().initLoader(0, null, this);
     }
   }
 
   private void refresh() {
-    if (!TextUtils.isEmpty(submitUsername)) {
+    if (!TextUtils.isEmpty(submittedAccountName)) {
       showProgressBar();
     } else {
       hideProgressBar();
@@ -141,7 +152,7 @@ public class AddAccountFragment extends DialogFragment
 
   private void hideProgressBar() {
     progressBar.setVisibility(View.INVISIBLE);
-    usernameText.setEnabled(true);
+    usernameText.setEnabled(!hasFixedAccountName());
     cancelButton.setEnabled(true);
     addButton.setEnabled(true);
   }
@@ -175,14 +186,14 @@ public class AddAccountFragment extends DialogFragment
   }
 
   private void submit(String username) {
-    submitUsername = username;
+    submittedAccountName = username;
     submitError = null;
     refresh();
     getLoaderManager().initLoader(0, null, this);
   }
 
   private void reset() {
-    submitUsername = null;
+    submittedAccountName = null;
     submitError = null;
     refresh();
     getLoaderManager().destroyLoader(0);
@@ -216,7 +227,7 @@ public class AddAccountFragment extends DialogFragment
 
   @Override
   public Loader<Bundle> onCreateLoader(int i, Bundle args) {
-    return new AddAccountLoader(getActivity(), submitUsername, getCode());
+    return new AddAccountLoader(getActivity(), submittedAccountName, getCode());
   }
 
   @Override
@@ -236,8 +247,16 @@ public class AddAccountFragment extends DialogFragment
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putString(STATE_SUBMIT_USERNAME, submitUsername);
+    outState.putString(STATE_SUBMITTED_ACCOUNT_NAME, submittedAccountName);
     outState.putString(STATE_SUBMIT_ERROR, submitError);
+  }
+
+  private boolean hasFixedAccountName() {
+    return !TextUtils.isEmpty(getFixedAccountName());
+  }
+
+  private String getFixedAccountName() {
+    return getArguments().getString(ARG_FIXED_ACCOUNT_NAME);
   }
 
   private String getCode() {

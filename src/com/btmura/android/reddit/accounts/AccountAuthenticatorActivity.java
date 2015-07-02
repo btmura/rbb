@@ -32,7 +32,7 @@ public class AccountAuthenticatorActivity
 
   private static final String TAG_ADD_ACCOUNT = "AddAccount";
 
-  public static final String EXTRA_USERNAME = "username";
+  public static final String EXTRA_ACCOUNT_NAME = "accountName";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +54,9 @@ public class AccountAuthenticatorActivity
 
   @Override
   public void onLoginSuccess(String code) {
+    String accountName = getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    AddAccountFragment.newInstance(code).show(ft, TAG_ADD_ACCOUNT);
+    AddAccountFragment.newInstance(accountName, code).show(ft, TAG_ADD_ACCOUNT);
   }
 
   @Override
