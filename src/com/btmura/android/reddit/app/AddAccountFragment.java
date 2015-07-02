@@ -164,6 +164,7 @@ public class AddAccountFragment extends DialogFragment
     if (listener != null) {
       listener.onAddAccountCancelled();
     }
+    dismiss();
   }
 
   @Override

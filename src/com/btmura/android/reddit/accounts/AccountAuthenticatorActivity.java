@@ -72,7 +72,7 @@ public class AccountAuthenticatorActivity
 
   @Override
   public void onAddAccountCancelled() {
-    finish();
+    // Dialog will be closed showing the permission listing.
   }
 
   @Override
