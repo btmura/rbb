@@ -20,10 +20,6 @@
         <item quantity="one">1 account</item>
         <item quantity="other">%1$,d accounts</item>
     </plurals>
-    <plurals name="accounts_removed">
-        <item quantity="one">1 account removed</item>
-        <item quantity="other">%1$,d accounts removed</item>
-    </plurals>
     <plurals name="comments">
         <item quantity="one">1 comment</item>
         <item quantity="other">%1$,d comments</item>

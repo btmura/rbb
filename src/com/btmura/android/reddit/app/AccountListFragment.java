@@ -23,7 +23,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -39,7 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
@@ -201,13 +199,6 @@ public class AccountListFragment extends ListFragment
           }
         }
         return removed;
-      }
-
-      @Override
-      protected void onPostExecute(Integer removed) {
-        String text = getResources()
-            .getQuantityString(R.plurals.accounts_removed, removed, removed);
-        Toast.makeText(ctx, text, Toast.LENGTH_SHORT).show();
       }
     }.execute();
   }
