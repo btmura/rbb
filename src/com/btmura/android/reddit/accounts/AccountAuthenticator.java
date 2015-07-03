@@ -35,26 +35,26 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
   public static final String TAG = "AccountAuthenticator";
 
   /** Access token that must not be expired to make requests. */
-  public static final String AUTH_TOKEN_ACCESS_TOKEN = "accessToken";
+  static final String ACCESS_TOKEN = "accessToken";
 
   /** Refresh token that can be used to refresh the access token. */
-  public static final String AUTH_TOKEN_REFRESH_TOKEN = "refreshToken";
+  static final String REFRESH_TOKEN = "refreshToken";
 
   /** Expiration time in milliseconds of the access token. */
-  public static final String USER_DATA_EXPIRATION_MS = "expirationMs";
+  static final String EXPIRATION_MS = "expirationMs";
 
   /** Scopes the user granted the account. Example: read history identity */
-  public static final String USER_DATA_SCOPES = "scopes";
+  static final String SCOPES = "scopes";
 
-  private final Context context;
+  private final Context ctx;
 
   public static String getAccountType(Context context) {
     return context.getString(R.string.account_type);
   }
 
-  public AccountAuthenticator(Context context) {
-    super(context);
-    this.context = context;
+  public AccountAuthenticator(Context ctx) {
+    super(ctx);
+    this.ctx = ctx;
   }
 
   @Override
@@ -68,7 +68,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
       Log.d(TAG, "addAccount");
     }
 
-    Intent intent = new Intent(context, AccountAuthenticatorActivity.class);
+    Intent intent = new Intent(ctx, AccountAuthenticatorActivity.class);
     intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE,
         response);
 
@@ -147,7 +147,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
   private Bundle createIntentResult(
       AccountAuthenticatorResponse response,
       String accountName) {
-    Intent intent = new Intent(context, AccountAuthenticatorActivity.class);
+    Intent intent = new Intent(ctx, AccountAuthenticatorActivity.class);
     intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE,
         response);
     if (!TextUtils.isEmpty(accountName)) {

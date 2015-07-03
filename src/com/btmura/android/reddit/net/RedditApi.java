@@ -298,6 +298,10 @@ public class RedditApi {
       CharSequence url,
       CharSequence data)
       throws AuthenticatorException, OperationCanceledException, IOException {
+    if (AccountUtils.isTokenExpired(ctx, accountName)) {
+      updateToken(ctx, accountName);
+    }
+
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
@@ -322,7 +326,11 @@ public class RedditApi {
       Context ctx,
       String accountName,
       CharSequence url)
-      throws IOException, AuthenticatorException, OperationCanceledException {
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    if (AccountUtils.isTokenExpired(ctx, accountName)) {
+      updateToken(ctx, accountName);
+    }
+
     HttpURLConnection conn = authConnect(ctx, accountName, url);
 
     // TODO(btmura): check whether error is scope problem or not
@@ -331,7 +339,6 @@ public class RedditApi {
       updateToken(ctx, accountName);
       conn = authConnect(ctx, accountName, url);
     }
-
     return conn;
   }
 
@@ -368,11 +375,12 @@ public class RedditApi {
   private static void updateToken(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     // TODO(btmura): put refresh token code in separate method
-    String rt = AccountUtils.getRefreshToken(ctx, accountName);
     // TODO(btmura): handle empty refresh token
-    AccessTokenResult atr = refreshToken(ctx, rt);
     // TODO(btmura): validate access token result
-    AccountUtils.setAccessToken(ctx, accountName, atr.accessToken);
+    String rt = AccountUtils.getRefreshToken(ctx, accountName);
+    AccessTokenResult atr = refreshToken(ctx, rt);
+    AccountUtils.updateAccount(ctx, accountName, atr.accessToken,
+        atr.expirationMs, atr.scope);
   }
 
   private static AccessTokenResult refreshToken(
@@ -386,7 +394,7 @@ public class RedditApi {
       @Nullable CharSequence code,
       @Nullable CharSequence refreshToken)
       throws IOException {
-    long timestampMs = System.currentTimeMillis();
+    long retrievalTimeMs = System.currentTimeMillis();
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
@@ -406,7 +414,7 @@ public class RedditApi {
       writePostData(conn, sb);
 
       r = newJsonReader(conn.getInputStream());
-      return AccessTokenResult.getAccessToken(r, timestampMs);
+      return AccessTokenResult.getAccessToken(r, retrievalTimeMs);
     } finally {
       close(r, conn);
     }

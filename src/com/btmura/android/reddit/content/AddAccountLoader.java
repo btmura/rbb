@@ -18,17 +18,13 @@ package com.btmura.android.reddit.content;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.net.AccessTokenResult;
 import com.btmura.android.reddit.net.RedditApi;
@@ -39,20 +35,18 @@ import com.btmura.android.reddit.provider.ThingProvider;
 import java.io.IOException;
 
 /**
- * Loader that adds an account given a username and the OAuth callback URL.
+ * Loader that adds an account given a accountName and the OAuth callback URL.
  */
 public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
 
   private static final String TAG = "AddAccountLoader";
 
-  private static final boolean DEBUG = BuildConfig.DEBUG;
-
-  private final String username;
+  private final String accountName;
   private final String code;
 
-  public AddAccountLoader(Context context, String username, String code) {
+  public AddAccountLoader(Context context, String accountName, String code) {
     super(context.getApplicationContext());
-    this.username = username;
+    this.accountName = accountName;
     this.code = code;
   }
 
@@ -65,14 +59,14 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
         return errorBundle(R.string.error_bad_access_token);
       }
 
-      Account a = AccountUtils.getAccount(ctx, username);
-      AccountManager am = AccountManager.get(ctx);
-      if (!addAccount(am, a, atr)) {
+      Account a = AccountUtils.getAccount(ctx, accountName);
+      if (!AccountUtils.addAccount(ctx, a.name, atr.accessToken,
+          atr.refreshToken, atr.expirationMs, atr.scope)) {
         return errorBundle(R.string.error_adding_account);
       }
 
-      if (!AccountProvider.initializeAccount(ctx, username)) {
-        removeAccount(am, a);
+      if (!AccountProvider.initializeAccount(ctx, accountName)) {
+        AccountUtils.removeAccount(ctx, accountName);
         return errorBundle(R.string.error_initializing_account);
       }
 
@@ -80,7 +74,7 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
       // new account after the user returns to the app. If somehow we crash
       // before the account is added, that is ok, because the AccountLoader
       // will fall back to the app storage account.
-      AccountPrefs.setLastAccount(ctx, username);
+      AccountPrefs.setLastAccount(ctx, accountName);
 
       ContentResolver.setSyncAutomatically(a,
           AccountProvider.AUTHORITY, true);
@@ -102,41 +96,6 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
   private boolean hasRequiredTokens(AccessTokenResult atr) {
     return !TextUtils.isEmpty(atr.accessToken)
         && !TextUtils.isEmpty(atr.refreshToken);
-  }
-
-  private boolean addAccount(
-      AccountManager am,
-      Account a,
-      AccessTokenResult atr) {
-    if (am.addAccountExplicitly(a, null /* pw */, null /* userdata */)) {
-      am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN,
-          atr.accessToken);
-      am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN,
-          atr.refreshToken);
-      am.setUserData(a, AccountAuthenticator.USER_DATA_EXPIRATION_MS,
-          Long.toString(atr.expirationMs));
-      am.setUserData(a, AccountAuthenticator.USER_DATA_SCOPES,
-          atr.scope);
-      return true;
-    }
-    return false;
-  }
-
-  private boolean removeAccount(AccountManager am, Account a) {
-    // TODO(btmura): use new API to remove account when possible
-    // TODO(btmura): removed code duplication with AccountListFragment
-    try {
-      return am.removeAccount(a, null, null).getResult();
-    } catch (OperationCanceledException e) {
-      Log.e(TAG, e.getMessage(), e);
-      return false;
-    } catch (IOException e) {
-      Log.e(TAG, e.getMessage(), e);
-      return false;
-    } catch (AuthenticatorException e) {
-      Log.e(TAG, e.getMessage(), e);
-      return false;
-    }
   }
 
   private Bundle errorBundle(int resId) {

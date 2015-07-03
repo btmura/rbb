@@ -23,10 +23,13 @@ import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.IOException;
 
 public class AccountUtils {
+
+  private static final String TAG = "AccountUtils";
 
   public static final String NO_ACCOUNT = "";
 
@@ -38,21 +41,12 @@ public class AccountUtils {
     return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
   }
 
-  public static boolean hasTokens(Context ctx, String accountName) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
-    return getAccessToken(ctx, accountName) != null
-        && getRefreshToken(ctx, accountName) != null;
-  }
-
   @Nullable
   public static String getAccessToken(Context ctx, String accountName) throws
       AuthenticatorException,
       OperationCanceledException,
       IOException {
-    return getAuthToken(ctx, accountName,
-        AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN);
+    return getAuthToken(ctx, accountName, AccountAuthenticator.ACCESS_TOKEN);
   }
 
   @Nullable
@@ -60,8 +54,7 @@ public class AccountUtils {
       AuthenticatorException,
       OperationCanceledException,
       IOException {
-    return getAuthToken(ctx, accountName,
-        AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN);
+    return getAuthToken(ctx, accountName, AccountAuthenticator.REFRESH_TOKEN);
   }
 
   @Nullable
@@ -77,19 +70,78 @@ public class AccountUtils {
     }
     Account a = getAccount(ctx, accountName);
     AccountManager am = AccountManager.get(ctx);
-    return am.blockingGetAuthToken(a, authTokenType,
-        true /* display notification */);
+    return am.blockingGetAuthToken(a, authTokenType, true /* notify */);
   }
 
-  public static void setAccessToken(
-      Context ctx,
-      String accountName,
-      String accessToken) {
-    // TODO(btmura): check accountName is not empty
+  public static boolean hasTokens(Context ctx, String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    return getAccessToken(ctx, accountName) != null
+        && getRefreshToken(ctx, accountName) != null;
+  }
+
+  public static boolean isTokenExpired(Context ctx, String accountName) {
+    if (!isAccount(accountName)) {
+      return false;
+    }
     Account a = getAccount(ctx, accountName);
     AccountManager am = AccountManager.get(ctx);
-    am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_ACCESS_TOKEN,
-        accessToken);
+    long expirationMs = Long.valueOf(
+        am.getUserData(a, AccountAuthenticator.EXPIRATION_MS));
+    return System.currentTimeMillis() >= expirationMs;
+  }
+
+  public static boolean addAccount(
+      Context ctx,
+      String accountName,
+      String accessToken,
+      String refreshToken,
+      long expirationMs,
+      String scopes) {
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    if (am.addAccountExplicitly(a, null /* pw */, null /* userdata */)) {
+      am.setAuthToken(a, AccountAuthenticator.ACCESS_TOKEN, accessToken);
+      am.setAuthToken(a, AccountAuthenticator.REFRESH_TOKEN, refreshToken);
+      am.setUserData(a, AccountAuthenticator.EXPIRATION_MS,
+          Long.toString(expirationMs));
+      am.setUserData(a, AccountAuthenticator.SCOPES, scopes);
+      return true;
+    }
+    return false;
+  }
+
+  public static void updateAccount(
+      Context ctx,
+      String accountName,
+      String accessToken,
+      long expirationMs,
+      String scopes) {
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    am.setAuthToken(a, AccountAuthenticator.ACCESS_TOKEN, accessToken);
+    am.setUserData(a, AccountAuthenticator.EXPIRATION_MS,
+        Long.toString(expirationMs));
+    am.setUserData(a, AccountAuthenticator.SCOPES, scopes);
+  }
+
+  public static boolean removeAccount(Context ctx, String accountName) {
+    // TODO(btmura): use new API to remove account when possible
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    try {
+      return am.removeAccount(a, null, null).getResult();
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return false;
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return false;
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return false;
+    }
   }
 
   private AccountUtils() {
