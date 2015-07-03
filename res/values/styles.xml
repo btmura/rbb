@@ -5,9 +5,9 @@
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
-  
+
           http://www.apache.org/licenses/LICENSE-2.0
-  
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -106,28 +106,6 @@
         <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
-    <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
-        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
-        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
-        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
-        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
-        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
-        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
-        <item name="menu_filter_icon">@drawable/ic_action_filter_dark</item>
-        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
-        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
-        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
-        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
-        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
-        <item name="menu_share_icon">@drawable/ic_action_share_dark</item>
-        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
-        <item name="next_icon">@drawable/ic_next_dark</item>
-        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
-    </style>
-
     <style name="Theme.Dark.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
         <item name="drawer_icon">@drawable/ic_drawer_dark</item>
         <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
@@ -172,28 +150,6 @@
         <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
-    <style name="Theme.Light.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
-        <item name="drawer_icon">@drawable/ic_drawer_light</item>
-        <item name="menu_about_icon">@drawable/ic_action_about_light</item>
-        <item name="menu_add_icon">@drawable/ic_action_add_light</item>
-        <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
-        <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
-        <item name="menu_edit_icon">@drawable/ic_action_edit_light</item>
-        <item name="menu_filter_icon">@drawable/ic_action_filter_light</item>
-        <item name="menu_link_icon">@drawable/ic_action_link_light</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
-        <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
-        <item name="menu_refresh_icon">@drawable/ic_action_refresh_light</item>
-        <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
-        <item name="menu_search_icon">@drawable/ic_action_search_light</item>
-        <item name="menu_send_icon">@drawable/ic_action_send_light</item>
-        <item name="menu_share_icon">@drawable/ic_action_share_light</item>
-        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
-        <item name="nesting_line_color">@android:color/holo_blue_dark</item>
-        <item name="next_icon">@drawable/ic_next_light</item>
-        <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
-    </style>
-
     <style name="Theme.Light.DialogWhenLarge" parent="@android:style/Theme.Holo.Light.DialogWhenLarge">
         <item name="drawer_icon">@drawable/ic_drawer_light</item>
         <item name="menu_about_icon">@drawable/ic_action_about_light</item>
@@ -217,15 +173,15 @@
     </style>
 
     <!--
-    We need a theme to animate from a translucent look to a runtime determined theme. The stock 
-    Translucent theme disables orientation changes on small screens, so we need to create our own 
-    theme based off of a theme that has animations. 
+    We need a theme to animate from a translucent look to a runtime determined theme. The stock
+    Translucent theme disables orientation changes on small screens, so we need to create our own
+    theme based off of a theme that has animations.
     -->
     <style name="Theme.Transition" parent="@android:style/Theme.Holo">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
-    
+
     <style name="Theme.Transition.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
