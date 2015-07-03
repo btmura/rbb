@@ -29,6 +29,17 @@ public class UrlsTest extends TestCase {
   private static final String NO_MORE = null;
 
   private static final String ACCOUNT = "account";
+  private static final String THING_ID = "thingId";
+
+  public void testThingInfo() {
+    assertCharSequenceEquals(
+        "https://www.reddit.com/api/info.json?id=t3_thingId",
+        Urls.thingInfo(NO_ACCOUNT, THING_ID));
+
+    assertCharSequenceEquals(
+        "https://oauth.reddit.com/api/info?id=t3_thingId",
+        Urls.thingInfo(ACCOUNT, THING_ID));
+  }
 
   public void testMySubreddits() {
     assertCharSequenceEquals(

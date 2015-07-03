@@ -107,7 +107,7 @@ public class Urls {
       sb.append(".json");
     }
 
-    return sb.append("id=")
+    return sb.append("?id=")
         .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
   }
 
