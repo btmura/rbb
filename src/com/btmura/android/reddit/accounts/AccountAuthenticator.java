@@ -34,13 +34,13 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
   public static final String TAG = "AccountAuthenticator";
 
-  public static final String AUTH_TOKEN_COOKIE = "cookie";
-  public static final String AUTH_TOKEN_MODHASH = "modhash";
-
+  /** Access token that must not be expired to make requests. */
   public static final String AUTH_TOKEN_ACCESS_TOKEN = "accessToken";
+
+  /** Refresh token that can be used to refresh the access token. */
   public static final String AUTH_TOKEN_REFRESH_TOKEN = "refreshToken";
 
-  /** Expiration in milliseconds of the access token. */
+  /** Expiration time in milliseconds of the access token. */
   public static final String USER_DATA_EXPIRATION_MS = "expirationMs";
 
   /** Scopes the user granted the account. Example: read history identity */

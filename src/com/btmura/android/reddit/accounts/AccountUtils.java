@@ -46,38 +46,6 @@ public class AccountUtils {
         && getRefreshToken(ctx, accountName) != null;
   }
 
-  // TODO(btmura): remove after OAuth transition
-  public static String getCookie(AccountManager manager, Account account)
-      throws OperationCanceledException, AuthenticatorException, IOException {
-    return manager.blockingGetAuthToken(account,
-        AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-  }
-
-  // TODO(btmura): remove after OAuth transition
-  public static String getCookie(Context context, Account account)
-      throws OperationCanceledException, AuthenticatorException, IOException {
-    return getCookie(AccountManager.get(context), account);
-  }
-
-  // TODO(btmura): remove after OAuth transition
-  public static String getCookie(Context context, String accountName)
-      throws OperationCanceledException, AuthenticatorException, IOException {
-    if (!isAccount(accountName)) {
-      return null;
-    }
-
-    Account account = new Account(accountName,
-        AccountAuthenticator.getAccountType(context));
-    return getCookie(context, account);
-  }
-
-  // TODO(btmura): remove after OAuth transition
-  public static String getModhash(AccountManager manager, Account account)
-      throws OperationCanceledException, AuthenticatorException, IOException {
-    return manager.blockingGetAuthToken(account,
-        AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
-  }
-
   @Nullable
   public static String getAccessToken(Context ctx, String accountName) throws
       AuthenticatorException,
