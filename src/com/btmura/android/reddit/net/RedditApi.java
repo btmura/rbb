@@ -386,6 +386,7 @@ public class RedditApi {
       @Nullable CharSequence code,
       @Nullable CharSequence refreshToken)
       throws IOException {
+    long timestampMs = System.currentTimeMillis();
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
@@ -405,7 +406,7 @@ public class RedditApi {
       writePostData(conn, sb);
 
       r = newJsonReader(conn.getInputStream());
-      return AccessTokenResult.getAccessToken(r);
+      return AccessTokenResult.getAccessToken(r, timestampMs);
     } finally {
       close(r, conn);
     }

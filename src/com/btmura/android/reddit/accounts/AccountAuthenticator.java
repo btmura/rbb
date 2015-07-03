@@ -40,8 +40,11 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
   public static final String AUTH_TOKEN_ACCESS_TOKEN = "accessToken";
   public static final String AUTH_TOKEN_REFRESH_TOKEN = "refreshToken";
 
-  public static final String USER_DATA_EXPIRES_IN = "expiresIn";
-  public static final String USER_DATA_SCOPE = "scope";
+  /** Expiration in milliseconds of the access token. */
+  public static final String USER_DATA_EXPIRATION_MS = "expirationMs";
+
+  /** Scopes the user granted the account. Example: read history identity */
+  public static final String USER_DATA_SCOPES = "scopes";
 
   private final Context context;
 

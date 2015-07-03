@@ -113,9 +113,9 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
           atr.accessToken);
       am.setAuthToken(a, AccountAuthenticator.AUTH_TOKEN_REFRESH_TOKEN,
           atr.refreshToken);
-      am.setUserData(a, AccountAuthenticator.USER_DATA_EXPIRES_IN,
-          Long.toString(atr.expiresIn));
-      am.setUserData(a, AccountAuthenticator.USER_DATA_SCOPE,
+      am.setUserData(a, AccountAuthenticator.USER_DATA_EXPIRATION_MS,
+          Long.toString(atr.expirationMs));
+      am.setUserData(a, AccountAuthenticator.USER_DATA_SCOPES,
           atr.scope);
       return true;
     }

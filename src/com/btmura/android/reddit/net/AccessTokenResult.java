@@ -21,6 +21,7 @@ import android.util.JsonReader;
 import com.btmura.android.reddit.util.JsonParser;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class AccessTokenResult extends JsonParser {
 
@@ -30,7 +31,11 @@ public class AccessTokenResult extends JsonParser {
   public String scope;        // Example: read
   public String refreshToken; // Example: 12345-67890
 
-  static AccessTokenResult getAccessToken(JsonReader r) throws IOException {
+  /** Expiration time in milliseconds of the access token. */
+  public long expirationMs;
+
+  static AccessTokenResult getAccessToken(JsonReader r, long retrievalTimeMs)
+      throws IOException {
     AccessTokenResult result = new AccessTokenResult();
     r.beginObject();
     while (r.hasNext()) {
@@ -48,6 +53,8 @@ public class AccessTokenResult extends JsonParser {
       }
     }
     r.endObject();
+    result.expirationMs = retrievalTimeMs
+        + TimeUnit.SECONDS.toMillis(result.expiresIn);
     return result;
   }
 
@@ -57,6 +64,7 @@ public class AccessTokenResult extends JsonParser {
         + " tokenType: " + tokenType
         + " expiresIn: " + expiresIn
         + " scope: " + scope
-        + " refreshToken: " + refreshToken;
+        + " refreshToken: " + refreshToken
+        + " expirationMs: " + expirationMs;
   }
 }
