@@ -83,9 +83,7 @@ public class LoginFragment extends Fragment {
 
   private void setupWebView() {
     // Clear reddit cookie to present a fresh login form.
-    if (!BuildConfig.DEBUG) {
-      CookieManager.getInstance().setCookie(".reddit.com", "reddit_session=");
-    }
+    CookieManager.getInstance().setCookie(".reddit.com", "reddit_session=");
 
     WebSettings settings = webView.getSettings();
     settings.setBuiltInZoomControls(true);
