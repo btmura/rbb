@@ -92,7 +92,7 @@ public class Urls {
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
         .append(encode(
-            "edit,history,identity,mysubreddits,privatemessages,read,report,submit,subscribe,vote"));
+            "edit,history,identity,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote"));
   }
 
   public static CharSequence myInfo() {
