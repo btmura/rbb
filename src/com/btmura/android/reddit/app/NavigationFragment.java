@@ -159,14 +159,14 @@ public class NavigationFragment extends ListFragment implements
       filter = savedInstanceState.getInt(STATE_FILTER);
     }
 
-    accountAdapter = AccountResultAdapter.newNavigationFragmentInstance(
-        getActivity());
+    accountAdapter =
+        AccountResultAdapter.newNavigationFragmentInstance(getActivity());
     accountAdapter.setOnAccountMessagesSelectedListener(this);
     placesAdapter = new AccountPlaceAdapter(getActivity(), this);
-    subredditAdapter = AccountSubredditAdapter.newAccountInstance(
-        getActivity());
-    mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter,
-        subredditAdapter);
+    subredditAdapter =
+        AccountSubredditAdapter.newAccountInstance(getActivity());
+    mergeAdapter =
+        new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
   }
 
   @Override
@@ -175,9 +175,9 @@ public class NavigationFragment extends ListFragment implements
       ViewGroup container,
       Bundle savedInstanceState) {
     View v = super.onCreateView(inflater, container, savedInstanceState);
-    ListView listView = (ListView) v.findViewById(android.R.id.list);
-    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-    listView.setMultiChoiceModeListener(this);
+    ListView lv = (ListView) v.findViewById(android.R.id.list);
+    lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+    lv.setMultiChoiceModeListener(this);
     return v;
   }
 
@@ -228,11 +228,11 @@ public class NavigationFragment extends ListFragment implements
   private void refreshSubredditLoader(boolean restartLoader) {
     Bundle args = newLoaderArgs(accountName);
     if (restartLoader) {
-      getLoaderManager().restartLoader(LOADER_SUBREDDITS, args,
-          subredditLoaderCallbacks);
+      getLoaderManager()
+          .restartLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
     } else {
-      getLoaderManager().initLoader(LOADER_SUBREDDITS, args,
-          subredditLoaderCallbacks);
+      getLoaderManager()
+          .initLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
     }
   }
 
@@ -412,7 +412,7 @@ public class NavigationFragment extends ListFragment implements
   }
 
   @Override
-  public void onListItemClick(ListView l, View v, int position, long id) {
+  public void onListItemClick(ListView lv, View v, int position, long id) {
     int adapterIndex = mergeAdapter.getAdapterIndex(position);
     int adapterPosition = mergeAdapter.getAdapterPosition(position);
     switch (adapterIndex) {
