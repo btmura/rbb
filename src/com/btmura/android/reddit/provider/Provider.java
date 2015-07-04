@@ -213,6 +213,16 @@ public class Provider {
     });
   }
 
+  public static void clearMailIndicatorAsync(Context ctx) {
+    final Context appCtx = ctx.getApplicationContext();
+    AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+      @Override
+      public void run() {
+        AccountProvider.clearMailIndicator(appCtx);
+      }
+    });
+  }
+
   static Bundle call(
       Context ctx,
       Uri uri,

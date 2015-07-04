@@ -59,7 +59,8 @@ class MessageListing extends JsonParser implements Listing {
   private static final int MERGE_ACTION = 1;
   private static final int MERGE_TEXT = 2;
 
-  private static final String MERGE_SELECTION = MessageActions.COLUMN_ACCOUNT + "=? AND "
+  private static final String MERGE_SELECTION =
+      MessageActions.COLUMN_ACCOUNT + "=? AND "
       + MessageActions.COLUMN_PARENT_THING_ID + "=?";
 
   private final Context ctx;
@@ -222,8 +223,7 @@ class MessageListing extends JsonParser implements Listing {
 
   @Override
   public void onKind(JsonReader r, int i) throws IOException {
-    values.get(i).put(Messages.COLUMN_KIND,
-        Kinds.parseKind(r.nextString()));
+    values.get(i).put(Messages.COLUMN_KIND, Kinds.parseKind(r.nextString()));
   }
 
   @Override

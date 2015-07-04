@@ -78,9 +78,9 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
           + " syncResult: " + syncResult.toString());
     }
 
-    // Only sync one time per minute. SyncManager code seems to be using
-    // delayUntil as a timestamp even though the docs say its more of a
-    // duration.
+    // Only sync once per minute when repeatedly requested.
+    // SyncManager code seems to be using delayUntil as a timestamp even
+    // though the docs say its more of a duration.
     syncResult.delayUntil = System.currentTimeMillis() / 1000
         + SYNC_DELAY_SECONDS;
   }

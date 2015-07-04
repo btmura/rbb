@@ -73,6 +73,8 @@ public class AccountProvider extends BaseProvider {
   }
 
   private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
+  private static final String METHOD_CLEAR_MAIL_INDICATOR =
+      "clearMailIndicator";
 
   public AccountProvider() {
     super(TAG);
@@ -98,10 +100,18 @@ public class AccountProvider extends BaseProvider {
         accountName, null) != null;
   }
 
+  /** Clears an account's mail indicator and returns true on success. */
+  public static boolean clearMailIndicator(Context ctx) {
+    return Provider.call(ctx, ACCOUNTS_URI, METHOD_CLEAR_MAIL_INDICATOR,
+        null, null) != null;
+  }
+
   @Override
   public Bundle call(String method, String accountName, Bundle extras) {
     if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
       return initializeAccount(accountName);
+    } else if (METHOD_CLEAR_MAIL_INDICATOR.equalsIgnoreCase(method)) {
+      return clearMailIndicator(accountName);
     }
     return null;
   }
@@ -116,6 +126,9 @@ public class AccountProvider extends BaseProvider {
    * to assure everything is done in a single transaction.
    */
   private Bundle initializeAccount(String accountName) {
+    if (BuildConfig.DEBUG) {
+      Log.d(TAG, "initializeAccount accountName: " + accountName);
+    }
     SubredditResult result;
     try {
       result = RedditApi.getMySubreddits(getContext(), accountName);
@@ -152,8 +165,7 @@ public class AccountProvider extends BaseProvider {
     db.beginTransaction();
     try {
       int deleted = 0;
-      int tableCount = tables.length;
-      for (int i = 0; i < tableCount; i++) {
+      for (int i = 0; i < tables.length; i++) {
         deleted += db.delete(tables[i], selection, args);
       }
 
@@ -175,5 +187,27 @@ public class AccountProvider extends BaseProvider {
     } finally {
       db.endTransaction();
     }
+  }
+
+  /**
+   * Clears the account's mail indicator locally and returns an empty bundle.
+   * It does not trigger a sync to Reddit.
+   */
+  private Bundle clearMailIndicator(String accountName) {
+    SQLiteDatabase db = helper.getWritableDatabase();
+    db.beginTransaction();
+    try {
+      // Update the account row which may or may not exist.
+      // SyncAdapter will make one later if necessary.
+      ContentValues v = new ContentValues(2);
+      v.put(Accounts.COLUMN_HAS_MAIL, false);
+      db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT,
+          Array.of(accountName));
+      db.setTransactionSuccessful();
+    } finally {
+      db.endTransaction();
+    }
+
+    return Bundle.EMPTY;
   }
 }
