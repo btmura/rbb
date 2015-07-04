@@ -36,8 +36,8 @@ public class SidebarLoader extends BaseAsyncTaskLoader<SidebarResult> {
   private final String accountName;
   private final String subreddit;
 
-  public SidebarLoader(Context context, String accountName, String subreddit) {
-    super(context.getApplicationContext());
+  public SidebarLoader(Context ctx, String accountName, String subreddit) {
+    super(ctx.getApplicationContext());
     this.accountName = accountName;
     this.subreddit = subreddit;
   }

@@ -70,7 +70,8 @@ public class CaptchaLoader extends AsyncTaskLoader<CaptchaResult> {
       super.deliverResult(newResult);
     }
 
-    if (oldResult != null && oldResult != newResult && !oldResult.captchaBitmap.isRecycled()) {
+    if (oldResult != null && oldResult != newResult
+        && !oldResult.captchaBitmap.isRecycled()) {
       oldResult.captchaBitmap.recycle();
     }
   }

@@ -32,7 +32,7 @@ public class SearchThingLoader extends AbstractSessionLoader
   private final int filter;
 
   public SearchThingLoader(
-      Context context,
+      Context ctx,
       String accountName,
       String subreddit,
       String query,
@@ -40,7 +40,7 @@ public class SearchThingLoader extends AbstractSessionLoader
       @Nullable String more,
       int count,
       Bundle cursorExtras) {
-    super(context,
+    super(ctx,
         ThingProvider.THINGS_URI,
         PROJECTION,
         Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,

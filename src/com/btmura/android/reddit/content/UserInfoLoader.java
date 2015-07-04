@@ -37,8 +37,8 @@ public class UserInfoLoader extends BaseAsyncTaskLoader<AccountInfoResult> {
   private final String accountName;
   private final String user;
 
-  public UserInfoLoader(Context context, String accountName, String user) {
-    super(context.getApplicationContext());
+  public UserInfoLoader(Context ctx, String accountName, String user) {
+    super(ctx.getApplicationContext());
     this.accountName = accountName;
     this.user = user;
   }

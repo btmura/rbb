@@ -18,6 +18,7 @@ package com.btmura.android.reddit.content;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -33,14 +34,14 @@ public class SubredditThingLoader extends AbstractSessionLoader
   private final int filter;
 
   public SubredditThingLoader(
-      Context context,
+      Context ctx,
       String accountName,
       String subreddit,
       int filter,
-      String more,
+      @Nullable String more,
       int count,
       Bundle sessionData) {
-    super(context,
+    super(ctx,
         ThingProvider.THINGS_URI,
         PROJECTION,
         Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,

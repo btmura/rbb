@@ -23,16 +23,16 @@ import android.content.Intent;
 /** Utility methods when working with {@link Context}. */
 public class Contexts {
 
-    /**
-     * Starts an activity for the intent and return true on success or false if no activity to
-     * handle the intent was found.
-     */
-    public static boolean startActivity(Context context, Intent intent) {
-        try {
-            context.startActivity(intent);
-            return true;
-        } catch (ActivityNotFoundException e) {
-            return false;
-        }
+  /**
+   * Starts an activity for the intent and return true on success or false if no
+   * activity to handle the intent was found.
+   */
+  public static boolean startActivity(Context context, Intent intent) {
+    try {
+      context.startActivity(intent);
+      return true;
+    } catch (ActivityNotFoundException e) {
+      return false;
     }
+  }
 }

@@ -27,9 +27,9 @@ class Prefs {
 
   private static SharedPreferences PREFS_INSTANCE;
 
-  synchronized static SharedPreferences getPrefsInstance(Context context) {
+  synchronized static SharedPreferences getInstance(Context ctx) {
     if (PREFS_INSTANCE == null) {
-      PREFS_INSTANCE = context.getApplicationContext()
+      PREFS_INSTANCE = ctx.getApplicationContext()
           .getSharedPreferences(PREFS_NAME, 0);
     }
     return PREFS_INSTANCE;

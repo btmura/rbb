@@ -39,8 +39,8 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
   private final String accountName;
 
-  public RandomSubredditLoader(Context context, String accountName) {
-    super(context);
+  public RandomSubredditLoader(Context ctx, String accountName) {
+    super(ctx);
     this.accountName = accountName;
   }
 

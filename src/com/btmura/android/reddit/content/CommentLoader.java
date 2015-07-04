@@ -86,13 +86,13 @@ public class CommentLoader extends AbstractSessionLoader {
   private final int filter;
 
   public CommentLoader(
-      Context context,
+      Context ctx,
       String accountName,
       String thingId,
       String linkId,
       int filter,
       Bundle cursorExtras) {
-    super(context,
+    super(ctx,
         ThingProvider.COMMENTS_URI,
         PROJECTION,
         Comments.SELECT_VISIBLE_BY_SESSION_ID,

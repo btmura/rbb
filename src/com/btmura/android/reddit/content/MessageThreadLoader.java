@@ -47,11 +47,11 @@ public class MessageThreadLoader extends AbstractSessionLoader {
   private final String thingId;
 
   public MessageThreadLoader(
-      Context context,
+      Context ctx,
       String accountName,
       String thingId,
       Bundle cursorExtras) {
-    super(context,
+    super(ctx,
         ThingProvider.MESSAGES_URI,
         PROJECTION,
         Messages.SELECT_BY_SESSION_ID,

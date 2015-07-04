@@ -58,13 +58,13 @@ public class MessageThingLoader extends AbstractSessionLoader {
   private final int filter;
 
   public MessageThingLoader(
-      Context context,
+      Context ctx,
       String accountName,
       int filter,
       @Nullable String more,
       int count,
       Bundle cursorExtras) {
-    super(context,
+    super(ctx,
         ThingProvider.MESSAGES_URI,
         PROJECTION,
         Messages.SELECT_BY_SESSION_ID,

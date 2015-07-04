@@ -59,10 +59,10 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
   private boolean savedState;
 
   public ThingDataLoader(
-      Context context,
+      Context ctx,
       String accountName,
       ThingBundle thingBundle) {
-    super(context.getApplicationContext());
+    super(ctx.getApplicationContext());
     this.accountName = accountName;
     this.thingBundle = thingBundle;
   }

@@ -41,7 +41,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
   private Bundle sessionData;
 
   AbstractSessionLoader(
-      Context context,
+      Context ctx,
       Uri uri,
       String[] projection,
       String selection,
@@ -49,7 +49,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
       String more,
       int count,
       Bundle sessionData) {
-    super(context, uri, projection, selection, null, sortOrder);
+    super(ctx, uri, projection, selection, null, sortOrder);
     this.more = more;
     this.count = count;
     this.sessionData = sessionData;
