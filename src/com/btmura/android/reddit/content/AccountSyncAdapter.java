@@ -33,7 +33,6 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
@@ -85,14 +84,6 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
     syncResult.delayUntil = System.currentTimeMillis() / 1000
         + SYNC_DELAY_SECONDS;
   }
-
-  private static final String[] ACTION_PROJECTION = {
-      AccountActions._ID,
-      AccountActions.COLUMN_ACTION,
-  };
-
-  private static final int ID = 0;
-  private static final int ACTION = 1;
 
   private static final String[] ACCOUNT_PROJECTION = {
       Accounts._ID,

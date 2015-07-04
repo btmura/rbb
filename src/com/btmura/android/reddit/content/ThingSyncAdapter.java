@@ -120,7 +120,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
       // SyncManager code seems to be using delayUntil as a timestamp even
       // though the docs say its more of a duration.
       if (limiter.rateLimit > 0) {
-        syncResult.delayUntil = System.currentTimeMillis() / 1000 + limiter.rateLimit;
+        syncResult.delayUntil = System.currentTimeMillis() / 1000
+            + limiter.rateLimit;
         if (BuildConfig.DEBUG) {
           Log.d(TAG, "rateLimit: " + limiter.rateLimit);
         }
