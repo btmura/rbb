@@ -102,8 +102,6 @@ public class AccountProvider extends BaseProvider {
   public Bundle call(String method, String accountName, Bundle extras) {
     if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
       return initializeAccount(accountName);
-    } else if (METHOD_CLEAR_MAIL_INDICATOR.equals(method)) {
-      return clearMailIndicator(accountName);
     }
     return null;
   }

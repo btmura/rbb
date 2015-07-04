@@ -38,11 +38,11 @@ public class Provider {
       Context ctx,
       final String accountName,
       final String... subreddits) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        SubredditProvider.addSubreddits(appContext, accountName, subreddits);
+        SubredditProvider.addSubreddits(appCtx, accountName, subreddits);
       }
     });
   }
@@ -51,11 +51,11 @@ public class Provider {
       Context ctx,
       final String accountName,
       final String... subreddits) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        SubredditProvider.removeSubreddits(appContext, accountName, subreddits);
+        SubredditProvider.removeSubreddits(appCtx, accountName, subreddits);
       }
     });
   }
@@ -64,11 +64,11 @@ public class Provider {
       Context ctx,
       final long id,
       final long sessionId) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.expandComment(appContext, id, sessionId);
+        ThingProvider.expandComment(appCtx, id, sessionId);
       }
     });
   }
@@ -77,11 +77,11 @@ public class Provider {
       Context ctx,
       final long id,
       final long[] childIds) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.collapseComment(appContext, id, childIds);
+        ThingProvider.collapseComment(appCtx, id, childIds);
       }
     });
   }
@@ -92,12 +92,12 @@ public class Provider {
       final String body,
       final String parentThingId,
       final String thingId) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.insertComment(appContext, accountName, body,
-            parentThingId, thingId);
+        ThingProvider.insertComment(appCtx, accountName, body, parentThingId,
+            thingId);
       }
     });
   }
@@ -108,11 +108,11 @@ public class Provider {
       final String body,
       final String parentThingId,
       final String thingId) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.editComment(appContext, accountName, body, parentThingId,
+        ThingProvider.editComment(appCtx, accountName, body, parentThingId,
             thingId);
       }
     });
@@ -125,16 +125,12 @@ public class Provider {
       final long[] ids,
       final String parentThingId,
       final String[] thingIds) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.deleteComment(appContext,
-            accountName,
-            hasChildren,
-            ids,
-            parentThingId,
-            thingIds);
+        ThingProvider.deleteComment(appCtx, accountName, hasChildren, ids,
+            parentThingId, thingIds);
       }
     });
   }
@@ -145,24 +141,12 @@ public class Provider {
       final String body,
       final String parentThingId,
       final String thingId) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.insertMessage(appContext, accountName, body,
-            parentThingId, thingId);
-      }
-    });
-  }
-
-  public static void markMessagesReadAsync(
-      Context ctx,
-      final String accountName) {
-    final Context appContext = ctx.getApplicationContext();
-    AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-      @Override
-      public void run() {
-        AccountProvider.markMessagesRead(appContext, accountName);
+        ThingProvider.insertMessage(appCtx, accountName, body, parentThingId,
+            thingId);
       }
     });
   }
@@ -172,12 +156,12 @@ public class Provider {
       final String accountName,
       final String thingId,
       final boolean read) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
         int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
-        ThingProvider.readMessage(appContext, accountName, action, thingId);
+        ThingProvider.readMessage(appCtx, accountName, action, thingId);
       }
     });
   }
@@ -188,13 +172,12 @@ public class Provider {
       final String thingId,
       final ThingBundle thingBundle,
       final boolean hide) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
         int action = hide ? HideActions.ACTION_HIDE : HideActions.ACTION_UNHIDE;
-        ThingProvider.hide(appContext, accountName, action, thingId,
-            thingBundle);
+        ThingProvider.hide(appCtx, accountName, action, thingId, thingBundle);
       }
     });
   }
@@ -205,13 +188,12 @@ public class Provider {
       final String thingId,
       final ThingBundle thingBundle,
       final boolean save) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
         int action = save ? SaveActions.ACTION_SAVE : SaveActions.ACTION_UNSAVE;
-        ThingProvider.save(appContext, accountName, action, thingId,
-            thingBundle);
+        ThingProvider.save(appCtx, accountName, action, thingId, thingBundle);
       }
     });
   }
@@ -222,12 +204,11 @@ public class Provider {
       final int action,
       final String thingId,
       final ThingBundle thingBundle) {
-    final Context appContext = ctx.getApplicationContext();
+    final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        ThingProvider.vote(appContext, accountName, action, thingId,
-            thingBundle);
+        ThingProvider.vote(appCtx, accountName, action, thingId, thingBundle);
       }
     });
   }
@@ -238,8 +219,8 @@ public class Provider {
       String method,
       String arg,
       Bundle extras) {
-    return ctx.getApplicationContext().getContentResolver().call(uri,
-        method, arg, extras);
+    return ctx.getApplicationContext().getContentResolver()
+        .call(uri, method, arg, extras);
   }
 
   static void scheduleBackup(Context ctx, String accountName) {
