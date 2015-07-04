@@ -43,7 +43,7 @@ class ProfileThingListController extends ThingTableListController {
 
   @Override
   public Loader<Cursor> createLoader() {
-    return new ProfileThingLoader(context,
+    return new ProfileThingLoader(ctx,
         getAccountName(),
         profileUser,
         getFilter(),

@@ -40,7 +40,7 @@ abstract class ThingTableListController
   static final String EXTRA_SELECTED_THING_ID = "selectedThingId";
   static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
-  protected final Context context;
+  protected final Context ctx;
   private final ThingListAdapter adapter;
 
   private final String accountName;
@@ -50,14 +50,12 @@ abstract class ThingTableListController
   private Bundle cursorExtras;
 
   ThingTableListController(
-      Context context,
+      Context ctx,
       Bundle args,
       OnThingViewClickListener listener) {
-    this.context = context;
+    this.ctx = ctx;
     this.accountName = getAccountNameExtra(args);
-    this.adapter = new ThingListAdapter(context,
-        accountName,
-        listener,
+    this.adapter = new ThingListAdapter(ctx, accountName, listener,
         getSingleChoiceExtra(args));
     restoreInstanceState(args);
   }

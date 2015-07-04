@@ -42,7 +42,7 @@ class SearchThingListController extends ThingTableListController {
 
   @Override
   public Loader<Cursor> createLoader() {
-    return new SearchThingLoader(context,
+    return new SearchThingLoader(ctx,
         getAccountName(),
         getSubreddit(),
         getQuery(),
@@ -80,6 +80,6 @@ class SearchThingListController extends ThingTableListController {
   @Override
   public void setFilter(int filter) {
     super.setFilter(filter);
-    AccountPrefs.setLastSearchFilter(context, filter);
+    AccountPrefs.setLastSearchFilter(ctx, filter);
   }
 }

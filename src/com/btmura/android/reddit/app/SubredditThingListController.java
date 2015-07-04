@@ -36,7 +36,7 @@ class SubredditThingListController extends ThingTableListController {
   @Override
   public Loader<Cursor> createLoader() {
     return new SubredditThingLoader(
-        context,
+        ctx,
         getAccountName(),
         getSubreddit(),
         getFilter(),
