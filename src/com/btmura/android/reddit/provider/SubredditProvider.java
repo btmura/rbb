@@ -29,110 +29,115 @@ import com.btmura.android.reddit.util.Array;
 
 public class SubredditProvider extends BaseProvider {
 
-    public static final String TAG = "SubredditProvider";
+  public static final String TAG = "SubredditProvider";
 
-    public static final String AUTHORITY = "com.btmura.android.reddit.provider.subreddits";
+  public static final String AUTHORITY = "com.btmura.android.reddit.provider.subreddits";
 
-    static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    static final String PATH_SUBREDDITS = "subreddits";
-    public static final Uri SUBREDDITS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SUBREDDITS);
-    public static final Uri SUBREDDITS_SYNC_URI = makeSyncUri(SUBREDDITS_URI);
+  static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+  static final String PATH_SUBREDDITS = "subreddits";
+  public static final Uri SUBREDDITS_URI = Uri.parse(
+      BASE_AUTHORITY_URI + PATH_SUBREDDITS);
 
-    private static final String METHOD_ADD_SUBREDDITS = "addSubreddits";
-    private static final String METHOD_REMOVE_SUBREDDITS = "removeSubreddits";
+  private static final String METHOD_ADD_SUBREDDITS = "addSubreddits";
+  private static final String METHOD_REMOVE_SUBREDDITS = "removeSubreddits";
 
-    private static final String EXTRA_SUBREDDIT_ARRAY = "subredditArray";
+  private static final String EXTRA_SUBREDDIT_ARRAY = "subredditArray";
 
-    public SubredditProvider() {
-        super(TAG);
+  public SubredditProvider() {
+    super(TAG);
+  }
+
+  @Override
+  protected String getTable(Uri uri) {
+    return Subreddits.TABLE_NAME;
+  }
+
+  public static Bundle addSubreddits(
+      Context context,
+      String accountName,
+      String... subreddits) {
+    Bundle extras = new Bundle(1);
+    extras.putStringArray(EXTRA_SUBREDDIT_ARRAY, subreddits);
+    return Provider.call(context,
+        SUBREDDITS_URI,
+        METHOD_ADD_SUBREDDITS,
+        accountName,
+        extras);
+  }
+
+  public static Bundle removeSubreddits(
+      Context context,
+      String accountName,
+      String... subreddits) {
+    Bundle extras = new Bundle(1);
+    extras.putStringArray(EXTRA_SUBREDDIT_ARRAY, subreddits);
+    return Provider.call(context,
+        SUBREDDITS_URI,
+        METHOD_REMOVE_SUBREDDITS,
+        accountName,
+        extras);
+  }
+
+  @Override
+  public Bundle call(String method, String arg, Bundle extras) {
+    if (METHOD_ADD_SUBREDDITS.equals(method)) {
+      return addSubredditAsync(arg, extras);
+    } else if (METHOD_REMOVE_SUBREDDITS.equals(method)) {
+      return removeSubredditAsync(arg, extras);
     }
+    return null;
+  }
 
-    @Override
-    protected String getTable(Uri uri) {
-        return Subreddits.TABLE_NAME;
-    }
+  private Bundle addSubredditAsync(String accountName, Bundle extras) {
+    String[] subreddits = extras.getStringArray(EXTRA_SUBREDDIT_ARRAY);
+    return changeSubreddits(accountName, subreddits, true);
+  }
 
-    public static Bundle addSubreddits(Context context,
-            String accountName,
-            String... subreddits) {
-        Bundle extras = new Bundle(1);
-        extras.putStringArray(EXTRA_SUBREDDIT_ARRAY, subreddits);
-        return Provider.call(context,
-                SUBREDDITS_URI,
-                METHOD_ADD_SUBREDDITS,
-                accountName,
-                extras);
-    }
+  private Bundle removeSubredditAsync(String accountName, Bundle extras) {
+    String[] subreddits = extras.getStringArray(EXTRA_SUBREDDIT_ARRAY);
+    return changeSubreddits(accountName, subreddits, false);
+  }
 
-    public static Bundle removeSubreddits(Context context,
-            String accountName,
-            String... subreddits) {
-        Bundle extras = new Bundle(1);
-        extras.putStringArray(EXTRA_SUBREDDIT_ARRAY, subreddits);
-        return Provider.call(context,
-                SUBREDDITS_URI,
-                METHOD_REMOVE_SUBREDDITS,
-                accountName,
-                extras);
-    }
+  private Bundle changeSubreddits(
+      String accountName,
+      String[] subreddits,
+      boolean add) {
+    ContentValues values = new ContentValues(3);
+    int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
 
-    @Override
-    public Bundle call(String method, String arg, Bundle extras) {
-        if (METHOD_ADD_SUBREDDITS.equals(method)) {
-            return addSubredditAsync(arg, extras);
-        } else if (METHOD_REMOVE_SUBREDDITS.equals(method)) {
-            return removeSubredditAsync(arg, extras);
+    SQLiteDatabase db = helper.getWritableDatabase();
+    db.beginTransaction();
+    try {
+      int count = subreddits.length;
+      for (int i = 0; i < count; i++) {
+        // All subreddit additions require an insert. The insert would remove any deletes
+        // due to table constraints.
+        //
+        // Deletes for an account require an insert with delete state. However, app storage
+        // accounts should just remove the row altogether.
+        if (add || AccountUtils.isAccount(accountName)) {
+          values.clear();
+          values.put(Subreddits.COLUMN_ACCOUNT, accountName);
+          values.put(Subreddits.COLUMN_NAME, subreddits[i]);
+          values.put(Subreddits.COLUMN_STATE, state);
+          if (db.replace(Subreddits.TABLE_NAME, null, values) == -1) {
+            return null;
+          }
+        } else {
+          db.delete(Subreddits.TABLE_NAME,
+              Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
+              Array.of(accountName, subreddits[i]));
         }
-        return null;
+      }
+      db.setTransactionSuccessful();
+    } finally {
+      db.endTransaction();
     }
 
-    private Bundle addSubredditAsync(String accountName, Bundle extras) {
-        String[] subreddits = extras.getStringArray(EXTRA_SUBREDDIT_ARRAY);
-        return changeSubreddits(accountName, subreddits, true);
-    }
+    Provider.scheduleBackup(getContext(), accountName);
 
-    private Bundle removeSubredditAsync(String accountName, Bundle extras) {
-        String[] subreddits = extras.getStringArray(EXTRA_SUBREDDIT_ARRAY);
-        return changeSubreddits(accountName, subreddits, false);
-    }
-
-    private Bundle changeSubreddits(String accountName, String[] subreddits, boolean add) {
-        ContentValues values = new ContentValues(3);
-        int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        db.beginTransaction();
-        try {
-            int count = subreddits.length;
-            for (int i = 0; i < count; i++) {
-                // All subreddit additions require an insert. The insert would remove any deletes
-                // due to table constraints.
-                //
-                // Deletes for an account require an insert with delete state. However, app storage
-                // accounts should just remove the row altogether.
-                if (add || AccountUtils.isAccount(accountName)) {
-                    values.clear();
-                    values.put(Subreddits.COLUMN_ACCOUNT, accountName);
-                    values.put(Subreddits.COLUMN_NAME, subreddits[i]);
-                    values.put(Subreddits.COLUMN_STATE, state);
-                    if (db.replace(Subreddits.TABLE_NAME, null, values) == -1) {
-                        return null;
-                    }
-                } else {
-                    db.delete(Subreddits.TABLE_NAME,
-                            Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
-                            Array.of(accountName, subreddits[i]));
-                }
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-
-        Provider.scheduleBackup(getContext(), accountName);
-
-        ContentResolver cr = getContext().getContentResolver();
-        cr.notifyChange(SUBREDDITS_URI, null, AccountUtils.isAccount(accountName));
-        return Bundle.EMPTY;
-    }
+    ContentResolver cr = getContext().getContentResolver();
+    cr.notifyChange(SUBREDDITS_URI, null, AccountUtils.isAccount(accountName));
+    return Bundle.EMPTY;
+  }
 }

@@ -71,12 +71,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
   private final String thingId;
   private final String linkId;
   private final int filter;
-  private final int numComments;
+  private final int limit;
   private final MarkdownFormatter formatter = new MarkdownFormatter();
 
   // TODO: Pass estimate of size to CommentListing rather than doing this.
-  private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(
-      360);
+  private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
   private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
   private Map<String, Integer> saveActionMap;
   private Map<String, Integer> voteActionMap;
@@ -88,7 +87,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
       String thingId,
       String linkId,
       int filter,
-      int numComments) {
+      int limit) {
     return new CommentListing(
         ctx,
         dbHelper,
@@ -96,7 +95,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         thingId,
         linkId,
         filter,
-        numComments);
+        limit);
   }
 
   private CommentListing(
@@ -106,14 +105,14 @@ class CommentListing extends JsonParser implements Listing, CommentList {
       String thingId,
       String linkId,
       int filter,
-      int numComments) {
+      int limit) {
     this.ctx = ctx;
     this.dbHelper = dbHelper;
     this.accountName = accountName;
     this.thingId = thingId;
     this.linkId = linkId;
     this.filter = filter;
-    this.numComments = numComments;
+    this.limit = limit;
   }
 
   @Override
@@ -134,7 +133,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         thingId,
         linkId,
         filter,
-        numComments);
+        limit);
     HttpURLConnection conn = RedditApi.connect(ctx, accountName, url);
     InputStream input = null;
     try {
@@ -313,8 +312,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
   private void mergeActions() {
     SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-    // Select by parent ID to see changes by all accounts, since the user can pick what account
-    // to use when making a comment. Do the same for edits and deletes to be consistent.
+    // Select by parent ID to see changes by all accounts, since the user can
+    // pick what account to use when making a comment. Do the same for edits
+    // and deletes to be consistent.
     Cursor c = db.query(CommentActions.TABLE_NAME,
         PROJECTION,
         CommentActions.SELECT_BY_PARENT_THING_ID,
@@ -447,20 +447,20 @@ class CommentListing extends JsonParser implements Listing, CommentList {
   }
 
   @Override
-  public long getCommentId(int position) {
+  public long getCommentId(int pos) {
     // Cast to avoid auto-boxing in the getAsLong method.
-    return ((Long) values.get(position).get(Comments._ID));
+    return ((Long) values.get(pos).get(Comments._ID));
   }
 
   @Override
-  public int getCommentNesting(int position) {
+  public int getCommentNesting(int pos) {
     // Cast to avoid auto-boxing in the getAsInteger method.
-    return ((Integer) values.get(position).get(Comments.COLUMN_NESTING));
+    return ((Integer) values.get(pos).get(Comments.COLUMN_NESTING));
   }
 
   @Override
-  public int getCommentSequence(int position) {
+  public int getCommentSequence(int pos) {
     // Cast to avoid auto-boxing in the getAsInteger method.
-    return ((Integer) values.get(position).get(Comments.COLUMN_SEQUENCE));
+    return ((Integer) values.get(pos).get(Comments.COLUMN_SEQUENCE));
   }
 }
