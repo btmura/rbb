@@ -22,23 +22,23 @@ import android.widget.ListView;
 
 public class Views {
 
-    public static int getCheckedPosition(ListView listView) {
-        SparseBooleanArray checked = listView.getCheckedItemPositions();
-        int size = listView.getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                return i;
-            }
-        }
-        return -1;
+  public static int getCheckedPosition(ListView listView) {
+    SparseBooleanArray checked = listView.getCheckedItemPositions();
+    int size = listView.getCount();
+    for (int i = 0; i < size; i++) {
+      if (checked.get(i)) {
+        return i;
+      }
     }
+    return -1;
+  }
 
-    public static void setVisibility(int visibility, View v1, View v2) {
-        if (v1 != null) {
-            v1.setVisibility(visibility);
-        }
-        if (v2 != null) {
-            v2.setVisibility(visibility);
-        }
+  public static void setVisibility(int visibility, View v1, View v2) {
+    if (v1 != null) {
+      v1.setVisibility(visibility);
     }
+    if (v2 != null) {
+      v2.setVisibility(visibility);
+    }
+  }
 }

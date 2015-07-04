@@ -22,53 +22,53 @@ import java.util.List;
 
 public class Array {
 
-    public static String[] of(long oneLong) {
-        return new String[] {Long.toString(oneLong)};
-    }
+  public static String[] of(long oneLong) {
+    return new String[]{Long.toString(oneLong)};
+  }
 
-    public static String[] of(long oneLong, String element) {
-        return new String[] {Long.toString(oneLong), element};
-    }
+  public static String[] of(long oneLong, String element) {
+    return new String[]{Long.toString(oneLong), element};
+  }
 
-    public static String[] of(int oneInt, String element) {
-        return new String[] {Integer.toString(oneInt), element};
-    }
+  public static String[] of(int oneInt, String element) {
+    return new String[]{Integer.toString(oneInt), element};
+  }
 
-    public static String[] of(String oneString) {
-        return new String[] {oneString};
-    }
+  public static String[] of(String oneString) {
+    return new String[]{oneString};
+  }
 
-    public static String[] of(String... elements) {
-        return elements;
-    }
+  public static String[] of(String... elements) {
+    return elements;
+  }
 
-    public static boolean[] newBooleanArray(int length, boolean fillValue) {
-        boolean[] array = new boolean[length];
-        Arrays.fill(array, fillValue);
-        return array;
-    }
+  public static boolean[] newBooleanArray(int length, boolean fillValue) {
+    boolean[] array = new boolean[length];
+    Arrays.fill(array, fillValue);
+    return array;
+  }
 
-    public static int[] newIntArray(int length, int fillValue) {
-        int[] array = new int[length];
-        Arrays.fill(array, fillValue);
-        return array;
-    }
+  public static int[] newIntArray(int length, int fillValue) {
+    int[] array = new int[length];
+    Arrays.fill(array, fillValue);
+    return array;
+  }
 
-    public static <T> boolean isEmpty(T[] array) {
-        return array == null || array.length == 0;
-    }
+  public static <T> boolean isEmpty(T[] array) {
+    return array == null || array.length == 0;
+  }
 
-    public static <T> T[] ensureLength(T[] original, int capacity) {
-        if (original.length < capacity) {
-            original = Arrays.copyOf(original, capacity);
-        }
-        return original;
+  public static <T> T[] ensureLength(T[] original, int capacity) {
+    if (original.length < capacity) {
+      original = Arrays.copyOf(original, capacity);
     }
+    return original;
+  }
 
-    public static <T> List<T> asList(T[] array) {
-        if (array != null) {
-            return Arrays.asList(array);
-        }
-        return Collections.emptyList();
+  public static <T> List<T> asList(T[] array) {
+    if (array != null) {
+      return Arrays.asList(array);
     }
+    return Collections.emptyList();
+  }
 }

@@ -21,21 +21,21 @@ package com.btmura.android.reddit.util;
  */
 public class ThingIds {
 
-    /** Add the given tag if the id does not have a tag at all. */
-    public static String addTag(String id, String tag) {
-        int sepIndex = id.indexOf('_');
-        if (sepIndex != -1) {
-            return id;
-        }
-        return tag + "_" + id;
+  /** Add the given tag if the id does not have a tag at all. */
+  public static String addTag(String id, String tag) {
+    int sepIndex = id.indexOf('_');
+    if (sepIndex != -1) {
+      return id;
     }
+    return tag + "_" + id;
+  }
 
-    /** Remove the tag if the id has one. */
-    public static String removeTag(String id) {
-        int sepIndex = id.indexOf('_');
-        if (sepIndex != -1) {
-            return id.substring(sepIndex + 1);
-        }
-        return id;
+  /** Remove the tag if the id has one. */
+  public static String removeTag(String id) {
+    int sepIndex = id.indexOf('_');
+    if (sepIndex != -1) {
+      return id.substring(sepIndex + 1);
     }
+    return id;
+  }
 }
