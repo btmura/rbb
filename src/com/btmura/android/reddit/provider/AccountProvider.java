@@ -51,16 +51,17 @@ public class AccountProvider extends BaseProvider {
 
   public static final String TAG = "AccountProvider";
 
-  public static final String AUTHORITY = "com.btmura.android.reddit.provider.accounts";
+  public static final String AUTHORITY =
+      "com.btmura.android.reddit.provider.accounts";
 
   static final String PATH_ACCOUNTS = "accounts";
   static final String PATH_ACCOUNT_ACTIONS = "actions/accounts";
 
   static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-  public static final Uri ACCOUNTS_URI = Uri.parse(
-      BASE_AUTHORITY_URI + PATH_ACCOUNTS);
-  public static final Uri ACCOUNT_ACTIONS_URI = Uri.parse(
-      BASE_AUTHORITY_URI + PATH_ACCOUNT_ACTIONS);
+  public static final Uri ACCOUNTS_URI =
+      Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNTS);
+  public static final Uri ACCOUNT_ACTIONS_URI =
+      Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNT_ACTIONS);
 
   private static final UriMatcher MATCHER = new UriMatcher(0);
   private static final int MATCH_ACCOUNTS = 1;
@@ -72,7 +73,6 @@ public class AccountProvider extends BaseProvider {
   }
 
   private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
-  private static final String METHOD_MARK_MESSAGES_READ = "markMessagesRead";
 
   public AccountProvider() {
     super(TAG);
@@ -92,26 +92,18 @@ public class AccountProvider extends BaseProvider {
     }
   }
 
-  /** Return true if account was initialized successfully with subreddits. */
-  public static boolean initializeAccount(Context context, String accountName) {
-    return Provider.call(context, ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT,
-        accountName, null)
-        != null;
-  }
-
-  /** Returns true if the account's messages were marked as read. */
-  public static boolean markMessagesRead(Context context, String accountName) {
-    return Provider.call(context, ACCOUNTS_URI, METHOD_MARK_MESSAGES_READ,
-        accountName, null)
-        != null;
+  /** Initializes an account's subreddits and returns true on success. */
+  public static boolean initializeAccount(Context ctx, String accountName) {
+    return Provider.call(ctx, ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT,
+        accountName, null) != null;
   }
 
   @Override
   public Bundle call(String method, String accountName, Bundle extras) {
     if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
       return initializeAccount(accountName);
-    } else if (METHOD_MARK_MESSAGES_READ.equals(method)) {
-      return markMessagesRead(accountName);
+    } else if (METHOD_CLEAR_MAIL_INDICATOR.equals(method)) {
+      return clearMailIndicator(accountName);
     }
     return null;
   }
@@ -161,8 +153,8 @@ public class AccountProvider extends BaseProvider {
     SQLiteDatabase db = helper.getWritableDatabase();
     db.beginTransaction();
     try {
-      int tableCount = tables.length;
       int deleted = 0;
+      int tableCount = tables.length;
       for (int i = 0; i < tableCount; i++) {
         deleted += db.delete(tables[i], selection, args);
       }
@@ -185,37 +177,5 @@ public class AccountProvider extends BaseProvider {
     } finally {
       db.endTransaction();
     }
-  }
-
-  private Bundle markMessagesRead(String accountName) {
-    SQLiteDatabase db = helper.getWritableDatabase();
-    db.beginTransaction();
-    try {
-      String[] args = Array.of(accountName);
-
-      // Update the account row which may or may not exist. SyncAdapter will make one later.
-      ContentValues v = new ContentValues(2);
-      v.put(Accounts.COLUMN_HAS_MAIL, false);
-      if (db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT,
-          args) > 0) {
-        // Schedule an action to mark messages read if there is an account row to update.
-        v.clear();
-        v.put(AccountActions.COLUMN_ACCOUNT, accountName);
-        v.put(AccountActions.COLUMN_ACTION,
-            AccountActions.ACTION_MARK_MESSAGES_READ);
-        if (db.update(AccountActions.TABLE_NAME, v,
-            Accounts.SELECT_BY_ACCOUNT, args) == 0
-            && db.insert(AccountActions.TABLE_NAME, null, v) == -1) {
-          return null;
-        }
-      }
-
-      db.setTransactionSuccessful();
-    } finally {
-      db.endTransaction();
-    }
-
-    getContext().getContentResolver().notifyChange(ACCOUNTS_URI, null, SYNC);
-    return Bundle.EMPTY;
   }
 }
