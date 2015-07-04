@@ -49,12 +49,12 @@ import java.util.Scanner;
 
 public class RedditApi {
 
-  private static final String TAG = "RedditApi2";
+  private static final String TAG = "RedditApi";
 
   static final String CHARSET = "UTF-8";
   static final String CONTENT_TYPE =
       "application/x-www-form-urlencoded;charset=" + CHARSET;
-  static final String USER_AGENT = "falling for reddit v3.4 by /u/btmura";
+  static final String USER_AGENT = "falling for reddit v3.5 by /u/btmura";
 
   private static final boolean LOG_RESPONSES = BuildConfig.DEBUG;
 
