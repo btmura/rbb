@@ -28,119 +28,122 @@ import com.btmura.android.reddit.util.Objects;
 
 public abstract class AbstractThingListAdapter extends BaseCursorAdapter {
 
-    protected String accountName;
-    protected String parentSubreddit;
-    protected String subreddit;
-    protected int thingBodyWidth;
-    protected long nowTimeMs;
-    protected String selectedThingId;
-    protected String selectedLinkId;
-    protected boolean singleChoice;
+  protected String accountName;
+  protected String parentSubreddit;
+  protected String subreddit;
+  protected int thingBodyWidth;
+  protected long nowTimeMs;
+  protected String selectedThingId;
+  protected String selectedLinkId;
+  protected boolean singleChoice;
 
-    AbstractThingListAdapter(Context context, String accountName, boolean singleChoice) {
-        super(context, null, 0);
-        this.accountName = accountName;
-        this.singleChoice = singleChoice;
+  AbstractThingListAdapter(
+      Context context,
+      String accountName,
+      boolean singleChoice) {
+    super(context, null, 0);
+    this.accountName = accountName;
+    this.singleChoice = singleChoice;
+  }
+
+  public void setParentSubreddit(String parentSubreddit) {
+    this.parentSubreddit = parentSubreddit;
+  }
+
+  public void setSubreddit(String subreddit) {
+    this.subreddit = subreddit;
+  }
+
+  public void setThingBodyWidth(int thingBodyWidth) {
+    this.thingBodyWidth = thingBodyWidth;
+  }
+
+  public String getAccountName() {
+    return accountName;
+  }
+
+  public String getParentSubreddit() {
+    return parentSubreddit;
+  }
+
+  public String getSubreddit() {
+    return subreddit;
+  }
+
+  public boolean isSingleChoice() {
+    return singleChoice;
+  }
+
+  @Override
+  public int getViewTypeCount() {
+    return 2;
+  }
+
+  @Override
+  public int getItemViewType(int position) {
+    switch (getKind(position)) {
+      case Kinds.KIND_MORE:
+        return 0;
+
+      default:
+        return 1;
     }
+  }
 
-    public void setParentSubreddit(String parentSubreddit) {
-        this.parentSubreddit = parentSubreddit;
+  @Override
+  public Cursor swapCursor(Cursor newCursor) {
+    nowTimeMs = System.currentTimeMillis();
+    return super.swapCursor(newCursor);
+  }
+
+  @Override
+  public boolean isEnabled(int position) {
+    return getKind(position) != Kinds.KIND_MORE;
+  }
+
+  @Override
+  public View newView(Context context, Cursor cursor, ViewGroup parent) {
+    switch (getKind(cursor.getPosition())) {
+      case Kinds.KIND_MORE:
+        LayoutInflater inflater = LayoutInflater.from(context);
+        return inflater.inflate(R.layout.thing_more_row, parent, false);
+
+      default:
+        return new ThingView(context);
     }
+  }
 
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
+  public int getKind(int position) {
+    return getInt(position, getKindIndex());
+  }
+
+  public String getSelectedThingId() {
+    return selectedThingId;
+  }
+
+  public String getSelectedLinkId() {
+    return selectedLinkId;
+  }
+
+  public void setSelectedThing(String thingId, String linkId) {
+    if (!Objects.equals(selectedThingId, thingId)
+        || !Objects.equals(selectedLinkId, linkId)) {
+      selectedThingId = thingId;
+      selectedLinkId = linkId;
+      notifyDataSetChanged();
     }
+  }
 
-    public void setThingBodyWidth(int thingBodyWidth) {
-        this.thingBodyWidth = thingBodyWidth;
-    }
+  public void setSelectedPosition(int position) {
+    setSelectedThing(getThingId(position), getLinkId(position));
+  }
 
-    public String getAccountName() {
-        return accountName;
-    }
+  // Abstract methods for getting the kind and selection ids
 
-    public String getParentSubreddit() {
-        return parentSubreddit;
-    }
+  abstract int getKindIndex();
 
-    public String getSubreddit() {
-        return subreddit;
-    }
+  abstract String getThingId(int position);
 
-    public boolean isSingleChoice() {
-        return singleChoice;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        switch (getKind(position)) {
-            case Kinds.KIND_MORE:
-                return 0;
-
-            default:
-                return 1;
-        }
-    }
-
-    @Override
-    public Cursor swapCursor(Cursor newCursor) {
-        nowTimeMs = System.currentTimeMillis();
-        return super.swapCursor(newCursor);
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        return getKind(position) != Kinds.KIND_MORE;
-    }
-
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        switch (getKind(cursor.getPosition())) {
-            case Kinds.KIND_MORE:
-                LayoutInflater inflater = LayoutInflater.from(context);
-                return inflater.inflate(R.layout.thing_more_row, parent, false);
-
-            default:
-                return new ThingView(context);
-        }
-    }
-
-    public int getKind(int position) {
-        return getInt(position, getKindIndex());
-    }
-
-    public String getSelectedThingId() {
-        return selectedThingId;
-    }
-
-    public String getSelectedLinkId() {
-        return selectedLinkId;
-    }
-
-    public void setSelectedThing(String thingId, String linkId) {
-        if (!Objects.equals(selectedThingId, thingId)
-                || !Objects.equals(selectedLinkId, linkId)) {
-            selectedThingId = thingId;
-            selectedLinkId = linkId;
-            notifyDataSetChanged();
-        }
-    }
-
-    public void setSelectedPosition(int position) {
-        setSelectedThing(getThingId(position), getLinkId(position));
-    }
-
-    // Abstract methods for getting the kind and selection ids
-
-    abstract int getKindIndex();
-
-    abstract String getThingId(int position);
-
-    abstract String getLinkId(int position);
+  abstract String getLinkId(int position);
 
 }

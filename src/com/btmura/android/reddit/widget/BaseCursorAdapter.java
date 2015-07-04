@@ -21,52 +21,44 @@ import android.database.Cursor;
 import android.widget.CursorAdapter;
 
 /**
- * {@link CursorAdapter} that adds some convenience methods to get values by adapter position and
- * column index.
+ * {@link CursorAdapter} that adds some convenience methods to get values by
+ * adapter position and column index.
  */
 abstract class BaseCursorAdapter extends CursorAdapter {
 
-    BaseCursorAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
-    }
+  BaseCursorAdapter(Context context, Cursor c, int flags) {
+    super(context, c, flags);
+  }
 
-    public boolean isNull(int position, int columnIndex) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return c.isNull(columnIndex);
-        }
-        return true;
+  public boolean getBoolean(int position, int columnIndex) {
+    Cursor c = getCursor();
+    if (c != null && c.moveToPosition(position)) {
+      return c.getInt(columnIndex) != 0;
     }
+    return false;
+  }
 
-    public boolean getBoolean(int position, int columnIndex) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return c.getInt(columnIndex) != 0;
-        }
-        return false;
+  public int getInt(int position, int columnIndex) {
+    Cursor c = getCursor();
+    if (c != null && c.moveToPosition(position)) {
+      return c.getInt(columnIndex);
     }
+    return -1;
+  }
 
-    public int getInt(int position, int columnIndex) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return c.getInt(columnIndex);
-        }
-        return -1;
+  public long getLong(int position, int columnIndex) {
+    Cursor c = getCursor();
+    if (c != null && c.moveToPosition(position)) {
+      return c.getLong(columnIndex);
     }
+    return -1;
+  }
 
-    public long getLong(int position, int columnIndex) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return c.getLong(columnIndex);
-        }
-        return -1;
+  public String getString(int position, int columnIndex) {
+    Cursor c = getCursor();
+    if (c != null && c.moveToPosition(position)) {
+      return c.getString(columnIndex);
     }
-
-    public String getString(int position, int columnIndex) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return c.getString(columnIndex);
-        }
-        return null;
-    }
+    return null;
+  }
 }

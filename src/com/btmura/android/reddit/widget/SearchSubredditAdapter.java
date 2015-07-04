@@ -26,22 +26,23 @@ import com.btmura.android.reddit.util.Objects;
 /** {@link SubredditAdapter} that handles searching for subreddits. */
 public class SearchSubredditAdapter extends SubredditAdapter {
 
-    public SearchSubredditAdapter(Context context, boolean singleChoice) {
-        super(context, singleChoice);
-    }
+  public SearchSubredditAdapter(Context ctx, boolean singleChoice) {
+    super(ctx, singleChoice);
+  }
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        String name = cursor.getString(SearchSubredditLoader.INDEX_NAME);
-        int subscribers = cursor.getInt(SearchSubredditLoader.INDEX_SUBSCRIBERS);
-        boolean over18 = cursor.getInt(SearchSubredditLoader.INDEX_OVER_18) == 1;
-        SubredditView v = (SubredditView) view;
-        v.setData(name, over18, subscribers);
-        v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
-    }
+  @Override
+  public void bindView(View v, Context ctx, Cursor c) {
+    String name = c.getString(SearchSubredditLoader.INDEX_NAME);
+    int subscribers = c.getInt(SearchSubredditLoader.INDEX_SUBSCRIBERS);
+    boolean over18 = c.getInt(SearchSubredditLoader.INDEX_OVER_18) == 1;
+    SubredditView sv = (SubredditView) v;
+    sv.setData(name, over18, subscribers);
+    sv.setChosen(singleChoice
+        && Objects.equalsIgnoreCase(selectedSubreddit, name));
+  }
 
-    @Override
-    public String getName(int position) {
-        return getString(position, SearchSubredditLoader.INDEX_NAME);
-    }
+  @Override
+  public String getName(int pos) {
+    return getString(pos, SearchSubredditLoader.INDEX_NAME);
+  }
 }

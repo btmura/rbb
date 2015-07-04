@@ -31,106 +31,107 @@ import com.btmura.android.reddit.net.SidebarResult;
 
 public class SidebarAdapter extends BaseAdapter {
 
-    private static final int TYPE_HEADER = 0;
-    private static final int TYPE_DESCRIPTION = 1;
+  private static final int TYPE_HEADER = 0;
+  private static final int TYPE_DESCRIPTION = 1;
 
-    private final Context context;
-    private final LayoutInflater inflater;
+  private final Context ctx;
+  private final LayoutInflater inflater;
 
-    private SidebarResult result;
+  private SidebarResult result;
 
-    public SidebarAdapter(Context context) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
+  public SidebarAdapter(Context ctx) {
+    this.ctx = ctx;
+    this.inflater = LayoutInflater.from(ctx);
+  }
+
+  public void swapData(SidebarResult result) {
+    this.result = result;
+    notifyDataSetChanged();
+  }
+
+  @Override
+  public boolean isEnabled(int pos) {
+    return getItemViewType(pos) == TYPE_HEADER;
+  }
+
+  @Override
+  public int getCount() {
+    if (result != null) {
+      return !TextUtils.isEmpty(result.description) ? 2 : 1;
     }
+    return 0;
+  }
 
-    public void swapData(SidebarResult result) {
-        this.result = result;
-        notifyDataSetChanged();
+  @Override
+  public SidebarResult getItem(int pos) {
+    return result;
+  }
+
+  @Override
+  public long getItemId(int pos) {
+    return pos;
+  }
+
+  @Override
+  public int getItemViewType(int pos) {
+    return pos;
+  }
+
+  @Override
+  public int getViewTypeCount() {
+    return 2;
+  }
+
+  public View getView(int pos, View convertView, ViewGroup parent) {
+    View v = convertView;
+    if (v == null) {
+      v = inflater.inflate(getLayout(pos), parent, false);
     }
+    setSubreddit(v, pos);
+    return v;
+  }
 
-    @Override
-    public boolean isEnabled(int position) {
-        return getItemViewType(position) == TYPE_HEADER;
+  private int getLayout(int pos) {
+    switch (getItemViewType(pos)) {
+      case TYPE_HEADER:
+        return R.layout.sidebar_header_row;
+
+      case TYPE_DESCRIPTION:
+        return R.layout.sidebar_row;
+
+      default:
+        throw new IllegalArgumentException();
     }
+  }
 
-    @Override
-    public int getCount() {
-        if (result != null) {
-            return !TextUtils.isEmpty(result.description) ? 2 : 1;
+  private void setSubreddit(View v, int pos) {
+    switch (getItemViewType(pos)) {
+      case TYPE_HEADER:
+        ImageView headerImage = (ImageView) v.findViewById(R.id.header_image);
+        if (result.headerImageBitmap != null) {
+          headerImage.setImageBitmap(result.headerImageBitmap);
+          headerImage.setVisibility(View.VISIBLE);
+        } else {
+          headerImage.setVisibility(View.GONE);
         }
-        return 0;
+
+        TextView title = (TextView) v.findViewById(R.id.title);
+        title.setText(result.title);
+
+        TextView status = (TextView) v.findViewById(R.id.status);
+        status.setText(
+            ctx.getResources().getQuantityString(R.plurals.subscribers,
+                result.subscribers, result.subscribers));
+        break;
+
+      case TYPE_DESCRIPTION:
+        TextView desc = (TextView) v;
+        desc.setText(result.description);
+        desc.setMovementMethod(LinkMovementMethod.getInstance());
+        break;
+
+      default:
+        throw new IllegalArgumentException();
     }
-
-    @Override
-    public SidebarResult getItem(int position) {
-        return result;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return position;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
-
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
-            v = inflater.inflate(getLayout(position), parent, false);
-        }
-        setSubreddit(v, position);
-        return v;
-    }
-
-    private int getLayout(int position) {
-        switch (getItemViewType(position)) {
-            case TYPE_HEADER:
-                return R.layout.sidebar_header_row;
-
-            case TYPE_DESCRIPTION:
-                return R.layout.sidebar_row;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    private void setSubreddit(View v, int position) {
-        switch (getItemViewType(position)) {
-            case TYPE_HEADER:
-                ImageView headerImage = (ImageView) v.findViewById(R.id.header_image);
-                if (result.headerImageBitmap != null) {
-                    headerImage.setImageBitmap(result.headerImageBitmap);
-                    headerImage.setVisibility(View.VISIBLE);
-                } else {
-                    headerImage.setVisibility(View.GONE);
-                }
-
-                TextView title = (TextView) v.findViewById(R.id.title);
-                title.setText(result.title);
-
-                TextView status = (TextView) v.findViewById(R.id.status);
-                status.setText(context.getResources().getQuantityString(R.plurals.subscribers,
-                        result.subscribers, result.subscribers));
-                break;
-
-            case TYPE_DESCRIPTION:
-                TextView desc = (TextView) v;
-                desc.setText(result.description);
-                desc.setMovementMethod(LinkMovementMethod.getInstance());
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
+  }
 }

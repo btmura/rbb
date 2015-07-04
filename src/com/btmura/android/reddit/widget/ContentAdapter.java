@@ -28,49 +28,49 @@ import com.btmura.android.reddit.R;
 
 public class ContentAdapter extends BaseCursorAdapter {
 
-    private final LayoutInflater inflater;
+  private final LayoutInflater inflater;
 
-    public ContentAdapter(Context context) {
-        super(context, null, 0);
-        inflater = LayoutInflater.from(context);
+  public ContentAdapter(Context ctx) {
+    super(ctx, null, 0);
+    inflater = LayoutInflater.from(ctx);
+  }
+
+  @Override
+  public boolean isEnabled(int position) {
+    return false;
+  }
+
+  @Override
+  public View newView(Context ctx, Cursor c, ViewGroup parent) {
+    return inflater.inflate(R.layout.content_row, parent, false);
+  }
+
+  @Override
+  public void bindView(View view, Context ctx, Cursor c) {
+    SpannableStringBuilder row = (SpannableStringBuilder) view.getTag();
+    if (row == null) {
+      row = new SpannableStringBuilder();
+      view.setTag(row);
     }
+    row.clear();
+    row.clearSpans();
 
-    @Override
-    public boolean isEnabled(int position) {
-        return false;
+    int columnCount = c.getColumnCount();
+    for (int i = 0; i < columnCount; i++) {
+      // Append the column name and make it bold.
+      row.append(String.format("%16s: ", c.getColumnName(i)));
+
+      // Append the column value and add a newline if it's not the last
+      // one.
+      String value = c.getString(i);
+      if (value != null) {
+        row.append(value);
+      }
+      if (i + 1 < columnCount) {
+        row.append("\n");
+      }
     }
-
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return inflater.inflate(R.layout.content_row, parent, false);
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        SpannableStringBuilder row = (SpannableStringBuilder) view.getTag();
-        if (row == null) {
-            row = new SpannableStringBuilder();
-            view.setTag(row);
-        }
-        row.clear();
-        row.clearSpans();
-
-        int columnCount = cursor.getColumnCount();
-        for (int i = 0; i < columnCount; i++) {
-            // Append the column name and make it bold.
-            row.append(String.format("%16s: ", cursor.getColumnName(i)));
-
-            // Append the column value and add a newline if it's not the last
-            // one.
-            String value = cursor.getString(i);
-            if (value != null) {
-                row.append(value);
-            }
-            if (i + 1 < columnCount) {
-                row.append("\n");
-            }
-        }
-        TextView tv = (TextView) view;
-        tv.setText(row);
-    }
+    TextView tv = (TextView) view;
+    tv.setText(row);
+  }
 }

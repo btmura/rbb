@@ -26,101 +26,102 @@ import com.btmura.android.reddit.text.MarkdownFormatter;
 
 public class MessageThreadAdapter extends BaseCursorAdapter {
 
-    private final MarkdownFormatter formatter = new MarkdownFormatter();
-    private String accountName;
-    private String thingId;
-    private long nowTimeMs;
+  private final MarkdownFormatter formatter = new MarkdownFormatter();
+  private String accountName;
+  private String thingId;
+  private long nowTimeMs;
 
-    public MessageThreadAdapter(Context context) {
-        super(context, null, 0);
-    }
+  public MessageThreadAdapter(Context ctx) {
+    super(ctx, null, 0);
+  }
 
-    @Override
-    public Cursor swapCursor(Cursor newCursor) {
-        nowTimeMs = System.currentTimeMillis();
-        return super.swapCursor(newCursor);
-    }
+  @Override
+  public Cursor swapCursor(Cursor newCursor) {
+    nowTimeMs = System.currentTimeMillis();
+    return super.swapCursor(newCursor);
+  }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return new ThingView(context);
-    }
+  @Override
+  public View newView(Context ctx, Cursor c, ViewGroup parent) {
+    return new ThingView(ctx);
+  }
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        final String author = cursor.getString(MessageThreadLoader.INDEX_AUTHOR);
-        final String body = cursor.getString(MessageThreadLoader.INDEX_BODY);
-        final long createdUtc = cursor.getLong(MessageThreadLoader.INDEX_CREATED_UTC);
-        final String destination = null;
-        final String domain = null;
-        final int downs = 0;
-        final boolean expanded = true;
-        final boolean isNew = false;
-        final int kind = cursor.getInt(MessageThreadLoader.INDEX_KIND);
-        final int likes = 0;
-        final String linkTitle = null;
-        final int nesting = 0;
-        final int numComments = 0;
-        final boolean over18 = false;
-        final String parentSubreddit = null;
-        final int score = 0;
-        final String subreddit = null;
-        final int thingBodyWidth = 0;
-        final int ups = 0;
+  @Override
+  public void bindView(View view, Context ctx, Cursor c) {
+    final String author = c.getString(MessageThreadLoader.INDEX_AUTHOR);
+    final String body = c.getString(MessageThreadLoader.INDEX_BODY);
+    final long createdUtc = c.getLong(
+        MessageThreadLoader.INDEX_CREATED_UTC);
+    final String destination = null;
+    final String domain = null;
+    final int downs = 0;
+    final boolean expanded = true;
+    final boolean isNew = false;
+    final int kind = c.getInt(MessageThreadLoader.INDEX_KIND);
+    final int likes = 0;
+    final String linkTitle = null;
+    final int nesting = 0;
+    final int numComments = 0;
+    final boolean over18 = false;
+    final String parentSubreddit = null;
+    final int score = 0;
+    final String subreddit = null;
+    final int thingBodyWidth = 0;
+    final int ups = 0;
 
-        // Only show the subject on the header message.
-        final String title = cursor.getPosition() == 0
-                ? cursor.getString(MessageThreadLoader.INDEX_SUBJECT) : null;
+    // Only show the subject on the header message.
+    final String title = c.getPosition() == 0
+        ? c.getString(MessageThreadLoader.INDEX_SUBJECT) : null;
 
-        final boolean drawVotingArrows = false;
-        final boolean showThumbnail = false;
-        final boolean showStatusPoints = false;
+    final boolean drawVotingArrows = false;
+    final boolean showThumbnail = false;
+    final boolean showStatusPoints = false;
 
-        ThingView tv = (ThingView) view;
-        tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
-        tv.setData(author,
-                body,
-                createdUtc,
-                destination,
-                domain,
-                downs,
-                expanded,
-                isNew,
-                kind,
-                likes,
-                linkTitle,
-                nesting,
-                nowTimeMs,
-                numComments,
-                over18,
-                parentSubreddit,
-                score,
-                subreddit,
-                thingBodyWidth,
-                thingId,
-                title,
-                ups,
-                drawVotingArrows,
-                showThumbnail,
-                showStatusPoints,
-                formatter);
-    }
+    ThingView tv = (ThingView) view;
+    tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
+    tv.setData(author,
+        body,
+        createdUtc,
+        destination,
+        domain,
+        downs,
+        expanded,
+        isNew,
+        kind,
+        likes,
+        linkTitle,
+        nesting,
+        nowTimeMs,
+        numComments,
+        over18,
+        parentSubreddit,
+        score,
+        subreddit,
+        thingBodyWidth,
+        thingId,
+        title,
+        ups,
+        drawVotingArrows,
+        showThumbnail,
+        showStatusPoints,
+        formatter);
+  }
 
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
+  public void setAccountName(String accountName) {
+    this.accountName = accountName;
+  }
 
-    public String getAccountName() {
-        return accountName;
-    }
+  public String getAccountName() {
+    return accountName;
+  }
 
-    // Getters for attributes
+  // Getters for attributes
 
-    public String getAuthor(int position) {
-        return getString(position, MessageThreadLoader.INDEX_AUTHOR);
-    }
+  public String getAuthor(int pos) {
+    return getString(pos, MessageThreadLoader.INDEX_AUTHOR);
+  }
 
-    public String getThingId(int position) {
-        return getString(position, MessageThreadLoader.INDEX_THING_ID);
-    }
+  public String getThingId(int pos) {
+    return getString(pos, MessageThreadLoader.INDEX_THING_ID);
+  }
 }
