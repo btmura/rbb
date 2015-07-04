@@ -26,22 +26,27 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class SubredditThingListController extends ThingTableListController {
 
-    SubredditThingListController(Context context, Bundle args, OnThingViewClickListener listener) {
-        super(context, args, listener);
-    }
+  SubredditThingListController(
+      Context context,
+      Bundle args,
+      OnThingViewClickListener listener) {
+    super(context, args, listener);
+  }
 
-    @Override
-    public Loader<Cursor> createLoader() {
-        return new SubredditThingLoader(context,
-                getAccountName(),
-                getSubreddit(),
-                getFilter(),
-                getMoreId(),
-                getCursorExtras());
-    }
+  @Override
+  public Loader<Cursor> createLoader() {
+    return new SubredditThingLoader(
+        context,
+        getAccountName(),
+        getSubreddit(),
+        getFilter(),
+        getMoreId(),
+        getCount(),
+        getCursorExtras());
+  }
 
-    @Override
-    public int getSwipeAction() {
-        return SWIPE_ACTION_HIDE;
-    }
+  @Override
+  public int getSwipeAction() {
+    return SWIPE_ACTION_HIDE;
+  }
 }

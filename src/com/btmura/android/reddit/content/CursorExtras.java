@@ -16,18 +16,13 @@
 
 package com.btmura.android.reddit.content;
 
-import android.database.Cursor;
 import android.os.Bundle;
 
 public class CursorExtras {
 
-    private static final String EXTRA_SESSION_ID = "sessionId";
+  private static final String EXTRA_SESSION_ID = "sessionId";
 
-    public static long getSessionId(Cursor cursor) {
-        return cursor != null ? getSessionId(cursor.getExtras()) : 0;
-    }
-
-    public static long getSessionId(Bundle extras) {
-        return extras != null ? extras.getLong(EXTRA_SESSION_ID) : 0;
-    }
+  public static long getSessionId(Bundle extras) {
+    return extras != null ? extras.getLong(EXTRA_SESSION_ID) : 0;
+  }
 }

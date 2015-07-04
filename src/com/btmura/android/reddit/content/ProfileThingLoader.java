@@ -18,48 +18,54 @@ package com.btmura.android.reddit.content;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 
-public class ProfileThingLoader extends AbstractSessionLoader implements ThingProjection {
+public class ProfileThingLoader extends AbstractSessionLoader
+    implements ThingProjection {
 
-    private final String accountName;
-    private final String profileUser;
-    private final int filter;
+  private final String accountName;
+  private final String profileUser;
+  private final int filter;
 
-    public ProfileThingLoader(Context context,
-            String accountName,
-            String profileUser,
-            int filter,
-            String more,
-            Bundle cursorExtras) {
-        super(context,
-                ThingProvider.THINGS_URI,
-                PROJECTION,
-                getSelectionStatement(filter),
-                null,
-                cursorExtras,
-                more);
-        this.accountName = accountName;
-        this.profileUser = profileUser;
-        this.filter = filter;
-    }
+  public ProfileThingLoader(
+      Context context,
+      String accountName,
+      String profileUser,
+      int filter,
+      @Nullable String more,
+      int count,
+      Bundle cursorExtras) {
+    super(context,
+        ThingProvider.THINGS_URI,
+        PROJECTION,
+        getSelectionStatement(filter),
+        NO_SORT,
+        more,
+        count,
+        cursorExtras);
+    this.accountName = accountName;
+    this.profileUser = profileUser;
+    this.filter = filter;
+  }
 
-    private static String getSelectionStatement(int filter) {
-        return filter == Filter.PROFILE_HIDDEN
-                ? Things.SELECT_HIDDEN_BY_SESSION_ID
-                : Things.SELECT_NOT_HIDDEN_BY_SESSION_ID;
-    }
+  private static String getSelectionStatement(int filter) {
+    return filter == Filter.PROFILE_HIDDEN
+        ? Things.SELECT_HIDDEN_BY_SESSION_ID
+        : Things.SELECT_NOT_HIDDEN_BY_SESSION_ID;
+  }
 
-    @Override
-    protected Bundle getSession(Bundle sessionData, String more) {
-        return ThingProvider.getProfileSession(getContext(),
-                accountName,
-                profileUser,
-                filter,
-                sessionData,
-                more);
-    }
+  @Override
+  protected Bundle getSession(Bundle sessionData, String more, int count) {
+    return ThingProvider.getProfileSession(getContext(),
+        accountName,
+        profileUser,
+        filter,
+        more,
+        count,
+        sessionData);
+  }
 }

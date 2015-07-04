@@ -27,196 +27,220 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
-class MessageThingListController implements ThingListController<MessageListAdapter> {
+class MessageThingListController
+    implements ThingListController<MessageListAdapter> {
 
-    static final String EXTRA_ACCOUNT_NAME = "accountName";
-    static final String EXTRA_MESSAGE_USER = "messageUser";
-    static final String EXTRA_FILTER = "filter";
-    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
-    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
+  static final String EXTRA_ACCOUNT_NAME = "accountName";
+  static final String EXTRA_MESSAGE_USER = "messageUser";
+  static final String EXTRA_FILTER = "filter";
+  static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+  static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
-    private final Context context;
-    private final String accountName;
-    private final String messageUser;
-    private final MessageListAdapter adapter;
+  private final Context context;
+  private final String accountName;
+  private final String messageUser;
+  private final MessageListAdapter adapter;
 
-    private int filter;
-    private String moreId;
-    private Bundle cursorExtras;
+  private int filter;
+  private String moreId;
+  private int count;
+  private Bundle cursorExtras;
 
-    MessageThingListController(Context context, Bundle args) {
-        this.context = context;
-        this.accountName = getAccountNameExtra(args);
-        this.messageUser = getMessageUserExtra(args);
-        this.filter = getFilterExtra(args);
-        this.adapter = new MessageListAdapter(context, accountName, getSingleChoiceExtra(args));
+  MessageThingListController(Context context, Bundle args) {
+    this.context = context;
+    this.accountName = getAccountNameExtra(args);
+    this.messageUser = getMessageUserExtra(args);
+    this.filter = getFilterExtra(args);
+    this.adapter = new MessageListAdapter(context, accountName,
+        getSingleChoiceExtra(args));
+  }
+
+  @Override
+  public void restoreInstanceState(Bundle savedInstanceState) {
+    cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
+  }
+
+  @Override
+  public void saveInstanceState(Bundle outState) {
+    outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
+  }
+
+  // Loader related methods.
+
+  @Override
+  public Loader<Cursor> createLoader() {
+    return new MessageThingLoader(context, accountName, filter, moreId, count,
+        cursorExtras);
+  }
+
+  @Override
+  public void swapCursor(Cursor cursor) {
+    moreId = null;
+    adapter.swapCursor(cursor);
+    cursorExtras = cursor != null ? cursor.getExtras() : null;
+  }
+
+  @Override
+  public ThingBundle getThingBundle(int position) {
+    Cursor c = adapter.getCursor();
+    if (c != null && c.moveToPosition(position)) {
+      return adapter.getThingBundle(position);
     }
+    return null;
+  }
 
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
+  public String getMessageUser() {
+    return messageUser;
+  }
+
+  // Actions
+
+  @Override
+  public void onThingSelected(int position) {
+    if (adapter.isNew(position)) {
+      Provider.readMessageAsync(context, accountName, getThingId(position),
+          true);
     }
+  }
 
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
+  // More complex getters.
+
+  @Override
+  public String getNextMoreId() {
+    Cursor c = adapter.getCursor();
+    if (c != null && c.moveToLast()) {
+      if (c.getInt(MessageThingLoader.INDEX_KIND) == Kinds.KIND_MORE) {
+        return c.getString(MessageThingLoader.INDEX_THING_ID);
+      }
     }
+    return null;
+  }
 
-    // Loader related methods.
+  @Override
+  public boolean hasNextMoreId() {
+    return !TextUtils.isEmpty(getNextMoreId());
+  }
 
-    @Override
-    public Loader<Cursor> createLoader() {
-        return new MessageThingLoader(context, accountName, filter, moreId, cursorExtras);
+  @Override
+  public int getNextCount() {
+    Cursor c = adapter.getCursor();
+    if (c != null) {
+      return c.getCount() - 1;
     }
+    return 0;
+  }
 
-    @Override
-    public void swapCursor(Cursor cursor) {
-        moreId = null;
-        adapter.swapCursor(cursor);
-        cursorExtras = cursor != null ? cursor.getExtras() : null;
-    }
+  // Getters
 
-    @Override
-    public ThingBundle getThingBundle(int position) {
-        Cursor c = adapter.getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return adapter.getThingBundle(position);
-        }
-        return null;
-    }
+  @Override
+  public String getAccountName() {
+    return accountName;
+  }
 
-    public String getMessageUser() {
-        return messageUser;
-    }
+  @Override
+  public MessageListAdapter getAdapter() {
+    return adapter;
+  }
 
-    // Actions
+  @Override
+  public int getFilter() {
+    return filter;
+  }
 
-    @Override
-    public void onThingSelected(int position) {
-        if (adapter.isNew(position)) {
-            Provider.readMessageAsync(context, accountName, getThingId(position), true);
-        }
-    }
+  @Override
+  public String getMoreId() {
+    return moreId;
+  }
 
-    // More complex getters.
+  @Override
+  public int getCount() {
+    return count;
+  }
 
-    @Override
-    public String getNextMoreId() {
-        Cursor c = adapter.getCursor();
-        if (c != null && c.moveToLast()) {
-            if (c.getInt(MessageThingLoader.INDEX_KIND) == Kinds.KIND_MORE) {
-                return c.getString(MessageThingLoader.INDEX_THING_ID);
-            }
-        }
-        return null;
-    }
+  @Override
+  public boolean isSingleChoice() {
+    return adapter.isSingleChoice();
+  }
 
-    @Override
-    public boolean hasNextMoreId() {
-        return !TextUtils.isEmpty(getNextMoreId());
-    }
+  @Override
+  public int getSwipeAction() {
+    return SWIPE_ACTION_NONE;
+  }
 
-    // Getters
+  // Simple setters.
 
-    @Override
-    public String getAccountName() {
-        return accountName;
-    }
+  @Override
+  public void setFilter(int filter) {
+    this.filter = filter;
+  }
 
-    @Override
-    public MessageListAdapter getAdapter() {
-        return adapter;
-    }
+  @Override
+  public void setMoreId(String moreId) {
+    this.moreId = moreId;
+  }
 
-    @Override
-    public int getFilter() {
-        return filter;
-    }
+  @Override
+  public void setCount(int count) {
+    this.count = count;
+  }
 
-    @Override
-    public String getMoreId() {
-        return moreId;
-    }
+  @Override
+  public void setSelectedPosition(int position) {
+    adapter.setSelectedPosition(position);
+  }
 
-    @Override
-    public boolean isSingleChoice() {
-        return adapter.isSingleChoice();
-    }
+  @Override
+  public void setSelectedThing(String thingId, String linkId) {
+    adapter.setSelectedThing(thingId, linkId);
+  }
 
-    @Override
-    public int getSwipeAction() {
-        return SWIPE_ACTION_NONE;
-    }
+  @Override
+  public void setThingBodyWidth(int thingBodyWidth) {
+    adapter.setThingBodyWidth(thingBodyWidth);
+  }
 
-    // Simple setters.
+  // Simple adapter getters.
 
-    @Override
-    public void setFilter(int filter) {
-        this.filter = filter;
-    }
+  private String getThingId(int position) {
+    return adapter.getString(position, MessageThingLoader.INDEX_THING_ID);
+  }
 
-    @Override
-    public void setMoreId(String moreId) {
-        this.moreId = moreId;
-    }
+  // Getters for extras.
 
-    @Override
-    public void setSelectedPosition(int position) {
-        adapter.setSelectedPosition(position);
-    }
+  private static String getAccountNameExtra(Bundle extras) {
+    return extras.getString(EXTRA_ACCOUNT_NAME);
+  }
 
-    @Override
-    public void setSelectedThing(String thingId, String linkId) {
-        adapter.setSelectedThing(thingId, linkId);
-    }
+  private static String getMessageUserExtra(Bundle extras) {
+    return extras.getString(EXTRA_MESSAGE_USER);
+  }
 
-    @Override
-    public void setThingBodyWidth(int thingBodyWidth) {
-        adapter.setThingBodyWidth(thingBodyWidth);
-    }
+  private static int getFilterExtra(Bundle extras) {
+    return extras.getInt(EXTRA_FILTER);
+  }
 
-    // Simple adapter getters.
+  private static boolean getSingleChoiceExtra(Bundle extras) {
+    return extras.getBoolean(EXTRA_SINGLE_CHOICE);
+  }
 
-    private String getThingId(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_THING_ID);
-    }
+  // TODO(btmura): Remove the need for these methods.
 
-    // Getters for extras.
+  @Override
+  public String getQuery() {
+    return null;
+  }
 
-    private static String getAccountNameExtra(Bundle extras) {
-        return extras.getString(EXTRA_ACCOUNT_NAME);
-    }
+  @Override
+  public String getSubreddit() {
+    return null;
+  }
 
-    private static String getMessageUserExtra(Bundle extras) {
-        return extras.getString(EXTRA_MESSAGE_USER);
-    }
+  @Override
+  public void setParentSubreddit(String parentSubreddit) {
+  }
 
-    private static int getFilterExtra(Bundle extras) {
-        return extras.getInt(EXTRA_FILTER);
-    }
-
-    private static boolean getSingleChoiceExtra(Bundle extras) {
-        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
-    }
-
-    // TODO(btmura): Remove the need for these methods.
-
-    @Override
-    public String getQuery() {
-        return null;
-    }
-
-    @Override
-    public String getSubreddit() {
-        return null;
-    }
-
-    @Override
-    public void setParentSubreddit(String parentSubreddit) {
-    }
-
-    @Override
-    public void setSubreddit(String subreddit) {
-    }
+  @Override
+  public void setSubreddit(String subreddit) {
+  }
 
 }

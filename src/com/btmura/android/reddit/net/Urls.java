@@ -34,8 +34,6 @@ import java.net.URLEncoder;
 
 public class Urls {
 
-  // TODO(btmura): make count a parameter
-
   public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
   public static final String WWW_REDDIT_COM = "https://www.reddit.com";
@@ -75,7 +73,13 @@ public class Urls {
   private static final String U_PATH = "/u/";
   private static final String USER_PATH = "/user/";
 
-  private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+  public static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+  public static final String NO_SUBREDDIT = null;
+  public static final int NO_FILTER = -1;
+  public static final String NO_MORE = null;
+  public static final int NO_COUNT = -1;
+  public static final int NO_LIMIT = -1;
+
   private static final int FORMAT_HTML = 0;
   private static final int FORMAT_JSON = 1;
 
@@ -119,12 +123,15 @@ public class Urls {
       String accountName,
       String subreddit,
       int filter,
-      @Nullable String more) {
-    return innerSubreddit(accountName, subreddit, filter, more, FORMAT_JSON);
+      @Nullable String more,
+      int count) {
+    return innerSubreddit(accountName, subreddit, filter, more, count,
+        FORMAT_JSON);
   }
 
   public static CharSequence subredditLink(String subreddit) {
-    return innerSubreddit(NO_ACCOUNT, subreddit, -1, null, FORMAT_HTML);
+    return innerSubreddit(NO_ACCOUNT, subreddit, NO_FILTER, NO_MORE, NO_COUNT,
+        FORMAT_HTML);
   }
 
   private static CharSequence innerSubreddit(
@@ -132,6 +139,7 @@ public class Urls {
       String subreddit,
       int filter,
       @Nullable String more,
+      int count,
       int format) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
@@ -167,10 +175,18 @@ public class Urls {
       sb.append(".json");
     }
 
-    if (more != null) {
-      sb.append("?count=25&after=").append(encode(more));
-    }
+    boolean hasMore = more != null;
+    boolean hasCount = count != NO_COUNT;
 
+    if (hasMore || hasCount) {
+      sb.append('?');
+    }
+    if (hasMore) {
+      sb.append("&after=").append(encode(more));
+    }
+    if (hasCount) {
+      sb.append("&count=").append(count);
+    }
     return sb;
   }
 
@@ -193,12 +209,11 @@ public class Urls {
       String thingId,
       String linkId,
       int filter,
-      int numComments,
+      int limit,
       int format) {
     thingId = ThingIds.removeTag(thingId);
 
     boolean hasLinkId = !TextUtils.isEmpty(linkId);
-    boolean hasLimit = numComments != -1;
 
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
         .append(COMMENTS_PATH)
@@ -208,13 +223,16 @@ public class Urls {
       sb.append(".json");
     }
 
-    if (hasLinkId || hasLimit || filter != -1) {
-      sb.append("?");
+    boolean hasFilter = filter != NO_FILTER;
+    boolean hasLimit = limit != NO_LIMIT;
+
+    if (hasLinkId || hasFilter || hasLimit) {
+      sb.append('?');
     }
 
     if (hasLinkId) {
       sb.append("&comment=").append(encode(thingId)).append("&context=3");
-    } else if (filter != -1) {
+    } else if (hasFilter) {
       switch (filter) {
         case Filter.COMMENTS_BEST:
           sb.append("&sort=confidence");
@@ -246,7 +264,7 @@ public class Urls {
     }
 
     if (hasLimit) {
-      sb.append("&limit=").append(numComments);
+      sb.append("&limit=").append(limit);
     }
 
     return sb;
@@ -255,6 +273,7 @@ public class Urls {
   public static CharSequence messages(
       int filter,
       @Nullable String more,
+      int count,
       boolean mark) {
     StringBuilder sb = new StringBuilder(OAUTH_REDDIT_COM)
         .append(MESSAGES_PATH);
@@ -275,11 +294,18 @@ public class Urls {
       default:
         throw new IllegalArgumentException();
     }
-    if (more != null || mark) {
-      sb.append("?");
+
+    boolean hasMore = more != null;
+    boolean hasCount = count != NO_COUNT;
+
+    if (hasMore || hasCount || mark) {
+      sb.append('?');
     }
-    if (more != null) {
-      sb.append("&count=25&after=").append(encode(more));
+    if (hasMore) {
+      sb.append("&after=").append(encode(more));
+    }
+    if (hasCount) {
+      sb.append("&count=").append(count);
     }
     if (mark) {
       sb.append("&mark=true");
@@ -291,7 +317,8 @@ public class Urls {
       String accountName,
       String user,
       int filter,
-      @Nullable String more) {
+      @Nullable String more,
+      int count) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
         .append(USER_PATH)
         .append(encode(user));
@@ -327,8 +354,18 @@ public class Urls {
     if (needsJsonExtension(accountName, FORMAT_JSON)) {
       sb.append(".json");
     }
-    if (more != null) {
-      sb.append("?count=25&after=").append(encode(more));
+
+    boolean hasMore = more != null;
+    boolean hasCount = count != NO_COUNT;
+
+    if (hasMore || hasCount) {
+      sb.append('?');
+    }
+    if (hasMore) {
+      sb.append("&after=").append(encode(more));
+    }
+    if (hasCount) {
+      sb.append("&count=").append(count);
     }
     return sb;
   }
@@ -356,14 +393,17 @@ public class Urls {
       @Nullable String subreddit,
       String query,
       int filter,
-      @Nullable String more) {
-    return innerSearch(accountName, subreddit, false, query, filter, more);
+      @Nullable String more,
+      int count) {
+    return innerSearch(accountName, subreddit, false, query, filter, more,
+        count);
   }
 
   public static CharSequence subredditSearch(
       String accountName,
       String query) {
-    return innerSearch(accountName, null, true, query, -1, null);
+    return innerSearch(accountName, NO_SUBREDDIT, true, query, NO_FILTER,
+        NO_MORE, NO_COUNT);
   }
 
   private static CharSequence innerSearch(
@@ -372,7 +412,8 @@ public class Urls {
       boolean subredditSearch,
       String query,
       int filter,
-      @Nullable String more) {
+      @Nullable String more,
+      int count) {
     StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
 
     if (subredditSearch) {
@@ -408,8 +449,11 @@ public class Urls {
         sb.append("&sort=comments");
         break;
     }
+    if (count != NO_COUNT) {
+      sb.append("&count=").append(count);
+    }
     if (more != null) {
-      sb.append("&count=25&after=").append(encode(more));
+      sb.append("&after=").append(encode(more));
     }
     if (!TextUtils.isEmpty(subreddit)) {
       sb.append("&restrict_sr=on");

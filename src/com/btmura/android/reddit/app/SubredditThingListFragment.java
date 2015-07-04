@@ -21,35 +21,42 @@ import android.os.Bundle;
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SubredditThingListFragment
-        extends ThingTableListFragment<SubredditThingListController> {
+    extends ThingTableListFragment<SubredditThingListController> {
 
-    public static SubredditThingListFragment newInstance(String accountName, String subreddit,
-            int filter, boolean singleChoice) {
-        Bundle args = new Bundle(5);
-        args.putString(SubredditThingListController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(SubredditThingListController.EXTRA_PARENT_SUBREDDIT, subreddit);
-        args.putString(SubredditThingListController.EXTRA_SUBREDDIT, subreddit);
-        args.putInt(SubredditThingListController.EXTRA_FILTER, filter);
-        args.putBoolean(SubredditThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
+  public static SubredditThingListFragment newInstance(
+      String accountName,
+      String subreddit,
+      int filter,
+      boolean singleChoice) {
+    Bundle args = new Bundle(5);
+    args.putString(SubredditThingListController.EXTRA_ACCOUNT_NAME,
+        accountName);
+    args.putString(SubredditThingListController.EXTRA_PARENT_SUBREDDIT,
+        subreddit);
+    args.putString(SubredditThingListController.EXTRA_SUBREDDIT, subreddit);
+    args.putInt(SubredditThingListController.EXTRA_FILTER, filter);
+    args.putBoolean(SubredditThingListController.EXTRA_SINGLE_CHOICE,
+        singleChoice);
 
-        SubredditThingListFragment frag = new SubredditThingListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
+    SubredditThingListFragment frag = new SubredditThingListFragment();
+    frag.setArguments(args);
+    return frag;
+  }
 
-    @Override
-    protected SubredditThingListController createController() {
-        return new SubredditThingListController(getActivity(), getArguments(), this);
-    }
+  @Override
+  protected SubredditThingListController createController() {
+    return new SubredditThingListController(getActivity(), getArguments(),
+        this);
+  }
 
-    @Override
-    public boolean equalFragments(ComparableFragment o) {
-        return ComparableFragments.equalClasses(this, o)
-                && ComparableFragments.equalStrings(this, o,
-                        SubredditThingListController.EXTRA_ACCOUNT_NAME)
-                && ComparableFragments.equalStrings(this, o,
-                        SubredditThingListController.EXTRA_SUBREDDIT)
-                && ComparableFragments.equalInts(this, o,
-                        SubredditThingListController.EXTRA_FILTER);
-    }
+  @Override
+  public boolean equalFragments(ComparableFragment o) {
+    return ComparableFragments.equalClasses(this, o)
+        && ComparableFragments.equalStrings(this, o,
+            SubredditThingListController.EXTRA_ACCOUNT_NAME)
+        && ComparableFragments.equalStrings(this, o,
+            SubredditThingListController.EXTRA_SUBREDDIT)
+        && ComparableFragments.equalInts(this, o,
+            SubredditThingListController.EXTRA_FILTER);
+  }
 }

@@ -19,48 +19,54 @@ package com.btmura.android.reddit.app;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
 interface ThingListController<A extends AbstractThingListAdapter> extends
-        Controller<A>,
-        SubredditHolder {
+    Controller<A>,
+    SubredditHolder {
 
-    static final int SWIPE_ACTION_NONE = 0;
-    static final int SWIPE_ACTION_HIDE = 1;
-    static final int SWIPE_ACTION_UNHIDE = 2;
+  int SWIPE_ACTION_NONE = 0;
+  int SWIPE_ACTION_HIDE = 1;
+  int SWIPE_ACTION_UNHIDE = 2;
 
-    ThingBundle getThingBundle(int position);
+  ThingBundle getThingBundle(int position);
 
-    void onThingSelected(int position);
+  void onThingSelected(int position);
 
-    // Getters.
+  // Getters.
 
-    String getAccountName();
+  String getAccountName();
 
-    int getFilter();
+  int getFilter();
 
-    String getMoreId();
+  String getMoreId();
 
-    String getNextMoreId();
+  String getNextMoreId();
 
-    String getQuery();
+  int getCount();
 
-    boolean hasNextMoreId();
+  int getNextCount();
 
-    boolean isSingleChoice();
+  String getQuery();
 
-    int getSwipeAction();
+  boolean hasNextMoreId();
 
-    // Setters.
+  boolean isSingleChoice();
 
-    void setFilter(int filter);
+  int getSwipeAction();
 
-    void setMoreId(String moreId);
+  // Setters.
 
-    void setParentSubreddit(String parentSubreddit);
+  void setFilter(int filter);
 
-    void setSelectedPosition(int position);
+  void setMoreId(String moreId);
 
-    void setSelectedThing(String thingId, String linkId);
+  void setCount(int count);
 
-    void setSubreddit(String subreddit);
+  void setParentSubreddit(String parentSubreddit);
 
-    void setThingBodyWidth(int thingBodyWidth);
+  void setSelectedPosition(int position);
+
+  void setSelectedThing(String thingId, String linkId);
+
+  void setSubreddit(String subreddit);
+
+  void setThingBodyWidth(int thingBodyWidth);
 }

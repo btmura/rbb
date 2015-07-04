@@ -23,6 +23,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
@@ -68,6 +69,7 @@ class MessageListing extends JsonParser implements Listing {
   private final String thingId;
   private final int filter;
   private final String more;
+  private final int count;
   private final boolean mark;
 
   private final ArrayList<ContentValues> values =
@@ -81,7 +83,8 @@ class MessageListing extends JsonParser implements Listing {
       SQLiteOpenHelper dbHelper,
       String accountName,
       int filter,
-      String more,
+      @Nullable String more,
+      int count,
       boolean mark) {
     return new MessageListing(
         ctx,
@@ -91,6 +94,7 @@ class MessageListing extends JsonParser implements Listing {
         null,
         filter,
         more,
+        count,
         mark);
   }
 
@@ -108,6 +112,7 @@ class MessageListing extends JsonParser implements Listing {
         thingId,
         0,
         null,
+        -1,
         false);
   }
 
@@ -119,6 +124,7 @@ class MessageListing extends JsonParser implements Listing {
       String thingId,
       int filter,
       String more,
+      int count,
       boolean mark) {
     this.ctx = ctx;
     this.dbHelper = dbHelper;
@@ -127,6 +133,7 @@ class MessageListing extends JsonParser implements Listing {
     this.thingId = thingId;
     this.filter = filter;
     this.more = more;
+    this.count = count;
     this.mark = mark;
   }
 
@@ -163,7 +170,7 @@ class MessageListing extends JsonParser implements Listing {
   private CharSequence getUrl() {
     switch (sessionType) {
       case Sessions.TYPE_MESSAGES:
-        return Urls.messages(filter, more, mark);
+        return Urls.messages(filter, more, count, mark);
 
       case Sessions.TYPE_MESSAGE_THREAD:
         return Urls.messageThread(thingId);

@@ -23,6 +23,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -179,6 +180,7 @@ class ThingListing extends JsonParser implements Listing {
   private final String profileUser;
   private final int filter;
   private final String more;
+  private final int count;
   private final MarkdownFormatter formatter = new MarkdownFormatter();
 
   private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(
@@ -192,10 +194,11 @@ class ThingListing extends JsonParser implements Listing {
       Context context,
       SQLiteOpenHelper dbHelper,
       String accountName,
-      String subreddit,
+      @Nullable String subreddit,
       String query,
       int filter,
-      String more) {
+      @Nullable String more,
+      int count) {
     return new ThingListing(context,
         dbHelper,
         Sessions.TYPE_THING_SEARCH,
@@ -204,7 +207,8 @@ class ThingListing extends JsonParser implements Listing {
         query,
         null,
         filter,
-        more);
+        more,
+        count);
   }
 
   static ThingListing newSubredditInstance(
@@ -213,7 +217,8 @@ class ThingListing extends JsonParser implements Listing {
       String accountName,
       String subreddit,
       int filter,
-      String more) {
+      @Nullable String more,
+      int count) {
     return new ThingListing(context,
         dbHelper,
         Sessions.TYPE_SUBREDDIT,
@@ -222,7 +227,8 @@ class ThingListing extends JsonParser implements Listing {
         null,
         null,
         filter,
-        more);
+        more,
+        count);
   }
 
   static ThingListing newUserInstance(
@@ -231,7 +237,8 @@ class ThingListing extends JsonParser implements Listing {
       String accountName,
       String profileUser,
       int filter,
-      String more) {
+      @Nullable String more,
+      int count) {
     return new ThingListing(context,
         dbHelper,
         Sessions.TYPE_USER,
@@ -240,7 +247,8 @@ class ThingListing extends JsonParser implements Listing {
         null,
         profileUser,
         filter,
-        more);
+        more,
+        count);
   }
 
   private ThingListing(
@@ -252,7 +260,8 @@ class ThingListing extends JsonParser implements Listing {
       String query,
       String profileUser,
       int filter,
-      String more) {
+      String more,
+      int count) {
     this.ctx = context;
     this.dbHelper = dbHelper;
     this.sessionType = sessionType;
@@ -262,6 +271,7 @@ class ThingListing extends JsonParser implements Listing {
     this.profileUser = profileUser;
     this.filter = filter;
     this.more = more;
+    this.count = count;
   }
 
   @Override
@@ -298,12 +308,12 @@ class ThingListing extends JsonParser implements Listing {
 
   private CharSequence getUrl() {
     if (!TextUtils.isEmpty(profileUser)) {
-      return Urls.profile(accountName, profileUser, filter, more);
+      return Urls.profile(accountName, profileUser, filter, more, count);
     }
     if (!TextUtils.isEmpty(query)) {
-      return Urls.search(accountName, subreddit, query, filter, more);
+      return Urls.search(accountName, subreddit, query, filter, more, count);
     }
-    return Urls.subreddit(accountName, subreddit, filter, more);
+    return Urls.subreddit(accountName, subreddit, filter, more, count);
   }
 
   @Override

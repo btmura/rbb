@@ -165,7 +165,7 @@ public class RedditApi {
     HttpURLConnection conn = null;
     InputStream is = null;
     try {
-      CharSequence url = Urls.messages(Filter.MESSAGE_INBOX, null, true);
+      CharSequence url = Urls.messages(Filter.MESSAGE_INBOX, null, -1, true);
       conn = connect(ctx, accountName, url);
       is = conn.getInputStream();
       while (is.read() != -1) {

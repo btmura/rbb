@@ -30,54 +30,67 @@ import com.btmura.android.reddit.util.Array;
 
 abstract class AbstractSessionLoader extends CursorLoader {
 
-    private static final String TAG = "AbstractSessionLoader";
+  private static final String TAG = "AbstractSessionLoader";
 
-    private Bundle sessionData;
-    private String more;
+  protected static final String NO_SORT = null;
+  protected static final String NO_MORE = null;
+  protected static final int NO_COUNT = -1;
 
-    AbstractSessionLoader(Context context,
-            Uri uri,
-            String[] projection,
-            String selection,
-            String sortOrder,
-            Bundle sessionData,
-            String more) {
-        super(context, uri, projection, selection, null, sortOrder);
-        this.sessionData = sessionData;
-        this.more = more;
+  private String more;
+  private int count;
+  private Bundle sessionData;
+
+  AbstractSessionLoader(
+      Context context,
+      Uri uri,
+      String[] projection,
+      String selection,
+      String sortOrder,
+      String more,
+      int count,
+      Bundle sessionData) {
+    super(context, uri, projection, selection, null, sortOrder);
+    this.more = more;
+    this.count = count;
+    this.sessionData = sessionData;
+  }
+
+  @Override
+  public Cursor loadInBackground() {
+    if (BuildConfig.DEBUG) {
+      Log.d(TAG, "loadInBackground");
     }
 
-    @Override
-    public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-
-        // 1. Use the new session data if non-null.
-        // 2. If this is not a request for more data and it failed, then show no data but an error.
-        // 3. If this is a request for more data and it failed, then just show existing data.
-        Bundle newSessionData = getSession(sessionData, more);
-        if (newSessionData != null) {
-            sessionData = newSessionData;
-        } else if (TextUtils.isEmpty(more)) {
-            sessionData = null;
-        }
-
-        // Reset the request for more data after attempting to get it.
-        more = null;
-
-        return newCursor();
+    // 1. Use the new session data if non-null.
+    // 2. If this is not a request for more data and it failed,
+    //    then show no data but an error.
+    // 3. If this is a request for more data and it failed,
+    //    then just show existing data.
+    Bundle newSessionData = getSession(sessionData, more, count);
+    if (newSessionData != null) {
+      sessionData = newSessionData;
+    } else if (TextUtils.isEmpty(more)) {
+      sessionData = null;
     }
 
-    protected abstract Bundle getSession(Bundle sessionData, String more);
+    // Reset the request for more data after attempting to get it.
+    more = null;
 
-    private Cursor newCursor() {
-        if (sessionData != null) {
-            long sessionId = CursorExtras.getSessionId(sessionData);
-            setSelectionArgs(Array.of(sessionId));
-            Cursor c = super.loadInBackground();
-            return c != null ? new CursorExtrasWrapper(c, sessionData) : null;
-        }
-        return null;
+    return newCursor();
+  }
+
+  protected abstract Bundle getSession(
+      Bundle sessionData,
+      String more,
+      int count);
+
+  private Cursor newCursor() {
+    if (sessionData != null) {
+      long sessionId = CursorExtras.getSessionId(sessionData);
+      setSelectionArgs(Array.of(sessionId));
+      Cursor c = super.loadInBackground();
+      return c != null ? new CursorExtrasWrapper(c, sessionData) : null;
     }
+    return null;
+  }
 }

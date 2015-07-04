@@ -26,7 +26,8 @@ public class UrlsTest extends TestCase {
   private static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
   private static final String NO_SUBREDDIT = null;
   private static final int NO_FILTER = -1;
-  private static final String NO_MORE = null;
+  private static final String NO_MORE = Urls.NO_MORE;
+  private static final int NO_COUNT = Urls.NO_COUNT;
 
   private static final String ACCOUNT = "account";
   private static final String THING_ID = "thingId";
@@ -50,11 +51,13 @@ public class UrlsTest extends TestCase {
   public void testSubreddit() {
     assertCharSequenceEquals(
         "https://www.reddit.com/r/android/hot.json",
-        Urls.subreddit(NO_ACCOUNT, "android", Filter.SUBREDDIT_HOT, NO_MORE));
+        Urls.subreddit(NO_ACCOUNT, "android", Filter.SUBREDDIT_HOT, NO_MORE,
+            NO_COUNT));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/r/android/new",
-        Urls.subreddit(ACCOUNT, "android", Filter.SUBREDDIT_NEW, NO_MORE));
+        Urls.subreddit(ACCOUNT, "android", Filter.SUBREDDIT_NEW, NO_MORE,
+            NO_COUNT));
   }
 
   public void testSubredditLink() {
@@ -68,11 +71,13 @@ public class UrlsTest extends TestCase {
   public void testProfile() {
     assertCharSequenceEquals(
         "https://www.reddit.com/user/btmura/overview.json",
-        Urls.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, NO_MORE));
+        Urls.profile(NO_ACCOUNT, "btmura", Filter.PROFILE_OVERVIEW, NO_MORE,
+            NO_COUNT));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/user/btmura/comments",
-        Urls.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, NO_MORE));
+        Urls.profile(ACCOUNT, "btmura", Filter.PROFILE_COMMENTS, NO_MORE,
+            NO_COUNT));
   }
 
   public void testProfileLink() {
@@ -96,19 +101,21 @@ public class UrlsTest extends TestCase {
   public void testSearch() {
     assertCharSequenceEquals(
         "https://www.reddit.com/search.json?q=s2000",
-        Urls.search(NO_ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
+        Urls.search(NO_ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE,
+            NO_COUNT));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/search?q=s2000",
-        Urls.search(ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE));
+        Urls.search(ACCOUNT, NO_SUBREDDIT, "s2000", NO_FILTER, NO_MORE,
+            NO_COUNT));
 
     assertCharSequenceEquals(
         "https://www.reddit.com/r/cars/search.json?q=s2000&restrict_sr=on",
-        Urls.search(NO_ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
+        Urls.search(NO_ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE, NO_COUNT));
 
     assertCharSequenceEquals(
         "https://oauth.reddit.com/r/cars/search?q=s2000&restrict_sr=on",
-        Urls.search(ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE));
+        Urls.search(ACCOUNT, "cars", "s2000", NO_FILTER, NO_MORE, NO_COUNT));
   }
 
   public void testSubredditSearch() {
