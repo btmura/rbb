@@ -273,8 +273,7 @@ public class Urls {
   public static CharSequence messages(
       int filter,
       @Nullable String more,
-      int count,
-      boolean mark) {
+      int count) {
     StringBuilder sb = new StringBuilder(OAUTH_REDDIT_COM)
         .append(MESSAGES_PATH);
 
@@ -298,7 +297,7 @@ public class Urls {
     boolean hasMore = more != null;
     boolean hasCount = count != NO_COUNT;
 
-    if (hasMore || hasCount || mark) {
+    if (hasMore || hasCount) {
       sb.append('?');
     }
     if (hasMore) {
@@ -306,9 +305,6 @@ public class Urls {
     }
     if (hasCount) {
       sb.append("&count=").append(count);
-    }
-    if (mark) {
-      sb.append("&mark=true");
     }
     return sb;
   }

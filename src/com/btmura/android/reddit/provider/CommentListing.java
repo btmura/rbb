@@ -153,10 +153,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
   }
 
   @Override
-  public void performExtraWork(Context context) {
-  }
-
-  @Override
   public String getTargetTable() {
     return Comments.TABLE_NAME;
   }

@@ -166,7 +166,6 @@ public class ThingProvider extends BaseProvider {
   private static final String EXTRA_ID_ARRAY = "idArray";
   private static final String EXTRA_LIMIT = "limit";
   private static final String EXTRA_LINK_ID = "linkId";
-  private static final String EXTRA_MARK = "mark";
   private static final String EXTRA_MORE = "more";
   private static final String EXTRA_PARENT_THING_ID = "parentThingId";
   private static final String EXTRA_QUERY = "query";
@@ -367,13 +366,8 @@ public class ThingProvider extends BaseProvider {
     extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
     extras.putInt(EXTRA_FILTER, filter);
     extras.putBundle(EXTRA_SESSION_DATA, sessionData);
-    if (!TextUtils.isEmpty(more)) {
-      extras.putString(EXTRA_MORE, more);
-      extras.putInt(EXTRA_COUNT, count);
-    } else if (filter == Filter.MESSAGE_INBOX
-        || filter == Filter.MESSAGE_UNREAD) {
-      extras.putBoolean(EXTRA_MARK, true);
-    }
+    extras.putString(EXTRA_MORE, more);
+    extras.putInt(EXTRA_COUNT, count);
     return Provider.call(ctx, MESSAGES_URI, METHOD_GET_SESSION, accountName,
         extras);
   }
@@ -590,9 +584,8 @@ public class ThingProvider extends BaseProvider {
 
     try {
       Listing listing = createListing(accountName, extras);
-      Bundle newSessionData = getListingSession(accountName, listing,
-          sessionData);
-      listing.performExtraWork(getContext());
+      Bundle newSessionData =
+          getListingSession(accountName, listing, sessionData);
       if (BuildConfig.DEBUG) {
         Log.d(TAG, "getSession --> NEW " + newSessionData);
       }
@@ -625,7 +618,6 @@ public class ThingProvider extends BaseProvider {
     int filter = extras.getInt(EXTRA_FILTER, -1);
     int limit = extras.getInt(EXTRA_LIMIT, -1);
     String linkId = extras.getString(EXTRA_LINK_ID);
-    boolean mark = extras.getBoolean(EXTRA_MARK, false);
     String more = extras.getString(EXTRA_MORE);
     String query = extras.getString(EXTRA_QUERY);
     String subreddit = extras.getString(EXTRA_SUBREDDIT);
@@ -648,8 +640,7 @@ public class ThingProvider extends BaseProvider {
             accountName,
             filter,
             more,
-            count,
-            mark);
+            count);
 
       case Sessions.TYPE_SUBREDDIT:
         return ThingListing.newSubredditInstance(

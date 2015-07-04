@@ -32,13 +32,15 @@ public class AccountActions implements BaseColumns {
   public static final String COLUMN_ACTION = "action";
 
   /** Action that marks the account's messages read. */
+  @Deprecated // Marking messages doesn't do anything anymore.
   public static final int ACTION_MARK_MESSAGES_READ = 1;
 
   /** Where clause fragment to select actions by ID. */
   public static final String SELECT_BY_ID = SharedColumns.SELECT_BY_ID;
 
   /** Where clause fragment to select actions by account name. */
-  public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+  public static final String SELECT_BY_ACCOUNT =
+      SharedColumns.SELECT_BY_ACCOUNT;
 
   /** Runs SQL to create the table. */
   static void create(SQLiteDatabase db) {

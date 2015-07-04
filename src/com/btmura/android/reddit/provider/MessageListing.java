@@ -70,7 +70,6 @@ class MessageListing extends JsonParser implements Listing {
   private final int filter;
   private final String more;
   private final int count;
-  private final boolean mark;
 
   private final ArrayList<ContentValues> values =
       new ArrayList<ContentValues>(30);
@@ -84,8 +83,7 @@ class MessageListing extends JsonParser implements Listing {
       String accountName,
       int filter,
       @Nullable String more,
-      int count,
-      boolean mark) {
+      int count) {
     return new MessageListing(
         ctx,
         dbHelper,
@@ -94,8 +92,7 @@ class MessageListing extends JsonParser implements Listing {
         null,
         filter,
         more,
-        count,
-        mark);
+        count);
   }
 
   /** Returns an instance for a message thread. */
@@ -112,8 +109,7 @@ class MessageListing extends JsonParser implements Listing {
         thingId,
         0,
         null,
-        -1,
-        false);
+        -1);
   }
 
   private MessageListing(
@@ -124,8 +120,7 @@ class MessageListing extends JsonParser implements Listing {
       String thingId,
       int filter,
       String more,
-      int count,
-      boolean mark) {
+      int count) {
     this.ctx = ctx;
     this.dbHelper = dbHelper;
     this.sessionType = sessionType;
@@ -134,7 +129,6 @@ class MessageListing extends JsonParser implements Listing {
     this.filter = filter;
     this.more = more;
     this.count = count;
-    this.mark = mark;
   }
 
   @Override
@@ -170,20 +164,13 @@ class MessageListing extends JsonParser implements Listing {
   private CharSequence getUrl() {
     switch (sessionType) {
       case Sessions.TYPE_MESSAGES:
-        return Urls.messages(filter, more, count, mark);
+        return Urls.messages(filter, more, count);
 
       case Sessions.TYPE_MESSAGE_THREAD:
         return Urls.messageThread(thingId);
 
       default:
         throw new IllegalArgumentException();
-    }
-  }
-
-  @Override
-  public void performExtraWork(Context context) {
-    if (mark) {
-      Provider.markMessagesReadAsync(context, accountName);
     }
   }
 

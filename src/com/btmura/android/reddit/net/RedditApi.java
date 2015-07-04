@@ -160,22 +160,6 @@ public class RedditApi {
     }
   }
 
-  public static void markMessagesRead(Context ctx, String accountName)
-      throws IOException, AuthenticatorException, OperationCanceledException {
-    HttpURLConnection conn = null;
-    InputStream is = null;
-    try {
-      CharSequence url = Urls.messages(Filter.MESSAGE_INBOX, null, -1, true);
-      conn = connect(ctx, accountName, url);
-      is = conn.getInputStream();
-      while (is.read() != -1) {
-        // read entire input stream
-      }
-    } finally {
-      close(is, conn);
-    }
-  }
-
   // POST requests
 
   public static Result comment(

@@ -36,9 +36,6 @@ interface Listing {
   /** Get the values for this listing possibly using the network. */
   List<ContentValues> getValues() throws Exception;
 
-  /** Called after the insertion transaction to perform additional ops. */
-  void performExtraWork(Context context);
-
   /** Return the name of the table where the values should be inserted. */
   String getTargetTable();
 

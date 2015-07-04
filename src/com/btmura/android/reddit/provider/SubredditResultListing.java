@@ -90,10 +90,6 @@ class SubredditResultListing extends JsonParser implements Listing {
   }
 
   @Override
-  public void performExtraWork(Context context) {
-  }
-
-  @Override
   public String getTargetTable() {
     return SubredditResults.TABLE_NAME;
   }

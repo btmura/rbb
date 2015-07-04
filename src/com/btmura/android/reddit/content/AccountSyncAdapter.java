@@ -116,39 +116,10 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
         return;
       }
 
-      // Mark the account's messages as read if requested.
-      boolean markRead = false;
-      Cursor c = provider.query(
-          AccountProvider.ACCOUNT_ACTIONS_URI,
-          ACTION_PROJECTION,
-          AccountActions.SELECT_BY_ACCOUNT, Array.of(account.name),
-          null);
-      try {
-        while (c.moveToNext()) {
-          switch (c.getInt(ACTION)) {
-            case AccountActions.ACTION_MARK_MESSAGES_READ:
-              if (!markRead) {
-                RedditApi.markMessagesRead(getContext(), account.name);
-                markRead = true;
-              }
-              int deleted = provider.delete(
-                  AccountProvider.ACCOUNT_ACTIONS_URI,
-                  AccountActions.SELECT_BY_ID, Array.of(c.getInt(ID)));
-              syncResult.stats.numDeletes += deleted;
-              break;
-          }
-        }
-      } finally {
-        if (c != null) {
-          c.close();
-        }
-      }
-
       // Update the account row with the latest information if it has changed.
       AccountInfoResult result =
           RedditApi.getMyInfo(getContext(), account.name);
-      boolean newHasMail = result.hasMail && !markRead;
-      c = provider.query(
+      Cursor c = provider.query(
           AccountProvider.ACCOUNTS_URI,
           ACCOUNT_PROJECTION,
           Accounts.SELECT_BY_ACCOUNT, Array.of(account.name),
@@ -158,13 +129,13 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
         if (!c.moveToNext()
             || result.linkKarma != c.getInt(LINK_KARMA)
             || result.commentKarma != c.getInt(COMMENT_KARMA)
-            || newHasMail != (c.getInt(HAS_MAIL) == 1)) {
+            || result.hasMail != (c.getInt(HAS_MAIL) == 1)) {
           // Insert or replace the existing row and notify loaders.
           ContentValues v = new ContentValues(4);
           v.put(Accounts.COLUMN_ACCOUNT, account.name);
           v.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
           v.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
-          v.put(Accounts.COLUMN_HAS_MAIL, newHasMail);
+          v.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
           provider.insert(AccountProvider.ACCOUNTS_URI, v);
           syncResult.stats.numInserts++;
         }
