@@ -84,7 +84,6 @@
     <string name="hint_captcha">Captcha</string>
     <string name="hint_comment">Comment</string>
     <string name="hint_message">Message</string>
-    <string name="hint_password">Password</string>
     <string name="hint_subject">Subject</string>
     <string name="hint_subreddit">Subreddit</string>
     <string name="hint_text_or_link">Text or link</string>
@@ -93,8 +92,6 @@
     <string name="karma_count">%1$,d</string>
     <string name="label_accounts">Accounts</string>
     <string name="loading">Loading…</string>
-    <string name="login_error">There was a problem: %1$s</string>
-    <string name="login_importing_error">There was a problem importing your subreddits…</string>
     <string name="menu_accounts">Accounts</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
@@ -137,7 +134,6 @@
     <string name="provider_things">Things</string>
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
-    <string name="show_password">Show password</string>
     <string name="subreddits_category">Subreddits</string>
     <string name="subtitle_profile">profile</string>
     <string name="subtitle_messages">messages</string>

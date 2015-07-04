@@ -117,11 +117,11 @@ public class MarkdownTableScanner {
             if (cell.startsWith(":") && cell.endsWith(":")) {
                 return Gravity.CENTER;
             } else if (cell.startsWith(":")) {
-                return Gravity.LEFT;
+                return Gravity.START;
             } else if (cell.endsWith(":")) {
-                return Gravity.RIGHT;
+                return Gravity.END;
             }
         }
-        return Gravity.LEFT;
+        return Gravity.START;
     }
 }
