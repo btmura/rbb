@@ -77,9 +77,8 @@ public class MarkdownFormatter {
   static class Escaped {
 
     private static final Pattern AMP_PATTERN = Pattern.compile("&(amp);");
-    private static final Pattern FULL_PATTERN =
-        Pattern.compile(
-            "&(gt|lt|amp|quot|apos|nbsp|mdash|#(\\d+)|#([Xx])([0-9A-Za-z]+));");
+    private static final Pattern FULL_PATTERN = Pattern.compile(
+        "&(gt|lt|amp|quot|apos|nbsp|mdash|#(\\d+)|#([Xx])([0-9A-Za-z]+));");
 
     static CharSequence format(Matcher matcher, CharSequence text) {
       return format(FULL_PATTERN, matcher, format(AMP_PATTERN, matcher, text));
@@ -136,8 +135,8 @@ public class MarkdownFormatter {
 
   static class CodeBlock {
 
-    static Pattern PATTERN_CODE_BLOCK = Pattern.compile(
-        "(?m)^(    |\t)(?:.*)$");
+    static Pattern PATTERN_CODE_BLOCK =
+        Pattern.compile("(?m)^(    |\t)(?:.*)$");
 
     static CharSequence format(Matcher matcher, CharSequence text) {
       CharSequence s = text;
@@ -198,11 +197,11 @@ public class MarkdownFormatter {
     static final int STYLE_ITALIC = 1;
     static final int STYLE_STRIKETHROUGH = 2;
 
-    private static final Pattern PATTERN_BOLD = Pattern.compile(
-        "\\*\\*.+?\\*\\*");
+    private static final Pattern PATTERN_BOLD =
+        Pattern.compile("\\*\\*.+?\\*\\*");
     private static final Pattern PATTERN_ITALIC = Pattern.compile("\\*.+?\\*");
-    private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile(
-        "~~.+?~~");
+    private static final Pattern PATTERN_STRIKETHROUGH =
+        Pattern.compile("~~.+?~~");
 
     static CharSequence format(Matcher matcher, CharSequence text, int style) {
       Pattern p = null;
@@ -415,8 +414,8 @@ public class MarkdownFormatter {
 
   static class RelativeLinks {
 
-    static Pattern RELATIVE_LINK_PATTERN = Pattern.compile(
-        "/([ru])/([0-9A-Za-z_+]+)/?");
+    static Pattern RELATIVE_LINK_PATTERN =
+        Pattern.compile("/([ru])/([0-9A-Za-z_+]+)/?");
 
     static CharSequence format(Matcher matcher, CharSequence text) {
       CharSequence s = text;
@@ -437,8 +436,8 @@ public class MarkdownFormatter {
 
   static class Heading {
 
-    private static Pattern PATTERN = Pattern.compile(
-        "(?m)^(#{1,} ?)(?:.+?)(#*)$");
+    private static Pattern PATTERN =
+        Pattern.compile("(?m)^(#{1,} ?)(?:.+?)(#*)$");
 
     static CharSequence format(Matcher matcher, CharSequence text) {
       CharSequence s = text;

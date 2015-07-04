@@ -36,9 +36,9 @@ public class UserSpan extends ClickableSpan {
 
   @Override
   public void onClick(View widget) {
-    Context context = widget.getContext();
-    Intent intent = new Intent(context, UserProfileActivity.class);
+    Context ctx = widget.getContext();
+    Intent intent = new Intent(ctx, UserProfileActivity.class);
     intent.setData(Uri.parse(Urls.profileLink(user).toString()));
-    Contexts.startActivity(context, intent);
+    Contexts.startActivity(ctx, intent);
   }
 }
