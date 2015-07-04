@@ -21,41 +21,42 @@ import android.provider.BaseColumns;
 
 public class SubredditResults implements BaseColumns {
 
-    public static final String TABLE_NAME = "subredditResults";
+  public static final String TABLE_NAME = "subredditResults";
 
-    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
+  public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
 
-    public static final String COLUMN_NAME = "name";
+  public static final String COLUMN_NAME = "name";
 
-    public static final String COLUMN_OVER_18 = "over18";
+  public static final String COLUMN_OVER_18 = "over18";
 
-    public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
+  public static final String COLUMN_SESSION_ID =
+      SharedColumns.COLUMN_SESSION_ID;
 
-    /** Number of subscribers to this subreddit. */
-    public static final String COLUMN_SUBSCRIBERS = "subscribers";
+  /** Number of subscribers to this subreddit. */
+  public static final String COLUMN_SUBSCRIBERS = "subscribers";
 
-    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
+  public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 
-    public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
+  public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
 
-    static void create(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
-                + COLUMN_NAME + " TEXT, "
-                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + COLUMN_SESSION_ID + " TEXT NOT NULL, "
-                + COLUMN_SUBSCRIBERS + " INTEGER)");
-    }
+  static void create(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+        + _ID + " INTEGER PRIMARY KEY, "
+        + COLUMN_ACCOUNT + " TEXT NOT NULL, "
+        + COLUMN_NAME + " TEXT, "
+        + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
+        + COLUMN_SESSION_ID + " TEXT NOT NULL, "
+        + COLUMN_SUBSCRIBERS + " INTEGER)");
+  }
 
-    /** Creates the temporary table used in version 2. Kept for testing upgrades. */
-    static void createTempTableV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
-                + COLUMN_NAME + " TEXT, "
-                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + COLUMN_SESSION_ID + " TEXT NOT NULL, "
-                + COLUMN_SUBSCRIBERS + " INTEGER)");
-    }
+  /** Creates the temporary table used in v2. Kept for testing upgrades. */
+  static void createTempTableV2(SQLiteDatabase db) {
+    db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+        + _ID + " INTEGER PRIMARY KEY, "
+        + COLUMN_ACCOUNT + " TEXT NOT NULL, "
+        + COLUMN_NAME + " TEXT, "
+        + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
+        + COLUMN_SESSION_ID + " TEXT NOT NULL, "
+        + COLUMN_SUBSCRIBERS + " INTEGER)");
+  }
 }

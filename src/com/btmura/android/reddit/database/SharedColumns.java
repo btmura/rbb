@@ -20,25 +20,25 @@ import android.provider.BaseColumns;
 
 public class SharedColumns {
 
-    /** String account name. */
-    public static final String COLUMN_ACCOUNT = "account";
+  /** String account name. */
+  public static final String COLUMN_ACCOUNT = "account";
 
-    /** Long session id referring to the primary key in the sessions table. */
-    public static final String COLUMN_SESSION_ID = "sessionId";
+  /** Long session id referring to the primary key in the sessions table. */
+  public static final String COLUMN_SESSION_ID = "sessionId";
 
-    /** Full string name of some thing with the kind tag attached. */
-    public static final String COLUMN_THING_ID = "thingId";
+  /** Full string name of some thing with the kind tag attached. */
+  public static final String COLUMN_THING_ID = "thingId";
 
-    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
+  public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
 
-    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
-            COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
+  public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+      COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
 
-    public static final String SELECT_BY_ID = BaseColumns._ID + "=?";
+  public static final String SELECT_BY_ID = BaseColumns._ID + "=?";
 
-    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
+  public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 
-    public static final String SELECT_BY_THING_ID = COLUMN_THING_ID + "=?";
+  public static final String SELECT_BY_THING_ID = COLUMN_THING_ID + "=?";
 
-    public static final String SORT_BY_ID = BaseColumns._ID + " ASC";
+  public static final String SORT_BY_ID = BaseColumns._ID + " ASC";
 }

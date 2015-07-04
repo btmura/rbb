@@ -22,84 +22,87 @@ import android.provider.BaseColumns;
 /** Table for holding comments on things. */
 public class Comments implements BaseThingColumns, BaseColumns {
 
-    public static final String TABLE_NAME = "comments";
+  public static final String TABLE_NAME = "comments";
 
-    // Most of the columns are defined in BaseThingColumns. We implement BaseThingColumns, because
-    // we might need to create a SaveAction or HideAction from it.
+  // Most of the columns are defined in BaseThingColumns. We implement
+  // BaseThingColumns, because we might need to create a SaveAction or
+  // HideAction from it.
 
-    /** Column with the account name of the user viewing the comments. */
-    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
+  /** Column with the account name of the user viewing the comments. */
+  public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
 
-    /** Column with the body of a comment. Empty for the header comment. */
-    public static final String COLUMN_BODY = "body";
+  /** Column with the body of a comment. Empty for the header comment. */
+  public static final String COLUMN_BODY = "body";
 
-    /** Column with the {@link CommentActions} row ID for a pending comment. */
-    public static final String COLUMN_COMMENT_ACTION_ID = "commentActionId";
+  /** Column with the {@link CommentActions} row ID for a pending comment. */
+  public static final String COLUMN_COMMENT_ACTION_ID = "commentActionId";
 
-    /** Column indicating whether or not this comment is expanded. */
-    public static final String COLUMN_EXPANDED = "expanded";
+  /** Column indicating whether or not this comment is expanded. */
+  public static final String COLUMN_EXPANDED = "expanded";
 
-    /** Column with the kind of thing. */
-    public static final String COLUMN_KIND = Kinds.COLUMN_KIND;
+  /** Column with the kind of thing. */
+  public static final String COLUMN_KIND = Kinds.COLUMN_KIND;
 
-    /** Column with the nesting level starting from 0. */
-    public static final String COLUMN_NESTING = "nesting";
+  /** Column with the nesting level starting from 0. */
+  public static final String COLUMN_NESTING = "nesting";
 
-    /** Column with the self text of the comment. Only for header comments. */
-    public static final String COLUMN_SELF_TEXT = "selfText";
+  /** Column with the self text of the comment. Only for header comments. */
+  public static final String COLUMN_SELF_TEXT = "selfText";
 
-    /** Column with the sequence used to order existing and pending comments. */
-    public static final String COLUMN_SEQUENCE = "sequence";
+  /** Column with the sequence used to order existing and pending comments. */
+  public static final String COLUMN_SEQUENCE = "sequence";
 
-    /** Column with the session ID that groups comments of a thing together. */
-    public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
+  /** Column with the session ID that groups comments of a thing together. */
+  public static final String COLUMN_SESSION_ID =
+      SharedColumns.COLUMN_SESSION_ID;
 
-    /** Column with the thing ID of the comment. */
-    public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
+  /** Column with the thing ID of the comment. */
+  public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
 
-    /**
-     * Column to indicate whether this comment is visible. A comment whose parent is collapsed will
-     * have expanded to true but visible to false.
-     */
-    public static final String COLUMN_VISIBLE = "visible";
+  /**
+   * Column to indicate whether this comment is visible. A comment whose parent
+   * is collapsed will have expanded to true but visible to false.
+   */
+  public static final String COLUMN_VISIBLE = "visible";
 
-    /** String shown instead of author when a comment is deleted. */
-    public static final String DELETED_AUTHOR = Things.DELETED_AUTHOR;
+  /** String shown instead of author when a comment is deleted. */
+  public static final String DELETED_AUTHOR = Things.DELETED_AUTHOR;
 
-    /** String shown instead of body when a comment is deleted. */
-    public static final String DELETED_BODY = Things.DELETED_BODY;
+  /** String shown instead of body when a comment is deleted. */
+  public static final String DELETED_BODY = Things.DELETED_BODY;
 
-    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+  public static final String SELECT_BY_ACCOUNT =
+      SharedColumns.SELECT_BY_ACCOUNT;
 
-    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
-            SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
+  public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+      SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
 
-    public static final String SELECT_BY_COMMENT_ACTION_ID = COLUMN_COMMENT_ACTION_ID + "=?";
+  public static final String SELECT_BY_COMMENT_ACTION_ID =
+      COLUMN_COMMENT_ACTION_ID + "=?";
 
-    public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+  public static final String SELECT_BY_SESSION_ID =
+      SharedColumns.SELECT_BY_SESSION_ID;
 
-    public static final String SELECT_BY_SESSION_ID_AND_THING_ID =
-            SELECT_BY_SESSION_ID + " AND " + COLUMN_THING_ID + "=?";
+  public static final String SELECT_VISIBLE_BY_SESSION_ID =
+      COLUMN_VISIBLE + "=1 AND " + SharedColumns.SELECT_BY_SESSION_ID;
 
-    public static final String SELECT_VISIBLE_BY_SESSION_ID = COLUMN_VISIBLE + "=1 AND "
-            + SharedColumns.SELECT_BY_SESSION_ID;
+  public static final String SORT_BY_SEQUENCE_AND_ID =
+      COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
-    public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
-
-    static void create(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT,"
-                + COLUMN_BODY + " TEXT,"
-                + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
-                + COLUMN_EXPANDED + " INTEGER DEFAULT 1,"
-                + COLUMN_KIND + " INTEGER,"
-                + COLUMN_NESTING + " INTEGER,"
-                + COLUMN_SELF_TEXT + " TEXT DEFAULT '',"
-                + COLUMN_SEQUENCE + " INTEGER,"
-                + COLUMN_SESSION_ID + " TEXT,"
-                + COLUMN_THING_ID + " TEXT,"
-                + COLUMN_VISIBLE + " INTEGER DEFAULT 1,"
-                + CREATE_THING_COLUMNS_V2 + ")");
-    }
+  static void create(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+        + _ID + " INTEGER PRIMARY KEY,"
+        + COLUMN_ACCOUNT + " TEXT,"
+        + COLUMN_BODY + " TEXT,"
+        + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
+        + COLUMN_EXPANDED + " INTEGER DEFAULT 1,"
+        + COLUMN_KIND + " INTEGER,"
+        + COLUMN_NESTING + " INTEGER,"
+        + COLUMN_SELF_TEXT + " TEXT DEFAULT '',"
+        + COLUMN_SEQUENCE + " INTEGER,"
+        + COLUMN_SESSION_ID + " TEXT,"
+        + COLUMN_THING_ID + " TEXT,"
+        + COLUMN_VISIBLE + " INTEGER DEFAULT 1,"
+        + CREATE_THING_COLUMNS_V2 + ")");
+  }
 }
