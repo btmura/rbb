@@ -15,20 +15,21 @@
  */
 package com.btmura.android.reddit.util;
 
-import static com.btmura.android.reddit.util.Strings.ELLIPSIS;
 import junit.framework.TestCase;
+
+import static com.btmura.android.reddit.util.Strings.ELLIPSIS;
 
 public class StringsTest extends TestCase {
 
-    public void testEllipsize() throws Exception {
-        assertEquals("brian" + ELLIPSIS, ellipsize("brian   whitespace", 6));
-        assertEquals("bri" + ELLIPSIS, ellipsize("brian", 3));
-        assertEquals("brian", ellipsize("brian", 5));
-        assertEquals("", ellipsize("", 5));
-        assertEquals(null, ellipsize(null, 7));
-    }
+  public void testEllipsize() throws Exception {
+    assertEquals("brian" + ELLIPSIS, ellipsize("brian   whitespace", 6));
+    assertEquals("bri" + ELLIPSIS, ellipsize("brian", 3));
+    assertEquals("brian", ellipsize("brian", 5));
+    assertEquals("", ellipsize("", 5));
+    assertEquals(null, ellipsize(null, 7));
+  }
 
-    private String ellipsize(String text, int maxLength) {
-        return Strings.toString(Strings.ellipsize(text, maxLength));
-    }
+  private String ellipsize(String text, int maxLength) {
+    return Strings.toString(Strings.ellipsize(text, maxLength));
+  }
 }

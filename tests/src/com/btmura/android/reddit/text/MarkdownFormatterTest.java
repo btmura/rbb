@@ -16,32 +16,32 @@
 
 package com.btmura.android.reddit.text;
 
-import com.btmura.android.reddit.text.MarkdownFormatter;
-
 public class MarkdownFormatterTest extends AbstractFormatterTest {
 
-    protected MarkdownFormatter formatter;
+  protected MarkdownFormatter formatter;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        formatter = new MarkdownFormatter();
-    }
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    formatter = new MarkdownFormatter();
+  }
 
-    public void testFormatAll() {
-        assertFormatAll("this is **&amp;lt;bold&gt;** text",
-                "this is <bold> text");
-        assertFormatAll("this is &gt;*italics&amp;lt;* and this is ~~strikethrough~~",
-                "this is >italics< and this is strikethrough");
-        assertFormatAll("    code **line** 1\nnot a code line\n\tcode *line* 2",
-                "code **line** 1\nnot a code line\ncode *line* 2");
-        assertFormatAll("    **bullet1\n\t[hello](http://hello.com)\n\t### HEADING",
-                "**bullet1\n[hello](http://hello.com)\n### HEADING");
-    }
+  public void testFormatAll() {
+    assertFormatAll("this is **&amp;lt;bold&gt;** text",
+        "this is <bold> text");
+    assertFormatAll(
+        "this is &gt;*italics&amp;lt;* and this is ~~strikethrough~~",
+        "this is >italics< and this is strikethrough");
+    assertFormatAll("    code **line** 1\nnot a code line\n\tcode *line* 2",
+        "code **line** 1\nnot a code line\ncode *line* 2");
+    assertFormatAll("    **bullet1\n\t[hello](http://hello.com)\n\t### HEADING",
+        "**bullet1\n[hello](http://hello.com)\n### HEADING");
+  }
 
-    private void assertFormatAll(String input, String expected) {
-        CharSequence formatted = formatter.formatAll(mContext, input);
-        String actual = formatted.toString();
-        assertEquals("expected: " + expected + " actual: " + actual, expected, actual);
-    }
+  private void assertFormatAll(String input, String expected) {
+    CharSequence formatted = formatter.formatAll(mContext, input);
+    String actual = formatted.toString();
+    assertEquals("expected: " + expected + " actual: " + actual, expected,
+        actual);
+  }
 }

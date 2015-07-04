@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.text;
 
-import java.util.regex.Matcher;
-
 import android.test.AndroidTestCase;
 import android.text.SpannableStringBuilder;
 import android.text.style.BulletSpan;
@@ -35,127 +33,161 @@ import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
 import com.btmura.android.reddit.util.Array;
 
+import java.util.regex.Matcher;
+
 abstract class AbstractFormatterTest extends AndroidTestCase {
 
-    protected Matcher matcher;
+  protected Matcher matcher;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        matcher = RawLinks.PATTERN.matcher("");
-    }
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    matcher = RawLinks.PATTERN.matcher("");
+  }
 
-    void assertEscapedFormat(String input, String expected) {
-        String actual = Escaped.format(matcher, input).toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-    }
+  void assertEscapedFormat(String input, String expected) {
+    String actual = Escaped.format(matcher, input).toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+  }
 
-    CharSequence assertStyleFormat(int style, String input, String expected) {
-        CharSequence cs = Styles.format(matcher, input, style);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertStyleFormat(int style, String input, String expected) {
+    CharSequence cs = Styles.format(matcher, input, style);
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    CharSequence assertBulletFormat(String input, String expected) {
-        CharSequence cs = MarkdownFormatter.Bullets.format(matcher, input);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertBulletFormat(String input, String expected) {
+    CharSequence cs = MarkdownFormatter.Bullets.format(matcher, input);
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    CharSequence assertCodeBlockFormat(String input, String expected) {
-        CharSequence cs = MarkdownFormatter.CodeBlock.format(matcher, input);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertCodeBlockFormat(String input, String expected) {
+    CharSequence cs = MarkdownFormatter.CodeBlock.format(matcher, input);
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    CharSequence assertRawLinksFormat(String input, String expected) {
-        CharSequence cs = MarkdownFormatter.RawLinks.format(matcher, input);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertRawLinksFormat(String input, String expected) {
+    CharSequence cs = MarkdownFormatter.RawLinks.format(matcher, input);
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    CharSequence assertNamedLinksFormat(String input, String expected) {
-        CharSequence cs = MarkdownFormatter.NamedLinks.format(input, new StringBuilder());
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertNamedLinksFormat(String input, String expected) {
+    CharSequence cs = MarkdownFormatter.NamedLinks.format(input,
+        new StringBuilder());
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    CharSequence assertSubredditFormat(String input, String expected) {
-        CharSequence cs = RelativeLinks.format(matcher, input);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertSubredditFormat(String input, String expected) {
+    CharSequence cs = RelativeLinks.format(matcher, input);
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    CharSequence assertHeadingFormat(String input, String expected) {
-        CharSequence cs = MarkdownFormatter.Heading.format(matcher, input);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
+  CharSequence assertHeadingFormat(String input, String expected) {
+    CharSequence cs = MarkdownFormatter.Heading.format(matcher, input);
+    String actual = cs.toString();
+    assertEquals("Expected: " + expected + " Actual: " + actual, expected,
+        actual);
+    return cs;
+  }
 
-    static <T> void assertNoSpans(CharSequence cs, int start, int end, Class<T> spanClass) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        T[] spans = b.getSpans(start, end, spanClass);
-        assertTrue(Array.isEmpty(spans));
-    }
+  static <T> void assertNoSpans(
+      CharSequence cs,
+      int start,
+      int end,
+      Class<T> spanClass) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    T[] spans = b.getSpans(start, end, spanClass);
+    assertTrue(Array.isEmpty(spans));
+  }
 
-    static void assertStyleSpan(CharSequence cs, int start, int end, int expectedStyle) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        StyleSpan[] spans = b.getSpans(start, end, StyleSpan.class);
-        assertEquals(expectedStyle, spans[0].getStyle());
-    }
+  static void assertStyleSpan(
+      CharSequence cs,
+      int start,
+      int end,
+      int expectedStyle) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    StyleSpan[] spans = b.getSpans(start, end, StyleSpan.class);
+    assertEquals(expectedStyle, spans[0].getStyle());
+  }
 
-    static void assertBulletSpan(CharSequence cs, int start, int end) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        BulletSpan[] spans = b.getSpans(start, end, BulletSpan.class);
-        assertEquals(1, spans.length);
-    }
+  static void assertBulletSpan(CharSequence cs, int start, int end) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    BulletSpan[] spans = b.getSpans(start, end, BulletSpan.class);
+    assertEquals(1, spans.length);
+  }
 
-    static void assertCodeBlockSpan(CharSequence text, int start, int end) {
-        SpannableStringBuilder b = (SpannableStringBuilder) text;
-        TypefaceSpan[] spans = b.getSpans(start, end, TypefaceSpan.class);
-        assertEquals(1, spans.length);
-    }
+  static void assertCodeBlockSpan(CharSequence text, int start, int end) {
+    SpannableStringBuilder b = (SpannableStringBuilder) text;
+    TypefaceSpan[] spans = b.getSpans(start, end, TypefaceSpan.class);
+    assertEquals(1, spans.length);
+  }
 
-    static void assertStrikethroughSpan(CharSequence cs, int start, int end) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        StrikethroughSpan[] spans = b.getSpans(start, end, StrikethroughSpan.class);
-        assertEquals(1, spans.length);
-    }
+  static void assertStrikethroughSpan(CharSequence cs, int start, int end) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    StrikethroughSpan[] spans = b.getSpans(start, end, StrikethroughSpan.class);
+    assertEquals(1, spans.length);
+  }
 
-    static void assertSubredditSpan(CharSequence cs, int start, int end, String expectedSubreddit) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        SubredditSpan[] spans = b.getSpans(start, end, SubredditSpan.class);
-        assertEquals(1, spans.length);
-        assertEquals("assertSubredditSpan expected: " + expectedSubreddit + " actual: "
-                + spans[0].subreddit, expectedSubreddit, spans[0].subreddit);
-    }
+  static void assertSubredditSpan(
+      CharSequence cs,
+      int start,
+      int end,
+      String expectedSubreddit) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    SubredditSpan[] spans = b.getSpans(start, end, SubredditSpan.class);
+    assertEquals(1, spans.length);
+    assertEquals(
+        "assertSubredditSpan expected: " + expectedSubreddit + " actual: "
+            + spans[0].subreddit, expectedSubreddit, spans[0].subreddit);
+  }
 
-    static void assertUserSpan(CharSequence cs, int start, int end, String expectedUser) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        UserSpan[] spans = b.getSpans(start, end, UserSpan.class);
-        assertEquals(1, spans.length);
-        assertEquals("assertUserSpan expected: " + expectedUser + " actual: " + spans[0].user,
-                expectedUser, spans[0].user);
-    }
+  static void assertUserSpan(
+      CharSequence cs,
+      int start,
+      int end,
+      String expectedUser) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    UserSpan[] spans = b.getSpans(start, end, UserSpan.class);
+    assertEquals(1, spans.length);
+    assertEquals(
+        "assertUserSpan expected: " + expectedUser + " actual: " + spans[0].user,
+        expectedUser, spans[0].user);
+  }
 
-    static void assertUrlSpan(CharSequence cs, int start, int end, String expectedUrl) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        URLSpan[] spans = b.getSpans(start, end, URLSpan.class);
-        assertEquals(1, spans.length);
-        assertEquals("assertUrlSpan expected: " + expectedUrl + " actual: " + spans[0].getURL(),
-                expectedUrl, spans[0].getURL());
-    }
+  static void assertUrlSpan(
+      CharSequence cs,
+      int start,
+      int end,
+      String expectedUrl) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    URLSpan[] spans = b.getSpans(start, end, URLSpan.class);
+    assertEquals(1, spans.length);
+    assertEquals(
+        "assertUrlSpan expected: " + expectedUrl + " actual: " + spans[0].getURL(),
+        expectedUrl, spans[0].getURL());
+  }
 
-    static void assertImageSpan(CharSequence cs, int start, int end) {
-        SpannableStringBuilder b = (SpannableStringBuilder) cs;
-        ImageSpan[] spans = b.getSpans(start, end, ImageSpan.class);
-        assertEquals(1, spans.length);
-    }
+  static void assertImageSpan(CharSequence cs, int start, int end) {
+    SpannableStringBuilder b = (SpannableStringBuilder) cs;
+    ImageSpan[] spans = b.getSpans(start, end, ImageSpan.class);
+    assertEquals(1, spans.length);
+  }
 }

@@ -16,34 +16,34 @@
 
 package com.btmura.android.reddit.net;
 
+import android.test.AndroidTestCase;
+import android.util.JsonReader;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import android.test.AndroidTestCase;
-import android.util.JsonReader;
-
 public class ResultTest extends AndroidTestCase {
 
-    public void testErrors_empty() throws IOException {
-        Result result = parse("{\"json\": {\"errors\": []}}");
-        assertNull(result.errors);
-    }
+  public void testErrors_empty() throws IOException {
+    Result result = parse("{\"json\": {\"errors\": []}}");
+    assertNull(result.errors);
+  }
 
-    public void testErrors_nullToken() throws IOException {
-        Result result = parse("{\"json\": {\"errors\": [[\"QUOTA_FILLED\","
-                + " \"You've submitted too many links recently. Please try again in an hour.\","
-                + " null]]}}");
-        assertNotNull(result.errors);
-    }
+  public void testErrors_nullToken() throws IOException {
+    Result result = parse("{\"json\": {\"errors\": [[\"QUOTA_FILLED\","
+        + " \"You've submitted too many links recently. Please try again in an hour.\","
+        + " null]]}}");
+    assertNotNull(result.errors);
+  }
 
-    private Result parse(String json) throws IOException {
-        InputStream in = new ByteArrayInputStream(json.getBytes());
-        try {
-            return Result.getResult(new JsonReader(new InputStreamReader(in)));
-        } finally {
-            in.close();
-        }
+  private Result parse(String json) throws IOException {
+    InputStream in = new ByteArrayInputStream(json.getBytes());
+    try {
+      return Result.getResult(new JsonReader(new InputStreamReader(in)));
+    } finally {
+      in.close();
     }
+  }
 }
