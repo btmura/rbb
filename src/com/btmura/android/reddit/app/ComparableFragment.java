@@ -20,7 +20,7 @@ import android.os.Bundle;
 
 public interface ComparableFragment {
 
-    Bundle getArguments();
+  Bundle getArguments();
 
-    boolean equalFragments(ComparableFragment o);
+  boolean equalFragments(ComparableFragment o);
 }

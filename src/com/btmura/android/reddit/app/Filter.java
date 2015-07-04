@@ -18,34 +18,34 @@ package com.btmura.android.reddit.app;
 
 public interface Filter {
 
-    static final int COMMENTS_BEST = 0;
-    static final int COMMENTS_TOP = 1;
-    static final int COMMENTS_NEW = 2;
-    static final int COMMENTS_HOT = 3;
-    static final int COMMENTS_CONTROVERSIAL = 4;
-    static final int COMMENTS_OLD = 5;
+  int COMMENTS_BEST = 0;
+  int COMMENTS_TOP = 1;
+  int COMMENTS_NEW = 2;
+  int COMMENTS_HOT = 3;
+  int COMMENTS_CONTROVERSIAL = 4;
+  int COMMENTS_OLD = 5;
 
-    static final int MESSAGE_INBOX = 0;
-    static final int MESSAGE_UNREAD = 1;
-    static final int MESSAGE_SENT = 2;
+  int MESSAGE_INBOX = 0;
+  int MESSAGE_UNREAD = 1;
+  int MESSAGE_SENT = 2;
 
-    static final int PROFILE_OVERVIEW = 0;
-    static final int PROFILE_COMMENTS = 1;
-    static final int PROFILE_SUBMITTED = 2;
-    static final int PROFILE_UPVOTED = 3;
-    static final int PROFILE_DOWNVOTED = 4;
-    static final int PROFILE_HIDDEN = 5;
-    static final int PROFILE_SAVED = 6;
+  int PROFILE_OVERVIEW = 0;
+  int PROFILE_COMMENTS = 1;
+  int PROFILE_SUBMITTED = 2;
+  int PROFILE_UPVOTED = 3;
+  int PROFILE_DOWNVOTED = 4;
+  int PROFILE_HIDDEN = 5;
+  int PROFILE_SAVED = 6;
 
-    static final int SEARCH_RELEVANCE = 0;
-    static final int SEARCH_NEW = 1;
-    static final int SEARCH_HOT = 2;
-    static final int SEARCH_TOP = 3;
-    static final int SEARCH_COMMENTS = 4;
+  int SEARCH_RELEVANCE = 0;
+  int SEARCH_NEW = 1;
+  int SEARCH_HOT = 2;
+  int SEARCH_TOP = 3;
+  int SEARCH_COMMENTS = 4;
 
-    static final int SUBREDDIT_HOT = 0;
-    static final int SUBREDDIT_TOP = 1;
-    static final int SUBREDDIT_CONTROVERSIAL = 2;
-    static final int SUBREDDIT_NEW = 3;
-    static final int SUBREDDIT_RISING = 4;
+  int SUBREDDIT_HOT = 0;
+  int SUBREDDIT_TOP = 1;
+  int SUBREDDIT_CONTROVERSIAL = 2;
+  int SUBREDDIT_NEW = 3;
+  int SUBREDDIT_RISING = 4;
 }

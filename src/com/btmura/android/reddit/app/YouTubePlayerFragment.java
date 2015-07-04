@@ -35,64 +35,71 @@ import com.google.android.youtube.player.YouTubePlayer.OnInitializedListener;
 import com.google.android.youtube.player.YouTubePlayer.Provider;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
-public class YouTubePlayerFragment extends Fragment implements OnInitializedListener {
+public class YouTubePlayerFragment extends Fragment
+    implements OnInitializedListener {
 
-    private static final String TAG = "YouTubePlayerFragment";
+  private static final String TAG = "YouTubePlayerFragment";
 
-    private static final String ARG_URL = "url";
+  private static final String ARG_URL = "url";
 
-    public static boolean isPlayableWithYouTube(Context context, String url) {
-        return isYouTubeAvailable(context) && YouTubeUrls.isYouTubeVideoUrl(url);
+  public static boolean isPlayableWithYouTube(Context context, String url) {
+    return isYouTubeAvailable(context) && YouTubeUrls.isYouTubeVideoUrl(url);
+  }
+
+  private static boolean isYouTubeAvailable(Context context) {
+    return YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(context)
+        == YouTubeInitializationResult.SUCCESS;
+  }
+
+  public static YouTubePlayerFragment newInstance(String url) {
+    Bundle args = new Bundle(1);
+    args.putString(ARG_URL, url);
+
+    YouTubePlayerFragment frag = new YouTubePlayerFragment();
+    frag.setArguments(args);
+    return frag;
+  }
+
+  @Override
+  public View onCreateView(
+      LayoutInflater inflater, ViewGroup container,
+      Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.youtube, container, false);
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+
+    YouTubePlayerSupportFragment frag =
+        YouTubePlayerSupportFragment.newInstance();
+    frag.initialize(getString(R.string.key_youtube), this);
+
+    FragmentTransaction ft = getFragmentManager().beginTransaction();
+    ft.replace(R.id.youtube_fragment, frag);
+    ft.commit();
+  }
+
+  @Override
+  public void onInitializationSuccess(
+      Provider provider, YouTubePlayer player,
+      boolean wasRestored) {
+    if (!wasRestored) {
+      if (BuildConfig.DEBUG) {
+        Log.d(TAG, "url: " + getUrl() + " videoId: " + YouTubeUrls.getVideoId(
+            getUrl()));
+      }
+      player.loadVideo(YouTubeUrls.getVideoId(getUrl()));
     }
+  }
 
-    private static boolean isYouTubeAvailable(Context context) {
-        return YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(context)
-                == YouTubeInitializationResult.SUCCESS;
-    }
+  @Override
+  public void onInitializationFailure(
+      Provider provider,
+      YouTubeInitializationResult result) {
+  }
 
-    public static YouTubePlayerFragment newInstance(String url) {
-        Bundle args = new Bundle(1);
-        args.putString(ARG_URL, url);
-
-        YouTubePlayerFragment frag = new YouTubePlayerFragment();
-        frag.setArguments(args);
-        return frag;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.youtube, container, false);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        YouTubePlayerSupportFragment frag = YouTubePlayerSupportFragment.newInstance();
-        frag.initialize(getString(R.string.key_youtube), this);
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.youtube_fragment, frag);
-        ft.commit();
-    }
-
-    @Override
-    public void onInitializationSuccess(Provider provider, YouTubePlayer player,
-            boolean wasRestored) {
-        if (!wasRestored) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "url: " + getUrl() + " videoId: " + YouTubeUrls.getVideoId(getUrl()));
-            }
-            player.loadVideo(YouTubeUrls.getVideoId(getUrl()));
-        }
-    }
-
-    @Override
-    public void onInitializationFailure(Provider provider, YouTubeInitializationResult result) {
-    }
-
-    private String getUrl() {
-        return getArguments().getString(ARG_URL);
-    }
+  private String getUrl() {
+    return getArguments().getString(ARG_URL);
+  }
 }

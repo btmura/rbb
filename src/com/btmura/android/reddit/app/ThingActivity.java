@@ -35,115 +35,120 @@ import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.Strings;
 
 public class ThingActivity extends GlobalMenuActivity implements
-        LoaderCallbacks<AccountResult>,
-        OnThingEventListener,
-        AccountNameHolder,
-        SubredditHolder {
+    LoaderCallbacks<AccountResult>,
+    OnThingEventListener,
+    AccountNameHolder,
+    SubredditHolder {
 
-    public static final String EXTRA_THING_BUNDLE = "thingBundle";
+  public static final String EXTRA_THING_BUNDLE = "thingBundle";
 
-    private static final String THING_FRAGMENT_TAG = "thing";
+  private static final String THING_FRAGMENT_TAG = "thing";
 
-    private String accountName;
-    private ThingBundle thingBundle;
-    private final MarkdownFormatter formatter = new MarkdownFormatter();
+  private String accountName;
+  private ThingBundle thingBundle;
+  private final MarkdownFormatter formatter = new MarkdownFormatter();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getTheme(this));
-        setContentView(R.layout.thing);
-        setupPrereqs(savedInstanceState);
-        setupFragments(savedInstanceState);
-        setupActionBar(savedInstanceState);
-        getSupportLoaderManager().initLoader(0, null, this);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setTheme(ThemePrefs.getTheme(this));
+    setContentView(R.layout.thing);
+    setupPrereqs();
+    setupFragments(savedInstanceState);
+    setupActionBar();
+    getSupportLoaderManager().initLoader(0, null, this);
+  }
+
+  private void setupPrereqs() {
+    thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
+  }
+
+  private void setupFragments(Bundle savedInstanceState) {
+    if (savedInstanceState == null) {
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
+      ft.commit();
     }
+  }
 
-    private void setupPrereqs(Bundle savedInstanceState) {
-        thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
+  private void setupActionBar() {
+    ActionBar bar = getActionBar();
+    bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+        | ActionBar.DISPLAY_HOME_AS_UP
+        | ActionBar.DISPLAY_SHOW_TITLE);
+    refreshTitle(thingBundle.hasLinkId()
+        ? thingBundle.getLinkTitle()
+        : thingBundle.getTitle());
+  }
+
+  private void refreshTitle(String title) {
+    setTitle(Strings.toString(formatter.formatAll(this, title)));
+  }
+
+  @Override
+  public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+    return new AccountLoader(this, true, false);
+  }
+
+  @Override
+  public void onLoadFinished(
+      Loader<AccountResult> loader,
+      AccountResult result) {
+    this.accountName = result.getLastAccount(this);
+    ThingFragment frag = ThingFragment.newInstance(accountName, thingBundle);
+    if (!Objects.equals(frag, getThingFragment())) {
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.thing_container, frag, THING_FRAGMENT_TAG);
+      ft.commitAllowingStateLoss();
+      invalidateOptionsMenu();
     }
+  }
 
-    private void setupFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-            ft.commit();
-        }
+  @Override
+  public void onLoaderReset(Loader<AccountResult> loader) {
+  }
+
+  @Override
+  public void onThingTitleDiscovery(String title) {
+    refreshTitle(title);
+  }
+
+  @Override
+  public String getAccountName() {
+    return accountName;
+  }
+
+  @Override
+  public String getSubreddit() {
+    return thingBundle.getSubreddit();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        handleHome();
+        return true;
+
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
-    private void setupActionBar(Bundle savedInstanceState) {
-        ActionBar bar = getActionBar();
-        bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-                | ActionBar.DISPLAY_HOME_AS_UP
-                | ActionBar.DISPLAY_SHOW_TITLE);
-        refreshTitle(thingBundle.hasLinkId() ? thingBundle.getLinkTitle() : thingBundle.getTitle());
+  private void handleHome() {
+    Intent upIntent = NavUtils.getParentActivityIntent(this);
+    upIntent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubreddit());
+    if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+      TaskStackBuilder.create(this)
+          .addNextIntentWithParentStack(upIntent)
+          .startActivities();
+    } else {
+      NavUtils.navigateUpFromSameTask(this);
     }
+  }
 
-    private void refreshTitle(String title) {
-        setTitle(Strings.toString(formatter.formatAll(this, title)));
-    }
-
-    @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true, false);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        this.accountName = result.getLastAccount(this);
-        ThingFragment frag = ThingFragment.newInstance(accountName, thingBundle);
-        if (!Objects.equals(frag, getThingFragment())) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_container, frag, THING_FRAGMENT_TAG);
-            ft.commitAllowingStateLoss();
-            invalidateOptionsMenu();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
-    @Override
-    public void onThingTitleDiscovery(String title) {
-        refreshTitle(title);
-    }
-
-    @Override
-    public String getAccountName() {
-        return accountName;
-    }
-
-    @Override
-    public String getSubreddit() {
-        return thingBundle.getSubreddit();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                handleHome();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleHome() {
-        Intent upIntent = NavUtils.getParentActivityIntent(this);
-        upIntent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubreddit());
-        if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
-            TaskStackBuilder.create(this)
-                    .addNextIntentWithParentStack(upIntent)
-                    .startActivities();
-        } else {
-            NavUtils.navigateUpFromSameTask(this);
-        }
-    }
-
-    private ThingFragment getThingFragment() {
-        return (ThingFragment) getSupportFragmentManager().findFragmentByTag(THING_FRAGMENT_TAG);
-    }
+  private ThingFragment getThingFragment() {
+    return (ThingFragment) getSupportFragmentManager()
+        .findFragmentByTag(THING_FRAGMENT_TAG);
+  }
 }

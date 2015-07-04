@@ -27,10 +27,10 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 class SubredditThingListController extends ThingTableListController {
 
   SubredditThingListController(
-      Context context,
+      Context ctx,
       Bundle args,
       OnThingViewClickListener listener) {
-    super(context, args, listener);
+    super(ctx, args, listener);
   }
 
   @Override

@@ -53,10 +53,10 @@ public class SubredditThingListFragment
   public boolean equalFragments(ComparableFragment o) {
     return ComparableFragments.equalClasses(this, o)
         && ComparableFragments.equalStrings(this, o,
-            SubredditThingListController.EXTRA_ACCOUNT_NAME)
+        SubredditThingListController.EXTRA_ACCOUNT_NAME)
         && ComparableFragments.equalStrings(this, o,
-            SubredditThingListController.EXTRA_SUBREDDIT)
+        SubredditThingListController.EXTRA_SUBREDDIT)
         && ComparableFragments.equalInts(this, o,
-            SubredditThingListController.EXTRA_FILTER);
+        SubredditThingListController.EXTRA_FILTER);
   }
 }

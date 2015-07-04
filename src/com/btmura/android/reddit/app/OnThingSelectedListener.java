@@ -19,7 +19,7 @@ package com.btmura.android.reddit.app;
 import android.view.View;
 
 public interface OnThingSelectedListener {
-    void onThingSelected(View view, ThingBundle thingBundle, int pageType);
+  void onThingSelected(View view, ThingBundle thingBundle, int pageType);
 
-    int onThingBodyMeasure();
+  int onThingBodyMeasure();
 }

@@ -54,9 +54,9 @@ public class RelatedSubredditListFragment
   public boolean equalFragments(ComparableFragment o) {
     return ComparableFragments.equalClasses(this, o)
         && ComparableFragments.equalStrings(this, o,
-            RelatedSubredditListController.EXTRA_ACCOUNT_NAME)
+        RelatedSubredditListController.EXTRA_ACCOUNT_NAME)
         && ComparableFragments.equalStrings(this, o,
-            RelatedSubredditListController.EXTRA_SIDEBAR_SUBREDDIT);
+        RelatedSubredditListController.EXTRA_SIDEBAR_SUBREDDIT);
   }
 
   @Override

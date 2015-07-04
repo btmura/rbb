@@ -17,5 +17,5 @@
 package com.btmura.android.reddit.app;
 
 public interface ThingHolder {
-    boolean isShowingThing();
+  boolean isShowingThing();
 }

@@ -26,26 +26,27 @@ import com.btmura.android.reddit.content.ThemePrefs;
 
 public class MarkdownTableActivity extends FragmentActivity {
 
-    public static final String EXTRA_TABLE_DATA = "tableData";
+  public static final String EXTRA_TABLE_DATA = "tableData";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
-        setContentView(R.layout.markdown_table);
-        setFragments(savedInstanceState);
-    }
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
+    setContentView(R.layout.markdown_table);
+    setFragments(savedInstanceState);
+  }
 
-    private void setFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(android.R.id.content, MarkdownTableFragment.newInstance(getTableData()));
-            ft.commit();
-        }
+  private void setFragments(Bundle savedInstanceState) {
+    if (savedInstanceState == null) {
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(android.R.id.content,
+          MarkdownTableFragment.newInstance(getTableData()));
+      ft.commit();
     }
+  }
 
-    private String getTableData() {
-        return getIntent().getStringExtra(EXTRA_TABLE_DATA);
-    }
+  private String getTableData() {
+    return getIntent().getStringExtra(EXTRA_TABLE_DATA);
+  }
 }

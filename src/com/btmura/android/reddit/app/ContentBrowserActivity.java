@@ -32,71 +32,74 @@ import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 
-public class ContentBrowserActivity extends FragmentActivity implements OnUriClickListener {
+public class ContentBrowserActivity extends FragmentActivity
+    implements OnUriClickListener {
 
-    private static final String[] AUTHORITIES = {
-            AccountProvider.AUTHORITY,
-            SubredditProvider.AUTHORITY,
-            ThingProvider.AUTHORITY,
-    };
+  private static final String[] AUTHORITIES = {
+      AccountProvider.AUTHORITY,
+      SubredditProvider.AUTHORITY,
+      ThingProvider.AUTHORITY,
+  };
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getTheme(this));
-        setContentView(R.layout.content_browser);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setTheme(ThemePrefs.getTheme(this));
+    setContentView(R.layout.content_browser);
+    getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_browser_container, ContentUriListFragment.newInstance());
-            ft.commit();
-        }
+    if (savedInstanceState == null) {
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.content_browser_container,
+          ContentUriListFragment.newInstance());
+      ft.commit();
     }
+  }
 
-    public void onUriClick(Uri uri) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_browser_container, ContentRowListFragment.newInstance(uri));
-        ft.addToBackStack(null);
-        ft.commit();
-    }
+  public void onUriClick(Uri uri) {
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    ft.replace(R.id.content_browser_container,
+        ContentRowListFragment.newInstance(uri));
+    ft.addToBackStack(null);
+    ft.commit();
+  }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.debug_menu, menu);
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.debug_menu, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        finish();
         return true;
+
+      case R.id.menu_app_info:
+        handleAppInfo();
+        return true;
+
+      case R.id.menu_sync_settings:
+        handleSyncSettings();
+        return true;
+
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+  private void handleAppInfo() {
+    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+    intent.setData(Uri.parse("package:com.btmura.android.reddit"));
+    startActivity(intent);
+  }
 
-            case R.id.menu_app_info:
-                handleAppInfo();
-                return true;
-
-            case R.id.menu_sync_settings:
-                handleSyncSettings();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleAppInfo() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:com.btmura.android.reddit"));
-        startActivity(intent);
-    }
-
-    private void handleSyncSettings() {
-        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
-        startActivity(intent);
-    }
+  private void handleSyncSettings() {
+    Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
+    intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
+    startActivity(intent);
+  }
 }

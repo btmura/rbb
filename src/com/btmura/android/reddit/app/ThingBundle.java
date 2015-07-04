@@ -481,6 +481,5 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     private String readFormattedString(JsonReader reader) throws IOException {
       return Strings.toString(formatter.formatNoSpans(readString(reader, "")));
     }
-
   }
 }

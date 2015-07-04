@@ -34,90 +34,92 @@ import com.btmura.android.reddit.util.MarkdownTableScanner.OnTableScanListener;
 
 public class MarkdownTableFragment extends Fragment {
 
-    static final String TAG = "MarkdownTableFragment";
+  static final String TAG = "MarkdownTableFragment";
 
-    private static final String EXTRA_TABLE_DATA = "tableData";
+  private static final String EXTRA_TABLE_DATA = "tableData";
 
-    private static final String STATE_SCROLL_X = "scrollX";
-    private static final String STATE_SCROLL_Y = "scrollY";
+  private static final String STATE_SCROLL_X = "scrollX";
+  private static final String STATE_SCROLL_Y = "scrollY";
 
-    private ScrollView tableScrollView;
+  private ScrollView tableScrollView;
 
-    private final MarkdownFormatter formatter = new MarkdownFormatter();
+  private final MarkdownFormatter formatter = new MarkdownFormatter();
 
-    public static MarkdownTableFragment newInstance(String tableData) {
-        Bundle args = new Bundle(1);
-        args.putString(EXTRA_TABLE_DATA, tableData);
-        MarkdownTableFragment frag = new MarkdownTableFragment();
-        frag.setArguments(args);
-        return frag;
-    }
+  public static MarkdownTableFragment newInstance(String tableData) {
+    Bundle args = new Bundle(1);
+    args.putString(EXTRA_TABLE_DATA, tableData);
+    MarkdownTableFragment frag = new MarkdownTableFragment();
+    frag.setArguments(args);
+    return frag;
+  }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater,
-            ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.markdown_table_frag, container, false);
-        populateTable(view, inflater);
-        setupScrollView(view, savedInstanceState);
-        return view;
-    }
+  @Override
+  public View onCreateView(
+      LayoutInflater inflater,
+      ViewGroup container,
+      Bundle savedInstanceState) {
+    View view = inflater.inflate(R.layout.markdown_table_frag, container,
+        false);
+    populateTable(view, inflater);
+    setupScrollView(view, savedInstanceState);
+    return view;
+  }
 
-    private void populateTable(final View view, final LayoutInflater inflater) {
-        final TableLayout table = (TableLayout) view.findViewById(R.id.table);
-        MarkdownTableScanner.scan(getTableDataExtra(),
-                new OnTableScanListener<TableRow>() {
-                    @Override
-                    public TableRow onRowStart() {
-                        return new TableRow(getActivity());
-                    }
+  private void populateTable(final View view, final LayoutInflater inflater) {
+    final TableLayout table = (TableLayout) view.findViewById(R.id.table);
+    MarkdownTableScanner.scan(getTableDataExtra(),
+        new OnTableScanListener<TableRow>() {
+          @Override
+          public TableRow onRowStart() {
+            return new TableRow(getActivity());
+          }
 
-                    @Override
-                    public void onCell(TableRow container, Cell cell) {
-                        int layout = cell.isHeader
-                                ? R.layout.markdown_table_cell_header
-                                : R.layout.markdown_table_cell;
+          @Override
+          public void onCell(TableRow container, Cell cell) {
+            int layout = cell.isHeader
+                ? R.layout.markdown_table_cell_header
+                : R.layout.markdown_table_cell;
 
-                        TextView tv = (TextView) inflater.inflate(layout, container, false);
-                        tv.setGravity(cell.gravity);
-                        tv.setMovementMethod(LinkMovementMethod.getInstance());
-                        tv.setText(formatter.formatAll(getActivity(), cell.contents));
-                        container.addView(tv);
+            TextView tv = (TextView) inflater.inflate(layout, container, false);
+            tv.setGravity(cell.gravity);
+            tv.setMovementMethod(LinkMovementMethod.getInstance());
+            tv.setText(formatter.formatAll(getActivity(), cell.contents));
+            container.addView(tv);
 
-                        table.setColumnShrinkable(cell.column, true);
-                        table.setColumnStretchable(cell.column, true);
-                    }
+            table.setColumnShrinkable(cell.column, true);
+            table.setColumnStretchable(cell.column, true);
+          }
 
-                    @Override
-                    public void onRowEnd(TableRow row) {
-                        table.addView(row);
-                    }
-                });
-    }
+          @Override
+          public void onRowEnd(TableRow row) {
+            table.addView(row);
+          }
+        });
+  }
 
-    private void setupScrollView(View view, Bundle savedInstanceState) {
-        tableScrollView = (ScrollView) view.findViewById(R.id.table_scroller);
-        if (savedInstanceState != null) {
-            final int scrollX = savedInstanceState.getInt(STATE_SCROLL_X);
-            final int scrollY = savedInstanceState.getInt(STATE_SCROLL_Y);
-            tableScrollView.post(new Runnable() {
-                @Override
-                public void run() {
-                    tableScrollView.setScrollX(scrollX);
-                    tableScrollView.setScrollY(scrollY);
-                }
-            });
+  private void setupScrollView(View view, Bundle savedInstanceState) {
+    tableScrollView = (ScrollView) view.findViewById(R.id.table_scroller);
+    if (savedInstanceState != null) {
+      final int scrollX = savedInstanceState.getInt(STATE_SCROLL_X);
+      final int scrollY = savedInstanceState.getInt(STATE_SCROLL_Y);
+      tableScrollView.post(new Runnable() {
+        @Override
+        public void run() {
+          tableScrollView.setScrollX(scrollX);
+          tableScrollView.setScrollY(scrollY);
         }
+      });
     }
+  }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SCROLL_X, tableScrollView.getScrollX());
-        outState.putInt(STATE_SCROLL_Y, tableScrollView.getScrollY());
-    }
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putInt(STATE_SCROLL_X, tableScrollView.getScrollX());
+    outState.putInt(STATE_SCROLL_Y, tableScrollView.getScrollY());
+  }
 
-    private String getTableDataExtra() {
-        return getArguments().getString(EXTRA_TABLE_DATA);
-    }
+  private String getTableDataExtra() {
+    return getArguments().getString(EXTRA_TABLE_DATA);
+  }
 }

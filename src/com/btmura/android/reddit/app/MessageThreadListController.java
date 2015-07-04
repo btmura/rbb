@@ -34,169 +34,187 @@ import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
 public class MessageThreadListController
-        implements Controller<MessageThreadAdapter>, ActionModeController {
+    implements Controller<MessageThreadAdapter>, ActionModeController {
 
-    static final String EXTRA_ACCOUNT_NAME = "accountName";
-    static final String EXTRA_THING_ID = "thingId";
-    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
+  static final String EXTRA_ACCOUNT_NAME = "accountName";
+  static final String EXTRA_THING_ID = "thingId";
+  static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
-    private final Context context;
-    private final String accountName;
-    private final String thingId;
-    private final MessageThreadAdapter adapter;
-    private Bundle cursorExtras;
-    private ActionMode actionMode;
+  private final Context context;
+  private final String accountName;
+  private final String thingId;
+  private final MessageThreadAdapter adapter;
+  private Bundle cursorExtras;
+  private ActionMode actionMode;
 
-    MessageThreadListController(Context context, Bundle args) {
-        this.context = context;
-        this.accountName = getAccountNameExtra(args);
-        this.thingId = getThingIdExtra(args);
-        this.adapter = new MessageThreadAdapter(context);
+  MessageThreadListController(Context context, Bundle args) {
+    this.context = context;
+    this.accountName = getAccountNameExtra(args);
+    this.thingId = getThingIdExtra(args);
+    this.adapter = new MessageThreadAdapter(context);
+  }
+
+  @Override
+  public void restoreInstanceState(Bundle savedInstanceState) {
+    cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
+  }
+
+  @Override
+  public void saveInstanceState(Bundle outState) {
+    outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
+  }
+
+  @Override
+  public Loader<Cursor> createLoader() {
+    return new MessageThreadLoader(context, accountName, thingId, cursorExtras);
+  }
+
+  @Override
+  public void swapCursor(Cursor cursor) {
+    adapter.swapCursor(cursor);
+    cursorExtras = cursor != null ? cursor.getExtras() : null;
+  }
+
+  // Getters
+
+  @Override
+  public MessageThreadAdapter getAdapter() {
+    return adapter;
+  }
+
+  public String getAccountName() {
+    return accountName;
+  }
+
+  // ActionModeController implementation
+
+  @Override
+  public void invalidateActionMode() {
+    if (actionMode != null) {
+      actionMode.invalidate();
+    }
+  }
+
+  @Override
+  public boolean onCreateActionMode(
+      ActionMode mode,
+      Menu menu,
+      ListView listView) {
+    if (adapter.getCursor() == null) {
+      listView.clearChoices();
+      return false;
     }
 
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
+    actionMode = mode;
+    MenuInflater inflater = mode.getMenuInflater();
+    inflater.inflate(R.menu.message_thread_action_menu, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onPrepareActionMode(
+      ActionMode mode,
+      Menu menu,
+      ListView listView) {
+    int count = listView.getCheckedItemCount();
+    int position = Views.getCheckedPosition(listView);
+
+    mode.setTitle(
+        context.getResources().getQuantityString(R.plurals.messages, count,
+            count));
+    prepareReplyActionItem(menu, count, position);
+    prepareAuthorActionItem(menu, count, position);
+    return true;
+  }
+
+  private void prepareReplyActionItem(
+      Menu menu,
+      int checkedCount,
+      int position) {
+    boolean show = checkedCount == 1
+        && !Objects.equals(accountName, adapter.getAuthor(position))
+        && !TextUtils.isEmpty(adapter.getThingId(position));
+    menu.findItem(R.id.menu_new_comment).setVisible(show);
+  }
+
+  private void prepareAuthorActionItem(
+      Menu menu,
+      int checkedCount,
+      int position) {
+    String author = adapter.getAuthor(position);
+    boolean show = checkedCount == 1 && MenuHelper.isUserItemVisible(author);
+    MenuItem item = menu.findItem(R.id.menu_author);
+    item.setVisible(show);
+    if (item.isVisible()) {
+      item.setTitle(MenuHelper.getUserTitle(context, author));
     }
+  }
 
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
-    }
-
-    @Override
-    public Loader<Cursor> createLoader() {
-        return new MessageThreadLoader(context, accountName, thingId, cursorExtras);
-    }
-
-    @Override
-    public void swapCursor(Cursor cursor) {
-        adapter.swapCursor(cursor);
-        cursorExtras = cursor != null ? cursor.getExtras() : null;
-    }
-
-    // Getters
-
-    @Override
-    public MessageThreadAdapter getAdapter() {
-        return adapter;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    // ActionModeController implementation
-
-    @Override
-    public void invalidateActionMode() {
-        if (actionMode != null) {
-            actionMode.invalidate();
-        }
-    }
-
-    @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView) {
-        if (adapter.getCursor() == null) {
-            listView.clearChoices();
-            return false;
-        }
-
-        actionMode = mode;
-        MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.message_thread_action_menu, menu);
+  @Override
+  public boolean onActionItemClicked(
+      ActionMode mode,
+      MenuItem item,
+      ListView lv) {
+    switch (item.getItemId()) {
+      case R.id.menu_new_comment:
+        handleNewComment(lv);
+        mode.finish();
         return true;
-    }
 
-    @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
-        int count = listView.getCheckedItemCount();
-        int position = Views.getCheckedPosition(listView);
-
-        mode.setTitle(context.getResources().getQuantityString(R.plurals.messages, count, count));
-        prepareReplyActionItem(menu, count, position);
-        prepareAuthorActionItem(menu, count, position);
+      case R.id.menu_author:
+        handleAuthor(lv);
+        mode.finish();
         return true;
+
+      default:
+        return false;
     }
+  }
 
-    private void prepareReplyActionItem(Menu menu, int checkedCount, int position) {
-        boolean show = checkedCount == 1
-                && !Objects.equals(accountName, adapter.getAuthor(position))
-                && !TextUtils.isEmpty(adapter.getThingId(position));
-        menu.findItem(R.id.menu_new_comment).setVisible(show);
-    }
+  private void handleNewComment(ListView listView) {
+    int position = Views.getCheckedPosition(listView);
+    String user = adapter.getAuthor(position);
 
-    private void prepareAuthorActionItem(Menu menu, int checkedCount, int position) {
-        String author = adapter.getAuthor(position);
-        boolean show = checkedCount == 1 && MenuHelper.isUserItemVisible(author);
-        MenuItem item = menu.findItem(R.id.menu_author);
-        item.setVisible(show);
-        if (item.isVisible()) {
-            item.setTitle(MenuHelper.getUserTitle(context, author));
-        }
-    }
+    // Message threads are odd in that the thing id doesn't refer to the
+    // topmost message, so the actions may not match up with the id. So get
+    // the parent id from the first element.
+    String parentThingId = adapter.getThingId(0);
+    String thingId = adapter.getThingId(position);
 
-    @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView) {
-        switch (item.getItemId()) {
-            case R.id.menu_new_comment:
-                handleNewComment(listView);
-                mode.finish();
-                return true;
+    MenuHelper.startMessageReplyComposer(context,
+        accountName,
+        user,
+        null,
+        parentThingId,
+        thingId,
+        false);
+  }
 
-            case R.id.menu_author:
-                handleAuthor(listView);
-                mode.finish();
-                return true;
+  private void handleAuthor(ListView listView) {
+    int position = Views.getCheckedPosition(listView);
+    MenuHelper.startProfileActivity(context, adapter.getAuthor(position));
+  }
 
-            default:
-                return false;
-        }
-    }
+  @Override
+  public void onItemCheckedStateChanged(
+      ActionMode mode, int position, long id,
+      boolean checked) {
+    mode.invalidate();
+  }
 
-    private void handleNewComment(ListView listView) {
-        int position = Views.getCheckedPosition(listView);
-        String user = adapter.getAuthor(position);
+  @Override
+  public void onDestroyActionMode(ActionMode mode) {
+    actionMode = null;
+  }
 
-        // Message threads are odd in that the thing id doesn't refer to the
-        // topmost message, so the actions may not match up with the id. So get
-        // the parent id from the first element.
-        String parentThingId = adapter.getThingId(0);
-        String thingId = adapter.getThingId(position);
+  // Getters for extras.
 
-        MenuHelper.startMessageReplyComposer(context,
-                accountName,
-                user,
-                null,
-                parentThingId,
-                thingId,
-                false);
-    }
+  private static String getAccountNameExtra(Bundle extras) {
+    return extras.getString(EXTRA_ACCOUNT_NAME);
+  }
 
-    private void handleAuthor(ListView listView) {
-        int position = Views.getCheckedPosition(listView);
-        MenuHelper.startProfileActivity(context, adapter.getAuthor(position));
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-            boolean checked) {
-        mode.invalidate();
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        actionMode = null;
-    }
-
-    // Getters for extras.
-
-    private static String getAccountNameExtra(Bundle extras) {
-        return extras.getString(EXTRA_ACCOUNT_NAME);
-    }
-
-    private static String getThingIdExtra(Bundle extras) {
-        return extras.getString(EXTRA_THING_ID);
-    }
+  private static String getThingIdExtra(Bundle extras) {
+    return extras.getString(EXTRA_THING_ID);
+  }
 
 }

@@ -22,18 +22,18 @@ import android.view.MenuItem;
 
 class NoMenuController implements MenuController {
 
-    static final NoMenuController INSTANCE = new NoMenuController();
+  static final NoMenuController INSTANCE = new NoMenuController();
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    }
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+  }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-    }
+  @Override
+  public void onPrepareOptionsMenu(Menu menu) {
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return false;
-    }
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    return false;
+  }
 }

@@ -16,28 +16,29 @@
 
 package com.btmura.android.reddit.app;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 
 abstract class GlobalMenuActivity extends FragmentActivity {
 
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_SEARCH:
-                GlobalMenuFragment frag = getGlobalMenuFragment();
-                if (frag != null) {
-                    frag.handleSearch();
-                    return true;
-                }
-
-            default:
-                return super.onKeyUp(keyCode, event);
+  @Override
+  public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
+    switch (keyCode) {
+      case KeyEvent.KEYCODE_SEARCH:
+        GlobalMenuFragment frag = getGlobalMenuFragment();
+        if (frag != null) {
+          frag.handleSearch();
+          return true;
         }
-    }
 
-    private GlobalMenuFragment getGlobalMenuFragment() {
-        return (GlobalMenuFragment) getSupportFragmentManager()
-                .findFragmentByTag(GlobalMenuFragment.TAG);
+      default:
+        return super.onKeyUp(keyCode, event);
     }
+  }
+
+  private GlobalMenuFragment getGlobalMenuFragment() {
+    return (GlobalMenuFragment) getSupportFragmentManager()
+        .findFragmentByTag(GlobalMenuFragment.TAG);
+  }
 }

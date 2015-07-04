@@ -19,5 +19,5 @@ package com.btmura.android.reddit.app;
 import android.view.View;
 
 public interface OnSubredditSelectedListener {
-    void onSubredditSelected(View view, String subreddit, boolean onLoad);
+  void onSubredditSelected(View view, String subreddit, boolean onLoad);
 }

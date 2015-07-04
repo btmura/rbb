@@ -32,151 +32,154 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 
 public class SidebarActivity extends AbstractBrowserActivity implements
-        LoaderCallbacks<AccountResult>,
-        TabListener,
-        AccountResultHolder,
-        SubredditHolder {
+    LoaderCallbacks<AccountResult>,
+    TabListener,
+    AccountResultHolder,
+    SubredditHolder {
 
-    private static final String TAG = "SidebarActivity";
+  private static final String TAG = "SidebarActivity";
 
-    public static final String EXTRA_SUBREDDIT = "subreddit";
+  public static final String EXTRA_SUBREDDIT = "subreddit";
 
-    private AccountResult accountResult;
-    private String accountName;
+  private AccountResult accountResult;
+  private String accountName;
 
-    private TabController tabController;
-    private Tab tabDescription;
-    private Tab tabRelated;
+  private TabController tabController;
+  private Tab tabDescription;
+  private Tab tabRelated;
 
-    public SidebarActivity() {
-        super(SidebarThingActivity.class);
+  public SidebarActivity() {
+    super(SidebarThingActivity.class);
+  }
+
+  @Override
+  protected void setContentView() {
+    setTheme(ThemePrefs.getTheme(this));
+    setContentView(R.layout.sidebar);
+  }
+
+  @Override
+  protected boolean skipSetup(Bundle savedInstanceState) {
+    tabController = new TabController(bar, savedInstanceState);
+    tabDescription = tabController.addTab(
+        newTab(getString(R.string.tab_description)));
+    tabRelated = tabController.addTab(newTab(getString(R.string.tab_related)));
+    return false;
+  }
+
+  private Tab newTab(CharSequence text) {
+    return bar.newTab().setText(text).setTabListener(this);
+  }
+
+  @Override
+  protected void doSetup(Bundle savedInstanceState) {
+    if (!hasSubredditName()) {
+      setSubredditName("android");
     }
+    bar.setDisplayHomeAsUpEnabled(true);
+    getSupportLoaderManager().initLoader(0, null, this);
+  }
 
-    @Override
-    protected void setContentView() {
-        setTheme(ThemePrefs.getTheme(this));
-        setContentView(R.layout.sidebar);
+  @Override
+  public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+    return new AccountLoader(this, true, false);
+  }
+
+  @Override
+  public void onLoadFinished(
+      Loader<AccountResult> loader,
+      AccountResult result) {
+    accountResult = result;
+    accountName = result.getLastAccount(this);
+    tabController.setupTabs();
+  }
+
+  @Override
+  public void onLoaderReset(Loader<AccountResult> loader) {
+    accountResult = null;
+    accountName = null;
+  }
+
+  @Override
+  public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
+    selectTab(tab);
+  }
+
+  @Override
+  public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
+    if (!isSinglePane) {
+      getSupportFragmentManager().popBackStack();
     }
+  }
 
-    @Override
-    protected boolean skipSetup(Bundle savedInstanceState) {
-        tabController = new TabController(bar, savedInstanceState);
-        tabDescription = tabController.addTab(newTab(getString(R.string.tab_description)));
-        tabRelated = tabController.addTab(newTab(getString(R.string.tab_related)));
-        return false;
+  private void selectTab(Tab tab) {
+    if (BuildConfig.DEBUG) {
+      Log.d(TAG, "selectTab tab: " + tab.getText());
     }
-
-    private Tab newTab(CharSequence text) {
-        return bar.newTab().setText(text).setTabListener(this);
+    if (tabController.selectTab(tab)) {
+      if (tab == tabDescription) {
+        refreshSidebarFragments();
+      } else if (tab == tabRelated) {
+        refreshRelatedSubredditFragments();
+      }
     }
+  }
 
-    @Override
-    protected void doSetup(Bundle savedInstanceState) {
-        if (!hasSubredditName()) {
-            setSubredditName("android");
-        }
-        bar.setDisplayHomeAsUpEnabled(true);
-        getSupportLoaderManager().initLoader(0, null, this);
+  private void refreshSidebarFragments() {
+    setSidebarFragments(accountName, getSubreddit());
+  }
+
+  private void refreshRelatedSubredditFragments() {
+    setRelatedSubredditsFragments(accountName, getSubreddit());
+  }
+
+  @Override
+  public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
+  }
+
+  @Override
+  protected void refreshActionBar(ControlFragment controlFrag) {
+    bar.setTitle(Subreddits.getTitle(this, getSubreddit()));
+  }
+
+  @Override
+  protected boolean hasLeftFragment() {
+    return tabController.isTabSelected(tabRelated);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        finish();
+        return true;
+
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
 
-    @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true, false);
-    }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    tabController.saveInstanceState(outState);
+  }
 
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountResult = result;
-        accountName = result.getLastAccount(this);
-        tabController.setupTabs();
-    }
+  @Override
+  public AccountResult getAccountResult() {
+    return accountResult;
+  }
 
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
-        accountResult = null;
-        accountName = null;
-    }
+  @Override
+  public String getSubreddit() {
+    return getIntent().getStringExtra(EXTRA_SUBREDDIT);
+  }
 
-    @Override
-    public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
-        selectTab(tab);
-    }
+  private boolean hasSubredditName() {
+    return getIntent().hasExtra(EXTRA_SUBREDDIT);
+  }
 
-    @Override
-    public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
-        if (!isSinglePane) {
-            getSupportFragmentManager().popBackStack();
-        }
-    }
-
-    private void selectTab(Tab tab) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "selectTab tab: " + tab.getText());
-        }
-        if (tabController.selectTab(tab)) {
-            if (tab == tabDescription) {
-                refreshSidebarFragments();
-            } else if (tab == tabRelated) {
-                refreshRelatedSubredditFragments();
-            }
-        }
-    }
-
-    private void refreshSidebarFragments() {
-        setSidebarFragments(accountName, getSubreddit());
-    }
-
-    private void refreshRelatedSubredditFragments() {
-        setRelatedSubredditsFragments(accountName, getSubreddit());
-    }
-
-    @Override
-    public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
-    }
-
-    @Override
-    protected void refreshActionBar(ControlFragment controlFrag) {
-        bar.setTitle(Subreddits.getTitle(this, getSubreddit()));
-    }
-
-    @Override
-    protected boolean hasLeftFragment() {
-        return tabController.isTabSelected(tabRelated);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        tabController.saveInstanceState(outState);
-    }
-
-    @Override
-    public AccountResult getAccountResult() {
-        return accountResult;
-    }
-
-    @Override
-    public String getSubreddit() {
-        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
-    }
-
-    private boolean hasSubredditName() {
-        return getIntent().hasExtra(EXTRA_SUBREDDIT);
-    }
-
-    private void setSubredditName(String subreddit) {
-        getIntent().putExtra(EXTRA_SUBREDDIT, subreddit);
-    }
+  private void setSubredditName(String subreddit) {
+    getIntent().putExtra(EXTRA_SUBREDDIT, subreddit);
+  }
 }
