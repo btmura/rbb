@@ -102,7 +102,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
       SyncResult syncResult) {
     try {
       Context ctx = getContext();
-      if (!AccountUtils.hasTokens(ctx, account.name)) {
+      if (!AccountUtils.hasCredentials(ctx, account.name)) {
         syncResult.stats.numAuthExceptions++;
         return;
       }

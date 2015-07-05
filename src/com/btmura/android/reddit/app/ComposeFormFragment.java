@@ -679,7 +679,7 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     protected Result doInBackground(Void... voidRay) {
       try {
-        if (!AccountUtils.hasTokens(ctx, accountName)) {
+        if (!AccountUtils.hasCredentials(ctx, accountName)) {
           return null;
         }
 

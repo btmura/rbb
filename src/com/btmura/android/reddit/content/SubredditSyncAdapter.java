@@ -99,7 +99,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
     try {
       Context ctx = getContext();
       // Quit if there are authentication issues.
-      if (!AccountUtils.hasTokens(ctx, account.name)) {
+      if (!AccountUtils.hasCredentials(ctx, account.name)) {
         syncResult.stats.numAuthExceptions++;
         return;
       }

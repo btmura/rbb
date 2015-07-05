@@ -30,7 +30,6 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 
@@ -282,7 +281,7 @@ public class RedditApi {
       CharSequence url,
       CharSequence data)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    if (AccountUtils.isTokenExpired(ctx, accountName)) {
+    if (AccountUtils.hasCredentialsExpired(ctx, accountName)) {
       updateToken(ctx, accountName);
     }
 
@@ -311,7 +310,7 @@ public class RedditApi {
       String accountName,
       CharSequence url)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    if (AccountUtils.isTokenExpired(ctx, accountName)) {
+    if (AccountUtils.hasCredentialsExpired(ctx, accountName)) {
       updateToken(ctx, accountName);
     }
 

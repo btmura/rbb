@@ -106,7 +106,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
       ContentProviderClient provider,
       SyncResult syncResult) {
     try {
-      if (!AccountUtils.hasTokens(getContext(), account.name)) {
+      if (!AccountUtils.hasCredentials(getContext(), account.name)) {
         syncResult.stats.numAuthExceptions++;
         return;
       }

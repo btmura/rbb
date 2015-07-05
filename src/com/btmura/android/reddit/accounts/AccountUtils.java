@@ -73,23 +73,26 @@ public class AccountUtils {
     return am.blockingGetAuthToken(a, authTokenType, true /* notify */);
   }
 
-  public static boolean hasTokens(Context ctx, String accountName) throws
-      AuthenticatorException,
-      OperationCanceledException,
-      IOException {
-    return getAccessToken(ctx, accountName) != null
+  public static boolean hasCredentials(Context ctx, String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return !isAccount(accountName)
+        || getAccessToken(ctx, accountName) != null
         && getRefreshToken(ctx, accountName) != null;
   }
 
-  public static boolean isTokenExpired(Context ctx, String accountName) {
-    if (!isAccount(accountName)) {
+  public static boolean hasCredentialsExpired(Context ctx, String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    if (!isAccount(accountName) || !hasCredentials(ctx, accountName)) {
       return false;
     }
     Account a = getAccount(ctx, accountName);
     AccountManager am = AccountManager.get(ctx);
-    long expirationMs = Long.valueOf(
-        am.getUserData(a, AccountAuthenticator.EXPIRATION_MS));
-    return System.currentTimeMillis() >= expirationMs;
+    String expiration = am.getUserData(a, AccountAuthenticator.EXPIRATION_MS);
+    if (TextUtils.isEmpty(expiration)) {
+      Log.wtf(TAG, "expiration is missing");
+      return true;
+    }
+    return System.currentTimeMillis() >= Long.valueOf(expiration);
   }
 
   public static boolean addAccount(
