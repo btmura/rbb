@@ -41,7 +41,8 @@ public class AccountAuthenticatorActivity
     setContentView(R.layout.account_authenticator);
     getActionBar().setDisplayHomeAsUpEnabled(true);
     if (savedInstanceState == null) {
-      LoginFragment frag = LoginFragment.newInstance(newStateToken());
+      LoginFragment frag =
+          LoginFragment.newInstance(getAccountNameExtra(), newStateToken());
       FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
       ft.replace(R.id.account_authenticator_container, frag);
       ft.commit();
@@ -54,9 +55,8 @@ public class AccountAuthenticatorActivity
 
   @Override
   public void onLoginSuccess(String code) {
-    String accountName = getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
-    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-    AddAccountFragment.newInstance(accountName, code).show(ft, TAG_ADD_ACCOUNT);
+    AddAccountFragment.newInstance(getAccountNameExtra(), code)
+        .show(getSupportFragmentManager(), TAG_ADD_ACCOUNT);
   }
 
   @Override
@@ -90,5 +90,9 @@ public class AccountAuthenticatorActivity
   private boolean handleHome() {
     finish();
     return true;
+  }
+
+  private String getAccountNameExtra() {
+    return getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
   }
 }

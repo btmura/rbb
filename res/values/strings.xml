@@ -143,5 +143,6 @@
     <string name="tab_subreddits">Subreddits</string>
     <string name="title_add_account">Add Account</string>
     <string name="title_login">Login</string>
+    <string name="title_login_to">Login to %1$s</string>
     <string name="view_table">View table</string>
 </resources>

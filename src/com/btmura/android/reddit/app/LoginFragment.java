@@ -40,6 +40,7 @@ import com.btmura.android.reddit.net.Urls;
  */
 public class LoginFragment extends Fragment {
 
+  private static final String ARG_ACCOUNT_NAME = "accountName";
   private static final String ARG_EXPECTED_STATE_TOKEN = "expectedStateToken";
 
   private OnLoginListener listener;
@@ -52,8 +53,11 @@ public class LoginFragment extends Fragment {
     void onLoginCancelled();
   }
 
-  public static LoginFragment newInstance(CharSequence expectedStateToken) {
-    Bundle args = new Bundle(1);
+  public static LoginFragment newInstance(
+      String accountName,
+      CharSequence expectedStateToken) {
+    Bundle args = new Bundle(2);
+    args.putString(ARG_ACCOUNT_NAME, accountName);
     args.putCharSequence(ARG_EXPECTED_STATE_TOKEN, expectedStateToken);
     LoginFragment frag = new LoginFragment();
     frag.setArguments(args);
@@ -142,7 +146,7 @@ public class LoginFragment extends Fragment {
 
     String state = uri.getQueryParameter("state");
     String code = uri.getQueryParameter("code");
-    if (TextUtils.equals(state, getExpectedStateToken())
+    if (TextUtils.equals(state, getExpectedStateTokenArg())
         && !TextUtils.isEmpty(code)) {
       if (listener != null) {
         listener.onLoginSuccess(code);
@@ -156,7 +160,7 @@ public class LoginFragment extends Fragment {
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    getActivity().setTitle(R.string.title_login);
+    setTitle();
     if (savedInstanceState == null) {
       loadLoginUrl();
     } else {
@@ -164,8 +168,15 @@ public class LoginFragment extends Fragment {
     }
   }
 
+  private void setTitle() {
+    String accountName = getAccountNameArg();
+    getActivity().setTitle(TextUtils.isEmpty(accountName)
+        ? getString(R.string.title_login)
+        : getString(R.string.title_login_to, accountName));
+  }
+
   private void loadLoginUrl() {
-    CharSequence url = Urls.authorize(getActivity(), getExpectedStateToken());
+    CharSequence url = Urls.authorize(getActivity(), getExpectedStateTokenArg());
     webView.loadUrl(url.toString());
   }
 
@@ -193,7 +204,11 @@ public class LoginFragment extends Fragment {
     super.onDetach();
   }
 
-  private CharSequence getExpectedStateToken() {
+  private String getAccountNameArg() {
+    return getArguments().getString(ARG_ACCOUNT_NAME);
+  }
+
+  private CharSequence getExpectedStateTokenArg() {
     return getArguments().getCharSequence(ARG_EXPECTED_STATE_TOKEN);
   }
 }
