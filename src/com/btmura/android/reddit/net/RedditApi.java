@@ -469,8 +469,7 @@ public class RedditApi {
     return new JsonReader(new InputStreamReader(new BufferedInputStream(in)));
   }
 
-  // TODO(btmura): make private
-  static InputStream logResponse(InputStream is) throws IOException {
+  private static InputStream logResponse(InputStream is) throws IOException {
     if (!LOG_RESPONSES) {
       return is;
     }
