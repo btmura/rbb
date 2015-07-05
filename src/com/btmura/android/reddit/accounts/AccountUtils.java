@@ -86,19 +86,25 @@ public class AccountUtils {
         && getRefreshToken(ctx, accountName) != null;
   }
 
-  public static boolean hasCredentialsExpired(Context ctx, String accountName)
+  public static boolean hasExpiredCredentials(Context ctx, String accountName)
       throws AuthenticatorException, OperationCanceledException, IOException {
     if (!isAccount(accountName) || !hasCredentials(ctx, accountName)) {
       return false;
     }
     Account a = getAccount(ctx, accountName);
     AccountManager am = AccountManager.get(ctx);
-    String expiration = am.getUserData(a, AccountAuthenticator.EXPIRATION_MS);
-    if (TextUtils.isEmpty(expiration)) {
+    String expValue = am.getUserData(a, AccountAuthenticator.EXPIRATION_MS);
+    if (TextUtils.isEmpty(expValue)) {
       Log.wtf(TAG, "expiration is missing");
       return true;
     }
-    return System.currentTimeMillis() >= Long.valueOf(expiration);
+    try {
+      long expirationMs = Long.valueOf(expValue);
+      return System.currentTimeMillis() >= expirationMs;
+    } catch (NumberFormatException e) {
+      Log.wtf(TAG, e);
+      return true;
+    }
   }
 
   public static boolean addAccount(

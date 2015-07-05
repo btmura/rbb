@@ -281,7 +281,7 @@ public class RedditApi {
       CharSequence url,
       CharSequence data)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    if (AccountUtils.hasCredentialsExpired(ctx, accountName)) {
+    if (AccountUtils.hasExpiredCredentials(ctx, accountName)) {
       updateToken(ctx, accountName);
     }
 
@@ -310,7 +310,7 @@ public class RedditApi {
       String accountName,
       CharSequence url)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    if (AccountUtils.hasCredentialsExpired(ctx, accountName)) {
+    if (AccountUtils.hasExpiredCredentials(ctx, accountName)) {
       updateToken(ctx, accountName);
     }
 
