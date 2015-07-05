@@ -59,8 +59,7 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
         return errorBundle(R.string.error_bad_access_token);
       }
 
-      Account a = AccountUtils.getAccount(ctx, accountName);
-      if (!AccountUtils.addAccount(ctx, a.name, atr.accessToken,
+      if (!AccountUtils.addAccount(ctx, accountName, atr.accessToken,
           atr.refreshToken, atr.expirationMs, atr.scope)) {
         return errorBundle(R.string.error_adding_account);
       }
@@ -76,6 +75,7 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
       // will fall back to the app storage account.
       AccountPrefs.setLastAccount(ctx, accountName);
 
+      Account a = AccountUtils.getAccount(ctx, accountName);
       ContentResolver.setSyncAutomatically(a,
           AccountProvider.AUTHORITY, true);
       ContentResolver.setSyncAutomatically(a,
