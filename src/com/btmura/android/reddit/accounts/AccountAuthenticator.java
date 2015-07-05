@@ -48,10 +48,6 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
   private final Context ctx;
 
-  public static String getAccountType(Context context) {
-    return context.getString(R.string.account_type);
-  }
-
   public AccountAuthenticator(Context ctx) {
     super(ctx);
     this.ctx = ctx;
@@ -150,7 +146,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     Intent intent = new Intent(ctx, AccountAuthenticatorActivity.class);
     intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE,
         response);
-    if (!TextUtils.isEmpty(accountName)) {
+    if (AccountUtils.isAccount(accountName)) {
       intent.putExtra(AccountAuthenticatorActivity.EXTRA_ACCOUNT_NAME,
           accountName);
     }

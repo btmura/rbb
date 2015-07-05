@@ -28,7 +28,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
@@ -134,7 +134,7 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult>
 
     // Get the accounts and sort them.
     Account[] accounts = manager
-        .getAccountsByType(AccountAuthenticator.getAccountType(ctx));
+        .getAccountsByType(AccountUtils.getAccountType(ctx));
     Arrays.sort(accounts, ACCOUNT_COMPARATOR);
 
     // Convert to strings and prepend the no account at the top.

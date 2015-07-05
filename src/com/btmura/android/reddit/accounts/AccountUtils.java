@@ -25,6 +25,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.btmura.android.reddit.R;
+
 import java.io.IOException;
 
 public class AccountUtils {
@@ -38,7 +40,11 @@ public class AccountUtils {
   }
 
   public static Account getAccount(Context ctx, String accountName) {
-    return new Account(accountName, AccountAuthenticator.getAccountType(ctx));
+    return new Account(accountName, getAccountType(ctx));
+  }
+
+  public static String getAccountType(Context ctx) {
+    return ctx.getString(R.string.account_type);
   }
 
   @Nullable

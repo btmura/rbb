@@ -34,7 +34,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
@@ -164,7 +164,7 @@ public class MenuHelper {
         Array.of(AccountProvider.AUTHORITY));
     if (Build.VERSION.SDK_INT >= 18) {
       intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES,
-          Array.of(AccountAuthenticator.getAccountType(context)));
+          Array.of(AccountUtils.getAccountType(context)));
     }
     context.startActivity(intent);
   }
