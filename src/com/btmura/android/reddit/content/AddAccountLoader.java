@@ -63,7 +63,7 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
           atr.accessToken, atr.refreshToken, atr.expirationMs, atr.scope);
 
       if (!AccountProvider.initializeAccount(ctx, accountName)) {
-        AccountUtils.removeAccount(ctx, accountName);
+        AccountProvider.removeAccount(ctx, accountName);
         return errorBundle(R.string.error_initializing_account);
       }
 

@@ -16,9 +16,10 @@
 
 package com.btmura.android.reddit.provider;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -28,10 +29,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.AccountActions;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
@@ -76,6 +79,27 @@ public class AccountProvider extends BaseProvider {
   private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
   private static final String METHOD_CLEAR_MAIL_INDICATOR =
       "clearMailIndicator";
+  private static final String METHOD_REMOVE_ACCOUNT = "removeAccount";
+
+  private static final String[] ACCOUNT_TABLES = {
+      Accounts.TABLE_NAME,
+      Comments.TABLE_NAME,
+      Messages.TABLE_NAME,
+      Sessions.TABLE_NAME,
+      Subreddits.TABLE_NAME,
+      SubredditResults.TABLE_NAME,
+      Things.TABLE_NAME,
+  };
+
+  private static final String[] ACTION_TABLES = {
+      AccountActions.TABLE_NAME,
+      CommentActions.TABLE_NAME,
+      HideActions.TABLE_NAME,
+      MessageActions.TABLE_NAME,
+      ReadActions.TABLE_NAME,
+      SaveActions.TABLE_NAME,
+      VoteActions.TABLE_NAME,
+  };
 
   public AccountProvider() {
     super(TAG);
@@ -107,12 +131,20 @@ public class AccountProvider extends BaseProvider {
         accountName, null) != null;
   }
 
+  /** Removes the account and returns true on success. */
+  public static boolean removeAccount(Context ctx, String accountName) {
+    return Provider.call(ctx, ACCOUNTS_URI, METHOD_REMOVE_ACCOUNT,
+        accountName, null) != null;
+  }
+
   @Override
   public Bundle call(String method, String accountName, Bundle extras) {
     if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
       return initializeAccount(accountName);
     } else if (METHOD_CLEAR_MAIL_INDICATOR.equalsIgnoreCase(method)) {
       return clearMailIndicator(accountName);
+    } else if (METHOD_REMOVE_ACCOUNT.equalsIgnoreCase(method)) {
+      return removeAccount(accountName);
     }
     return null;
   }
@@ -144,18 +176,6 @@ public class AccountProvider extends BaseProvider {
       return null;
     }
 
-    // Don't clear the action tables because the user may be reinitializing
-    // their account.
-    String[] tables = {
-        Accounts.TABLE_NAME,
-        Subreddits.TABLE_NAME,
-        Things.TABLE_NAME,
-        Comments.TABLE_NAME,
-        Messages.TABLE_NAME,
-        SubredditResults.TABLE_NAME,
-        Sessions.TABLE_NAME,
-    };
-
     String selection = SharedColumns.SELECT_BY_ACCOUNT;
     String[] args = Array.of(accountName);
 
@@ -163,8 +183,8 @@ public class AccountProvider extends BaseProvider {
     db.beginTransaction();
     try {
       int deleted = 0;
-      for (int i = 0; i < tables.length; i++) {
-        deleted += db.delete(tables[i], selection, args);
+      for (int i = 0; i < ACCOUNT_TABLES.length; i++) {
+        deleted += db.delete(ACCOUNT_TABLES[i], selection, args);
       }
 
       ContentValues v = new ContentValues(3);
@@ -188,8 +208,8 @@ public class AccountProvider extends BaseProvider {
   }
 
   /**
-   * Clears the account's mail indicator locally and returns an empty bundle.
-   * It does not trigger a sync to Reddit.
+   * Clears the account's mail indicator locally and returns an empty bundle. It
+   * does not trigger a sync to Reddit.
    */
   private Bundle clearMailIndicator(String accountName) {
     SQLiteDatabase db = helper.getWritableDatabase();
@@ -199,7 +219,7 @@ public class AccountProvider extends BaseProvider {
       // SyncAdapter will make one later if necessary.
       ContentValues v = new ContentValues(2);
       v.put(Accounts.COLUMN_HAS_MAIL, false);
-      int updated = db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT,
+      db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT,
           Array.of(accountName));
       db.setTransactionSuccessful();
     } finally {
@@ -209,6 +229,49 @@ public class AccountProvider extends BaseProvider {
     // Notify cursors so the indicator disappears but don't sync since that will
     // just make the indicator appear again.
     getContext().getContentResolver().notifyChange(ACCOUNTS_URI, null, NO_SYNC);
+    return Bundle.EMPTY;
+  }
+
+  private Bundle removeAccount(String accountName) {
+    Context ctx = getContext();
+    AccountManager am = AccountManager.get(ctx);
+    Account account = AccountUtils.getAccount(getContext(), accountName);
+    try {
+      if (!am.removeAccount(account, null, null).getResult()) {
+        return null;
+      }
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return null;
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return null;
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+      return null;
+    }
+
+    String selection = SharedColumns.SELECT_BY_ACCOUNT;
+    String[] args = Array.of(accountName);
+
+    SQLiteDatabase db = helper.getWritableDatabase();
+    db.beginTransaction();
+    try {
+      int deleted = 0;
+      for (int i = 0; i < ACCOUNT_TABLES.length; i++) {
+        deleted += db.delete(ACCOUNT_TABLES[i], selection, args);
+      }
+      for (int i = 0; i < ACTION_TABLES.length; i++) {
+        deleted += db.delete(ACTION_TABLES[i], selection, args);
+      }
+      if (BuildConfig.DEBUG) {
+        Log.d(TAG, "removeAccount deleted: " + deleted);
+      }
+      db.setTransactionSuccessful();
+    } finally {
+      db.endTransaction();
+    }
+
     return Bundle.EMPTY;
   }
 }

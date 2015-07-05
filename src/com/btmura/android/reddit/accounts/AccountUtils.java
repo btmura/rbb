@@ -144,24 +144,6 @@ public class AccountUtils {
     am.setUserData(a, AccountAuthenticator.SCOPES, scopes);
   }
 
-  public static boolean removeAccount(Context ctx, String accountName) {
-    // TODO(btmura): use new API to remove account when possible
-    Account a = getAccount(ctx, accountName);
-    AccountManager am = AccountManager.get(ctx);
-    try {
-      return am.removeAccount(a, null, null).getResult();
-    } catch (OperationCanceledException e) {
-      Log.e(TAG, e.getMessage(), e);
-      return false;
-    } catch (IOException e) {
-      Log.e(TAG, e.getMessage(), e);
-      return false;
-    } catch (AuthenticatorException e) {
-      Log.e(TAG, e.getMessage(), e);
-      return false;
-    }
-  }
-
   private AccountUtils() {
   }
 }

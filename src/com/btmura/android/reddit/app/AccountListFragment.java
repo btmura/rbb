@@ -43,6 +43,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountResultAdapter;
 
 import java.io.IOException;
@@ -176,29 +177,13 @@ public class AccountListFragment extends ListFragment
 
   private void removeAccounts(final String[] accountNames) {
     final Context ctx = getActivity().getApplicationContext();
-    new AsyncTask<Void, Void, Integer>() {
+    new AsyncTask<Void, Void, Void>() {
       @Override
-      protected Integer doInBackground(Void... voidRay) {
-        AccountManager manager = AccountManager.get(ctx);
-        int removed = 0;
-        int length = accountNames.length;
-        for (int i = 0; i < length; i++) {
-          Account account = AccountUtils.getAccount(ctx, accountNames[i]);
-          AccountManagerFuture<Boolean> result =
-              manager.removeAccount(account, null, null);
-          try {
-            if (result.getResult()) {
-              removed++;
-            }
-          } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-          } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-          } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-          }
+      protected Void doInBackground(Void... voidRay) {
+        for (int i = 0; i < accountNames.length; i++) {
+          AccountProvider.removeAccount(ctx, accountNames[i]);
         }
-        return removed;
+        return null;
       }
     }.execute();
   }
