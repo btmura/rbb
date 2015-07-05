@@ -38,10 +38,9 @@ public class Urls {
 
   public static final String WWW_REDDIT_COM = "https://www.reddit.com";
   private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
-  private static final String SSL_REDDIT_COM = "https://ssl.reddit.com";
 
   private static final String ACCESS_TOKEN_URL =
-      SSL_REDDIT_COM + "/api/v1/access_token";
+      WWW_REDDIT_COM + "/api/v1/access_token";
   private static final String CAPTCHA_URL = WWW_REDDIT_COM + "/captcha/";
   private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
   private static final String COMPOSE_URL = OAUTH_REDDIT_COM + "/api/compose";
