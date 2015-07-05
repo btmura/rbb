@@ -18,6 +18,7 @@ package com.btmura.android.reddit.provider;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -101,9 +102,9 @@ public class AccountProvider extends BaseProvider {
   }
 
   /** Clears an account's mail indicator and returns true on success. */
-  public static boolean clearMailIndicator(Context ctx) {
+  public static boolean clearMailIndicator(Context ctx, String accountName) {
     return Provider.call(ctx, ACCOUNTS_URI, METHOD_CLEAR_MAIL_INDICATOR,
-        null, null) != null;
+        accountName, null) != null;
   }
 
   @Override
@@ -201,13 +202,16 @@ public class AccountProvider extends BaseProvider {
       // SyncAdapter will make one later if necessary.
       ContentValues v = new ContentValues(2);
       v.put(Accounts.COLUMN_HAS_MAIL, false);
-      db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT,
+      int updated = db.update(Accounts.TABLE_NAME, v, Accounts.SELECT_BY_ACCOUNT,
           Array.of(accountName));
       db.setTransactionSuccessful();
     } finally {
       db.endTransaction();
     }
 
+    // Notify cursors so the indicator disappears but don't sync since that will
+    // just make the indicator appear again.
+    getContext().getContentResolver().notifyChange(ACCOUNTS_URI, null, NO_SYNC);
     return Bundle.EMPTY;
   }
 }

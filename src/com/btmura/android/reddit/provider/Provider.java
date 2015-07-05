@@ -183,7 +183,7 @@ public class Provider {
   }
 
   public static void saveAsync(
-      final Context ctx,
+      Context ctx,
       final String accountName,
       final String thingId,
       final ThingBundle thingBundle,
@@ -213,12 +213,14 @@ public class Provider {
     });
   }
 
-  public static void clearMailIndicatorAsync(Context ctx) {
+  public static void clearMailIndicatorAsync(
+      Context ctx,
+      final String accountName) {
     final Context appCtx = ctx.getApplicationContext();
     AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        AccountProvider.clearMailIndicator(appCtx);
+        AccountProvider.clearMailIndicator(appCtx, accountName);
       }
     });
   }

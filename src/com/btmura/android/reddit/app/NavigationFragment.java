@@ -398,7 +398,7 @@ public class NavigationFragment extends ListFragment implements
   public void onAccountMessagesSelected(String accountName) {
     selectAccount(accountName);
     selectPlaceWithNoSubreddit(PLACE_MESSAGES, Filter.MESSAGE_UNREAD, true);
-    Provider.clearMailIndicatorAsync(getActivity());
+    Provider.clearMailIndicatorAsync(getActivity(), accountName);
   }
 
   @Override
