@@ -48,7 +48,6 @@
     <string name="empty_list">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
     <string name="error_account_required">You need an account to do this…</string>
-    <string name="error_adding_account">Couldn\'t add account…</string>
     <string name="error_bad_access_token">Reddit returned an invalid access token… Try again?</string>
     <string name="error_blank_field">This field cannot be blank…</string>
     <string name="error_initializing_account">Couldn\'t initialize account…</string>

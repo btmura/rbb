@@ -119,14 +119,15 @@ public class AccountUtils {
 
     // This returns false if an account already exists.
     // We will just overwrite the existing tokens and info.
-    am.addAccountExplicitly(a, null /* pw */, null /* userdata */);
+    boolean exists = am.addAccountExplicitly(a, null, null);
 
     am.setAuthToken(a, AccountAuthenticator.ACCESS_TOKEN, accessToken);
     am.setAuthToken(a, AccountAuthenticator.REFRESH_TOKEN, refreshToken);
     am.setUserData(a, AccountAuthenticator.EXPIRATION_MS,
         Long.toString(expirationMs));
     am.setUserData(a, AccountAuthenticator.SCOPES, scopes);
-    return true;
+
+    return exists;
   }
 
   public static void updateAccount(

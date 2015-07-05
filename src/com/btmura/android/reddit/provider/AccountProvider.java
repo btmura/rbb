@@ -144,6 +144,8 @@ public class AccountProvider extends BaseProvider {
       return null;
     }
 
+    // Don't clear the action tables because the user may be reinitializing
+    // their account.
     String[] tables = {
         Accounts.TABLE_NAME,
         Subreddits.TABLE_NAME,
@@ -152,11 +154,6 @@ public class AccountProvider extends BaseProvider {
         Messages.TABLE_NAME,
         SubredditResults.TABLE_NAME,
         Sessions.TABLE_NAME,
-        CommentActions.TABLE_NAME,
-        MessageActions.TABLE_NAME,
-        ReadActions.TABLE_NAME,
-        SaveActions.TABLE_NAME,
-        VoteActions.TABLE_NAME,
     };
 
     String selection = SharedColumns.SELECT_BY_ACCOUNT;

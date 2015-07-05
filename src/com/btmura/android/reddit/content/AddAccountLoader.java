@@ -59,10 +59,8 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
         return errorBundle(R.string.error_bad_access_token);
       }
 
-      if (!AccountUtils.addAccount(ctx, accountName, atr.accessToken,
-          atr.refreshToken, atr.expirationMs, atr.scope)) {
-        return errorBundle(R.string.error_adding_account);
-      }
+      boolean exists = AccountUtils.addAccount(ctx, accountName,
+          atr.accessToken, atr.refreshToken, atr.expirationMs, atr.scope);
 
       if (!AccountProvider.initializeAccount(ctx, accountName)) {
         AccountUtils.removeAccount(ctx, accountName);
@@ -82,6 +80,16 @@ public class AddAccountLoader extends BaseAsyncTaskLoader<Bundle> {
           SubredditProvider.AUTHORITY, true);
       ContentResolver.setSyncAutomatically(a,
           ThingProvider.AUTHORITY, true);
+
+      // Request a manual sync to get the existing account up to speed.
+      if (exists) {
+        ContentResolver.requestSync(a,
+            AccountProvider.AUTHORITY, Bundle.EMPTY);
+        ContentResolver.requestSync(a,
+            SubredditProvider.AUTHORITY, Bundle.EMPTY);
+        ContentResolver.requestSync(a,
+            ThingProvider.AUTHORITY, Bundle.EMPTY);
+      }
 
       Bundle b = new Bundle(2);
       b.putString(AccountManager.KEY_ACCOUNT_NAME, a.name);
