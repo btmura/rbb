@@ -281,23 +281,10 @@ public class RedditApi {
       CharSequence url,
       CharSequence data)
       throws AuthenticatorException, OperationCanceledException, IOException {
-    if (AccountUtils.hasExpiredCredentials(ctx, accountName)) {
-      updateToken(ctx, accountName);
-    }
-
     HttpURLConnection conn = null;
     JsonReader r = null;
     try {
-      conn = authConnect(ctx, accountName, url);
-      writePostData(conn, data);
-
-      if (needTokenUpdate(accountName, conn)) {
-        conn.disconnect();
-        updateToken(ctx, accountName);
-        conn = authConnect(ctx, accountName, url);
-        writePostData(conn, data);
-      }
-
+      conn = newConnection(ctx, accountName, url, data);
       r = newJsonReader(conn.getInputStream());
       return Result.getResult(r);
     } finally {
@@ -310,19 +297,48 @@ public class RedditApi {
       String accountName,
       CharSequence url)
       throws AuthenticatorException, OperationCanceledException, IOException {
+    return newConnection(ctx, accountName, url, null);
+  }
+
+  private static HttpURLConnection newConnection(
+      Context ctx,
+      String accountName,
+      CharSequence url,
+      @Nullable CharSequence data)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    // Check that the account has required and not-expired credentials.
+    checkCredentials(ctx, accountName);
+
+    // Setup connection and write data making it a POST if necessary.
+    HttpURLConnection conn = authConnect(ctx, accountName, url);
+    if (!TextUtils.isEmpty(data)) {
+      writePostData(conn, data);
+    }
+
+    // Connect. If unauthorized, try again to refresh credentials.
+    if (isUnauthorized(accountName, conn)) {
+      conn.disconnect();
+      updateToken(ctx, accountName);
+
+      // Setup connection once more and rite data makig it a POST if necessary.
+      conn = authConnect(ctx, accountName, url);
+      if (!TextUtils.isEmpty(data)) {
+        writePostData(conn, data);
+      }
+    }
+
+    return conn;
+  }
+
+  private static void checkCredentials(Context ctx, String accountName)
+      throws AuthenticatorException, IOException, OperationCanceledException {
+    if (!AccountUtils.hasCredentials(ctx, accountName)) {
+      throw new AuthenticatorException("missing credentials");
+    }
+
     if (AccountUtils.hasExpiredCredentials(ctx, accountName)) {
       updateToken(ctx, accountName);
     }
-
-    HttpURLConnection conn = authConnect(ctx, accountName, url);
-
-    // TODO(btmura): check whether error is scope problem or not
-    if (needTokenUpdate(accountName, conn)) {
-      conn.disconnect();
-      updateToken(ctx, accountName);
-      conn = authConnect(ctx, accountName, url);
-    }
-    return conn;
   }
 
   private static HttpURLConnection authConnect(
@@ -347,7 +363,7 @@ public class RedditApi {
     return conn;
   }
 
-  private static boolean needTokenUpdate(
+  private static boolean isUnauthorized(
       String accountName,
       HttpURLConnection conn)
       throws IOException {
