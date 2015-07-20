@@ -29,100 +29,99 @@ import com.btmura.android.reddit.database.Subreddits;
 // TODO(btmura): Split this apart into separate classes for profile and subreddits.
 class ThingTableMenuController implements MenuController {
 
-    private final Context context;
-    private final FragmentManager fragmentManager;
-    private final String accountName;
-    private final SubredditHolder subredditNameHolder;
-    private final ThingHolder thingHolder;
-    private final Refreshable refreshable;
+  private final Context ctx;
+  private final FragmentManager fragmentManager;
+  private final String accountName;
+  private final SubredditHolder subredditNameHolder;
+  private final ThingHolder thingHolder;
+  private final Refreshable refreshable;
 
-    ThingTableMenuController(Context context,
-            FragmentManager fragmentManager,
-            String accountName,
-            String query,
-            SubredditHolder subredditNameHolder,
-            ThingHolder thingHolder,
-            Refreshable refreshable) {
-        this.context = context;
-        this.fragmentManager = fragmentManager;
-        this.accountName = accountName;
-        this.subredditNameHolder = subredditNameHolder;
-        this.thingHolder = thingHolder;
-        this.refreshable = refreshable;
+  ThingTableMenuController(
+      Context ctx,
+      FragmentManager fragmentManager,
+      String accountName,
+      SubredditHolder subredditNameHolder,
+      ThingHolder thingHolder,
+      Refreshable refreshable) {
+    this.ctx = ctx;
+    this.fragmentManager = fragmentManager;
+    this.accountName = accountName;
+    this.subredditNameHolder = subredditNameHolder;
+    this.thingHolder = thingHolder;
+    this.refreshable = refreshable;
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    inflater.inflate(R.menu.thing_table_menu, menu);
+  }
+
+  @Override
+  public void onPrepareOptionsMenu(Menu menu) {
+    String subreddit = getSubreddit();
+
+    boolean hasAccount = AccountUtils.isAccount(accountName);
+    boolean hasSubreddit = subreddit != null;
+    boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
+    boolean hasSidebar = Subreddits.hasSidebar(subreddit);
+    boolean isSubreddit = hasSubreddit && !hasThing;
+
+    boolean showNewPost = isSubreddit && hasAccount;
+    boolean showSubreddit = isSubreddit && hasSidebar;
+    boolean showRefresh = !hasThing;
+
+    menu.findItem(R.id.menu_add_subreddit).setVisible(isSubreddit);
+    menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
+    menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
+
+    MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+    subredditItem.setVisible(showSubreddit);
+    if (showSubreddit) {
+      subredditItem.setTitle(MenuHelper.getSubredditTitle(ctx, subreddit));
     }
+  }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.thing_table_menu, menu);
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.menu_new_post:
+        handleNewPost();
+        return true;
+
+      case R.id.menu_refresh:
+        handleRefresh();
+        return true;
+
+      case R.id.menu_subreddit:
+        handleSubreddit();
+        return true;
+
+      case R.id.menu_add_subreddit:
+        handleAddSubreddit();
+        return true;
+
+      default:
+        return false;
     }
+  }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        String subreddit = getSubreddit();
+  private void handleNewPost() {
+    MenuHelper.startNewPostComposer(ctx, accountName, getSubreddit());
+  }
 
-        boolean hasAccount = AccountUtils.isAccount(accountName);
-        boolean hasSubreddit = subreddit != null;
-        boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
-        boolean hasSidebar = Subreddits.hasSidebar(subreddit);
-        boolean isSubreddit = hasSubreddit && !hasThing;
+  private void handleRefresh() {
+    refreshable.refresh();
+  }
 
-        boolean showAddSubreddit = isSubreddit;
-        boolean showNewPost = isSubreddit && hasAccount;
-        boolean showSubreddit = isSubreddit && hasSidebar;
-        boolean showRefresh = !hasThing;
+  private void handleSubreddit() {
+    MenuHelper.startSidebarActivity(ctx, getSubreddit());
+  }
 
-        menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
-        menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
-        menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
+  private void handleAddSubreddit() {
+    MenuHelper.showAddSubredditDialog(fragmentManager, getSubreddit());
+  }
 
-        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        subredditItem.setVisible(showSubreddit);
-        if (showSubreddit) {
-            subredditItem.setTitle(MenuHelper.getSubredditTitle(context, subreddit));
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_new_post:
-                handleNewPost();
-                return true;
-
-            case R.id.menu_refresh:
-                handleRefresh();
-                return true;
-
-            case R.id.menu_subreddit:
-                handleSubreddit();
-                return true;
-
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    private void handleNewPost() {
-        MenuHelper.startNewPostComposer(context, accountName, getSubreddit());
-    }
-
-    private void handleRefresh() {
-        refreshable.refresh();
-    }
-
-    private void handleSubreddit() {
-        MenuHelper.startSidebarActivity(context, getSubreddit());
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(fragmentManager, getSubreddit());
-    }
-
-    private String getSubreddit() {
-        return subredditNameHolder.getSubreddit();
-    }
+  private String getSubreddit() {
+    return subredditNameHolder.getSubreddit();
+  }
 }

@@ -99,7 +99,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     // Actions to be done on comments.
 
     public void author(int position) {
-        MenuHelper.startProfileActivity(context, getAuthor(position), -1);
+        MenuHelper.startProfileActivity(context, getAuthor(position));
     }
 
     public void copyUrl(int position) {
@@ -114,7 +114,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     private CharSequence getCommentUrl(int position) {
         String permaLink = getPermaLink(0);
         String thingId = position != 0 ? getThingId(position) : null;
-        return Urls.perma(permaLink, thingId);
+        return Urls.permaLink(permaLink, thingId);
     }
 
     public void delete(ListView listView) {

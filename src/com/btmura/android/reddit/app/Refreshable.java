@@ -17,5 +17,5 @@
 package com.btmura.android.reddit.app;
 
 interface Refreshable {
-    void refresh();
+  void refresh();
 }

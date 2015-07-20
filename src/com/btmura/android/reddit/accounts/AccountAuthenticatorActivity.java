@@ -17,42 +17,82 @@
 package com.btmura.android.reddit.accounts;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
-import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
+import com.btmura.android.reddit.app.LoginFragment;
 import com.btmura.android.reddit.content.ThemePrefs;
 
-public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity
-        implements OnAccountAddedListener {
+public class AccountAuthenticatorActivity
+    extends SupportAccountAuthenticatorActivity
+    implements LoginFragment.OnLoginListener,
+    AddAccountFragment.OnAddAccountListener {
 
-    public static final String EXTRA_LOGIN = "login";
+  private static final String TAG_ADD_ACCOUNT = "AddAccount";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getDialogTheme(this));
-        setContentView(R.layout.account_authenticator);
+  public static final String EXTRA_ACCOUNT_NAME = "accountName";
 
-        if (savedInstanceState == null) {
-            Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_LOGIN));
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.account_authenticator_container, frag);
-            ft.commit();
-        }
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setTheme(ThemePrefs.getTheme(this));
+    setContentView(R.layout.account_authenticator);
+    getActionBar().setDisplayHomeAsUpEnabled(true);
+    if (savedInstanceState == null) {
+      LoginFragment frag =
+          LoginFragment.newInstance(getAccountNameExtra(), newStateToken());
+      FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      ft.replace(R.id.account_authenticator_container, frag);
+      ft.commit();
     }
+  }
 
-    @Override
-    public void onAccountAdded(Bundle result) {
-        setAccountAuthenticatorResult(result);
-        setResult(RESULT_OK);
-        finish();
-    }
+  private static CharSequence newStateToken() {
+    return new StringBuilder("rbb_").append(System.currentTimeMillis());
+  }
 
-    @Override
-    public void onAccountCancelled() {
-        finish();
+  @Override
+  public void onLoginSuccess(String code) {
+    AddAccountFragment.newInstance(getAccountNameExtra(), code)
+        .show(getSupportFragmentManager(), TAG_ADD_ACCOUNT);
+  }
+
+  @Override
+  public void onLoginCancelled() {
+    finish();
+  }
+
+  @Override
+  public void onAddAccountSuccess(Bundle result) {
+    setAccountAuthenticatorResult(result);
+    setResult(RESULT_OK);
+    finish();
+  }
+
+  @Override
+  public void onAddAccountCancelled() {
+    // Dialog will be closed showing the permission listing.
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        return handleHome();
+
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
+
+  private boolean handleHome() {
+    finish();
+    return true;
+  }
+
+  private String getAccountNameExtra() {
+    return getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
+  }
 }

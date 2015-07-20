@@ -18,52 +18,52 @@ package com.btmura.android.reddit.text;
 
 public class MarkdownFormatter_EscapedTest extends AbstractFormatterTest {
 
-    public void testFormat_noEscapes() {
-        assertEscapedFormat("title", "title");
-    }
+  public void testFormat_noEscapes() {
+    assertEscapedFormat("title", "title");
+  }
 
-    public void testFormat_gt() {
-        assertEscapedFormat("gt &gt;", "gt >");
-    }
+  public void testFormat_gt() {
+    assertEscapedFormat("gt &gt;", "gt >");
+  }
 
-    public void testFormat_lt() {
-        assertEscapedFormat("lt &lt;", "lt <");
-    }
+  public void testFormat_lt() {
+    assertEscapedFormat("lt &lt;", "lt <");
+  }
 
-    public void testFormat_amp() {
-        assertEscapedFormat("amp &amp;", "amp &");
-    }
+  public void testFormat_amp() {
+    assertEscapedFormat("amp &amp;", "amp &");
+  }
 
-    public void testFormat_quot() {
-        assertEscapedFormat("quot &quot;", "quot \"");
-    }
+  public void testFormat_quot() {
+    assertEscapedFormat("quot &quot;", "quot \"");
+  }
 
-    public void testFormat_apos() {
-        assertEscapedFormat("apos &apos;", "apos '");
-    }
+  public void testFormat_apos() {
+    assertEscapedFormat("apos &apos;", "apos '");
+  }
 
-    public void testFormat_nbsp() {
-        assertEscapedFormat("nbsp &nbsp;", "nbsp  ");
-    }
+  public void testFormat_nbsp() {
+    assertEscapedFormat("nbsp &nbsp;", "nbsp  ");
+  }
 
-    public void testFormat_mdash() {
-        assertEscapedFormat("mdash &mdash;", "mdash —");
-    }
+  public void testFormat_mdash() {
+    assertEscapedFormat("mdash &mdash;", "mdash —");
+  }
 
-    public void testFormat_characterReference() {
-        assertEscapedFormat("#3232 &#3232;", "#3232 ಠ");
-    }
+  public void testFormat_characterReference() {
+    assertEscapedFormat("#3232 &#3232;", "#3232 ಠ");
+  }
 
-    public void testFormat_hexadecimalCharacterReference() {
-        assertEscapedFormat("#xCA0 &#xCA0;", "#xCA0 ಠ");
-    }
+  public void testFormat_hexadecimalCharacterReference() {
+    assertEscapedFormat("#xCA0 &#xCA0;", "#xCA0 ಠ");
+  }
 
-    public void testFormat_multipleEscapes() {
-        assertEscapedFormat("gt &gt; lt &lt;", "gt > lt <");
-        assertEscapedFormat("&lt;3 &apos;Quote&apos; &mdash;", "<3 'Quote' —");
-    }
+  public void testFormat_multipleEscapes() {
+    assertEscapedFormat("gt &gt; lt &lt;", "gt > lt <");
+    assertEscapedFormat("&lt;3 &apos;Quote&apos; &mdash;", "<3 'Quote' —");
+  }
 
-    public void testFormat_escapedEscapes() {
-        assertEscapedFormat("&amp;gt;", ">");
-    }
+  public void testFormat_escapedEscapes() {
+    assertEscapedFormat("&amp;gt;", ">");
+  }
 }

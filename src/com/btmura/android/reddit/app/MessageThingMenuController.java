@@ -25,54 +25,55 @@ import com.btmura.android.reddit.R;
 
 class MessageThingMenuController implements MenuController {
 
-    private final Context context;
-    private final String accountName;
-    private final ThingHolder thingHolder;
-    private final Refreshable refreshable;
+  private final Context context;
+  private final String accountName;
+  private final ThingHolder thingHolder;
+  private final Refreshable refreshable;
 
-    MessageThingMenuController(Context context,
-            String accountName,
-            ThingHolder thingHolder,
-            Refreshable refreshable) {
-        this.context = context;
-        this.accountName = accountName;
-        this.thingHolder = thingHolder;
-        this.refreshable = refreshable;
+  MessageThingMenuController(
+      Context context,
+      String accountName,
+      ThingHolder thingHolder,
+      Refreshable refreshable) {
+    this.context = context;
+    this.accountName = accountName;
+    this.thingHolder = thingHolder;
+    this.refreshable = refreshable;
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    inflater.inflate(R.menu.message_thing_menu, menu);
+  }
+
+  @Override
+  public void onPrepareOptionsMenu(Menu menu) {
+    boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
+    menu.findItem(R.id.menu_new_message).setVisible(!hasThing);
+    menu.findItem(R.id.menu_refresh).setVisible(!hasThing);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.menu_new_message:
+        handleNewMessage();
+        return true;
+
+      case R.id.menu_refresh:
+        handleRefresh();
+        return true;
+
+      default:
+        return false;
     }
+  }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.message_thing_menu, menu);
-    }
+  private void handleNewMessage() {
+    MenuHelper.startNewMessageComposer(context, accountName, null);
+  }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
-        menu.findItem(R.id.menu_new_message).setVisible(!hasThing);
-        menu.findItem(R.id.menu_refresh).setVisible(!hasThing);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_new_message:
-                handleNewMessage();
-                return true;
-
-            case R.id.menu_refresh:
-                handleRefresh();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    private void handleNewMessage() {
-        MenuHelper.startNewMessageComposer(context, accountName, null);
-    }
-
-    private void handleRefresh() {
-        refreshable.refresh();
-    }
+  private void handleRefresh() {
+    refreshable.refresh();
+  }
 }

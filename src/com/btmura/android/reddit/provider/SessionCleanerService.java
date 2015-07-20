@@ -22,21 +22,21 @@ import android.content.Intent;
 
 public class SessionCleanerService extends IntentService {
 
-    private static final String EXTRA_SESSION_TYPE = "sessionType";
+  private static final String EXTRA_SESSION_TYPE = "sessionType";
 
-    public static void startService(Context context, int sessionType) {
-        Intent intent = new Intent(context, SessionCleanerService.class);
-        intent.putExtra(EXTRA_SESSION_TYPE, sessionType);
-        context.startService(intent);
-    }
+  public static void startService(Context context, int sessionType) {
+    Intent intent = new Intent(context, SessionCleanerService.class);
+    intent.putExtra(EXTRA_SESSION_TYPE, sessionType);
+    context.startService(intent);
+  }
 
-    public SessionCleanerService() {
-        super("SessionCleanerService");
-    }
+  public SessionCleanerService() {
+    super("SessionCleanerService");
+  }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        int sessionType = intent.getIntExtra(EXTRA_SESSION_TYPE, 0);
-        ThingProvider.cleanSessions(this, sessionType);
-    }
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    int sessionType = intent.getIntExtra(EXTRA_SESSION_TYPE, 0);
+    ThingProvider.cleanSessions(this, sessionType);
+  }
 }

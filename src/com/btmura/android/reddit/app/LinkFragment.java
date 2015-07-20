@@ -42,221 +42,229 @@ import com.btmura.android.reddit.util.Strings;
 
 public class LinkFragment extends Fragment implements OnLongClickListener {
 
-    public static final String TAG = "LinkFragment";
+  public static final String TAG = "LinkFragment";
 
-    private static final String ARG_URL = "url";
+  private static final String ARG_URL = "url";
 
-    private WebView webView;
-    private ProgressBar progress;
+  private WebView webView;
+  private ProgressBar progress;
 
-    public static LinkFragment newInstance(CharSequence url) {
-        Bundle b = new Bundle(1);
-        b.putCharSequence(ARG_URL, url);
-        LinkFragment frag = new LinkFragment();
-        frag.setArguments(b);
-        return frag;
+  public static LinkFragment newInstance(CharSequence url) {
+    Bundle b = new Bundle(1);
+    b.putCharSequence(ARG_URL, url);
+    LinkFragment frag = new LinkFragment();
+    frag.setArguments(b);
+    return frag;
+  }
+
+  @Override
+  public View onCreateView(
+      LayoutInflater inflater,
+      ViewGroup container,
+      Bundle savedInstanceState) {
+    View view = inflater.inflate(R.layout.link, container, false);
+    webView = (WebView) view.findViewById(R.id.link);
+    progress = (ProgressBar) view.findViewById(R.id.progress_bar);
+    setupWebView(webView);
+    return view;
+  }
+
+  @SuppressLint("SetJavaScriptEnabled")
+  private void setupWebView(WebView webView) {
+    WebSettings settings = webView.getSettings();
+    settings.setBuiltInZoomControls(true);
+    settings.setDisplayZoomControls(false);
+    settings.setDomStorageEnabled(true);
+    settings.setJavaScriptEnabled(true);
+    settings.setLoadWithOverviewMode(true);
+    settings.setSupportZoom(true);
+    settings.setPluginState(PluginState.ON_DEMAND);
+    settings.setUseWideViewPort(true);
+
+    webView.setOnLongClickListener(this);
+
+    webView.setWebViewClient(new WebViewClient() {
+      @Override
+      public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (progress != null) {
+          progress.setVisibility(View.VISIBLE);
+        }
+      }
+
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        if (progress != null) {
+          progress.setVisibility(View.GONE);
+        }
+      }
+    });
+
+    webView.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public void onProgressChanged(WebView view, int newProgress) {
+        if (progress != null) {
+          progress.setProgress(newProgress);
+        }
+      }
+    });
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    if (savedInstanceState != null) {
+      webView.restoreState(savedInstanceState);
+    } else {
+      webView.loadUrl(getUrl());
+    }
+  }
+
+  private String getUrl() {
+    String url = Strings.toString(getArguments().getCharSequence(ARG_URL));
+    if (url != null && url.endsWith(".pdf")) {
+      return "http://docs.google.com/gview?embedded=true&url="
+          + Urls.encode(url);
+    }
+    return url;
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    webView.onResume();
+  }
+
+  @Override
+  public void onPause() {
+    webView.onPause();
+    super.onPause();
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    webView.saveState(outState);
+  }
+
+  @Override
+  public void onDetach() {
+    webView.destroy();
+    webView = null;
+    progress = null;
+    super.onDetach();
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public boolean onLongClick(View v) {
+    HitTestResult hit = webView.getHitTestResult();
+    if (!TextUtils.isEmpty(hit.getExtra())) {
+      switch (hit.getType()) {
+        case HitTestResult.IMAGE_TYPE:
+        case HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+          handleHit(hit,
+              R.array.link_image_menu_items,
+              new ImageClickListener(hit.getExtra()));
+          return true;
+
+        case HitTestResult.ANCHOR_TYPE:
+        case HitTestResult.SRC_ANCHOR_TYPE:
+          handleHit(hit,
+              R.array.link_anchor_menu_items,
+              new AnchorClickListener(hit.getExtra()));
+          return true;
+
+        default:
+          return false;
+      }
+    }
+    return false;
+  }
+
+  private void handleHit(
+      HitTestResult hit,
+      int arrayResId,
+      OnClickListener listener) {
+    new AlertDialog.Builder(getActivity())
+        .setTitle(hit.getExtra())
+        .setItems(arrayResId, listener)
+        .show();
+  }
+
+  class ImageClickListener implements OnClickListener {
+
+    // The following constants need to match the
+    // R.array.link_image_menu_items array.
+
+    private static final int ITEM_OPEN = 0;
+    private static final int ITEM_SAVE = 1;
+    private static final int ITEM_SHARE = 2;
+    private static final int ITEM_COPY_URL = 3;
+
+    private final String url;
+
+    ImageClickListener(String url) {
+      this.url = url;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.link, container, false);
-        webView = (WebView) view.findViewById(R.id.link);
-        progress = (ProgressBar) view.findViewById(R.id.progress);
-        setupWebView(webView);
-        return view;
+    public void onClick(DialogInterface dialog, int which) {
+      switch (which) {
+        case ITEM_OPEN:
+          MenuHelper.openUrl(getActivity(), url);
+          break;
+
+        case ITEM_SAVE:
+          MenuHelper.downloadUrl(getActivity(), url, url);
+          break;
+
+        case ITEM_SHARE:
+          MenuHelper.shareImageUrl(getActivity(), url);
+          break;
+
+        case ITEM_COPY_URL:
+          MenuHelper.copyUrl(getActivity(), url, url);
+          break;
+
+        default:
+          break;
+      }
     }
+  }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private void setupWebView(WebView webView) {
-        WebSettings settings = webView.getSettings();
-        settings.setBuiltInZoomControls(true);
-        settings.setDisplayZoomControls(false);
-        settings.setDomStorageEnabled(true);
-        settings.setJavaScriptEnabled(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setSupportZoom(true);
-        settings.setPluginState(PluginState.ON_DEMAND);
-        settings.setUseWideViewPort(true);
+  class AnchorClickListener implements OnClickListener {
 
-        webView.setOnLongClickListener(this);
+    // The following constants need to match the
+    // R.array.link_image_menu_items array.
 
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                if (progress != null) {
-                    progress.setVisibility(View.VISIBLE);
-                }
-            }
+    private static final int ITEM_OPEN = 0;
+    private static final int ITEM_SHARE = 1;
+    private static final int ITEM_COPY_URL = 2;
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                if (progress != null) {
-                    progress.setVisibility(View.GONE);
-                }
-            }
-        });
+    private final String url;
 
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                if (progress != null) {
-                    progress.setProgress(newProgress);
-                }
-            }
-        });
+    AnchorClickListener(String url) {
+      this.url = url;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            webView.restoreState(savedInstanceState);
-        } else {
-            webView.loadUrl(getUrl());
-        }
+    public void onClick(DialogInterface dialog, int which) {
+      switch (which) {
+        case ITEM_OPEN:
+          MenuHelper.openUrl(getActivity(), url);
+          break;
+
+        case ITEM_SHARE:
+          MenuHelper.shareImageUrl(getActivity(), url);
+          break;
+
+        case ITEM_COPY_URL:
+          MenuHelper.copyUrl(getActivity(), url, url);
+          break;
+
+        default:
+          break;
+      }
     }
-
-    private String getUrl() {
-        String url = Strings.toString(getArguments().getCharSequence(ARG_URL));
-        if (url != null && url.endsWith(".pdf")) {
-            return "http://docs.google.com/gview?embedded=true&url=" + Urls.encode(url);
-        }
-        return url;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        webView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        webView.onPause();
-        super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        webView.saveState(outState);
-    }
-
-    @Override
-    public void onDetach() {
-        webView.destroy();
-        webView = null;
-        progress = null;
-        super.onDetach();
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean onLongClick(View v) {
-        HitTestResult hit = webView.getHitTestResult();
-        if (!TextUtils.isEmpty(hit.getExtra())) {
-            switch (hit.getType()) {
-                case HitTestResult.IMAGE_TYPE:
-                case HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
-                    handleHit(hit,
-                            R.array.link_image_menu_items,
-                            new ImageClickListener(hit.getExtra()));
-                    return true;
-
-                case HitTestResult.ANCHOR_TYPE:
-                case HitTestResult.SRC_ANCHOR_TYPE:
-                    handleHit(hit,
-                            R.array.link_anchor_menu_items,
-                            new AnchorClickListener(hit.getExtra()));
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
-
-    private void handleHit(HitTestResult hit, int arrayResId, OnClickListener listener) {
-        new AlertDialog.Builder(getActivity())
-                .setTitle(hit.getExtra())
-                .setItems(arrayResId, listener)
-                .show();
-    }
-
-    class ImageClickListener implements OnClickListener {
-
-        // The following constants need to match the R.array.link_image_menu_items array.
-
-        private static final int ITEM_OPEN = 0;
-        private static final int ITEM_SAVE = 1;
-        private static final int ITEM_SHARE = 2;
-        private static final int ITEM_COPY_URL = 3;
-
-        private final String url;
-
-        ImageClickListener(String url) {
-            this.url = url;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which) {
-                case ITEM_OPEN:
-                    MenuHelper.openUrl(getActivity(), url);
-                    break;
-
-                case ITEM_SAVE:
-                    MenuHelper.downloadUrl(getActivity(), url, url);
-                    break;
-
-                case ITEM_SHARE:
-                    MenuHelper.shareImageUrl(getActivity(), url);
-                    break;
-
-                case ITEM_COPY_URL:
-                    MenuHelper.copyUrl(getActivity(), url, url);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-
-    class AnchorClickListener implements OnClickListener {
-
-        // The following constants need to match the R.array.link_image_menu_items array.
-
-        private static final int ITEM_OPEN = 0;
-        private static final int ITEM_SHARE = 1;
-        private static final int ITEM_COPY_URL = 2;
-
-        private final String url;
-
-        AnchorClickListener(String url) {
-            this.url = url;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which) {
-                case ITEM_OPEN:
-                    MenuHelper.openUrl(getActivity(), url);
-                    break;
-
-                case ITEM_SHARE:
-                    MenuHelper.shareImageUrl(getActivity(), url);
-                    break;
-
-                case ITEM_COPY_URL:
-                    MenuHelper.copyUrl(getActivity(), url, url);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
+  }
 }

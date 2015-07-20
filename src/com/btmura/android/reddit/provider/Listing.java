@@ -16,34 +16,30 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.io.IOException;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 
+import java.util.List;
+
 /**
- * {@link Listing} is an internal interface to enforce some uniformity on grabbing values to present
- * to the user.
+ * {@link Listing} is an internal interface to enforce some uniformity on
+ * grabbing values to present to the user.
  */
 interface Listing {
 
-    /** Returns the type of session this listing creates. */
-    int getSessionType();
+  /** Returns the type of session this listing creates. */
+  int getSessionType();
 
-    /** Returns the thing ID that may be used to identify a session. */
-    String getSessionThingId();
+  /** Returns the thing ID that may be used to identify a session. */
+  String getSessionThingId();
 
-    /** Get the values for this listing possibly using the network. */
-    List<ContentValues> getValues() throws IOException;
+  /** Get the values for this listing possibly using the network. */
+  List<ContentValues> getValues() throws Exception;
 
-    /** Called after the insertion transaction to perform additional ops. */
-    void performExtraWork(Context context);
+  /** Return the name of the table where the values should be inserted. */
+  String getTargetTable();
 
-    /** Return the name of the table where the values should be inserted. */
-    String getTargetTable();
-
-    /** Return whether this query is appending to an existing data set. */
-    boolean isAppend();
+  /** Return whether this query is appending to an existing data set. */
+  boolean isAppend();
 
 }

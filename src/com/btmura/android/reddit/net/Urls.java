@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2015 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 
 package com.btmura.android.reddit.net;
 
+import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
@@ -30,534 +34,621 @@ import java.net.URLEncoder;
 
 public class Urls {
 
-    /** Type for getting a HTML response. */
-    public static final int TYPE_HTML = 0;
+  public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
 
-    /** Type for getting a JSON response. */
-    public static final int TYPE_JSON = 1;
+  public static final String WWW_REDDIT_COM = "https://www.reddit.com";
+  private static final String OAUTH_REDDIT_COM = "https://oauth.reddit.com";
 
-    public static final String OAUTH_REDIRECT_URL = "rbb://oauth/";
+  private static final String ACCESS_TOKEN_URL =
+      WWW_REDDIT_COM + "/api/v1/access_token";
+  private static final String CAPTCHA_URL = WWW_REDDIT_COM + "/captcha/";
+  private static final String COMMENT_URL = OAUTH_REDDIT_COM + "/api/comment";
+  private static final String COMPOSE_URL = OAUTH_REDDIT_COM + "/api/compose";
+  private static final String DEL_URL = OAUTH_REDDIT_COM + "/api/del";
+  private static final String EDIT_URL = OAUTH_REDDIT_COM + "/api/editusertext";
+  private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
+  private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
+  private static final String MY_SUBREDDITS_URL =
+      OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
+  private static final String READ_MESSAGE =
+      OAUTH_REDDIT_COM + "/api/read_message";
+  private static final String SAVE_URL = OAUTH_REDDIT_COM + "/api/save";
+  private static final String SUBMIT_URL = OAUTH_REDDIT_COM + "/api/submit/";
+  private static final String SUBSCRIBE_URL =
+      OAUTH_REDDIT_COM + "/api/subscribe/";
+  private static final String UNHIDE_URL = OAUTH_REDDIT_COM + "/api/unhide";
+  private static final String UNREAD_MESSAGE =
+      OAUTH_REDDIT_COM + "/api/unread_message";
+  private static final String UNSAVE_URL = OAUTH_REDDIT_COM + "/api/unsave";
+  private static final String VOTE_URL = OAUTH_REDDIT_COM + "/api/vote/";
 
-    public static final String BASE_URL = "https://www.reddit.com";
-    private static final String BASE_SSL_URL = "https://ssl.reddit.com";
+  private static final String AUTHORIZE_PATH = "/api/v1/authorize.compact";
+  private static final String COMMENTS_PATH = "/comments/";
+  private static final String INFO_PATH = "/api/info";
+  private static final String MESSAGES_PATH = "/message";
+  private static final String MESSAGE_THREAD_PATH = "/message/messages/";
+  private static final String SUBREDDITS_PATH = "/subreddits";
+  private static final String R_PATH = "/r/";
+  private static final String U_PATH = "/u/";
+  private static final String USER_PATH = "/user/";
 
-    public static final String API_ACCESS_TOKEN_URL = BASE_URL + "/api/v1/access_token";
+  public static final String NO_ACCOUNT = AccountUtils.NO_ACCOUNT;
+  public static final String NO_SUBREDDIT = null;
+  public static final int NO_FILTER = -1;
+  public static final String NO_MORE = null;
+  public static final int NO_COUNT = -1;
+  public static final int NO_LIMIT = -1;
 
-    private static final String API_AUTHORIZE_URL = BASE_URL + "/api/v1/authorize";
-    private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
-    private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
-    private static final String API_DELETE_URL = BASE_URL + "/api/del";
-    private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
-    private static final String API_HIDE_URL = BASE_URL + "/api/hide";
-    private static final String API_INFO_URL = BASE_URL + "/api/info";
-    private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
-    private static final String API_ME_URL = BASE_URL + "/api/me";
-    private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
-    private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
-    private static final String API_SAVE_URL = BASE_URL + "/api/save";
-    private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
-    private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
-    private static final String API_UNHIDE_URL = BASE_URL + "/api/unhide";
-    private static final String API_UNREAD_MESSAGE = BASE_URL + "/api/unread_message";
-    private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
-    private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
+  private static final int FORMAT_HTML = 0;
+  private static final int FORMAT_JSON = 1;
 
-    private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
-    private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
-    private static final String BASE_MESSAGE_URL = BASE_URL + "/message/";
-    private static final String BASE_MESSAGE_THREAD_URL = BASE_URL + "/message/messages/";
-    private static final String BASE_SEARCH_QUERY = "/search.json?q=";
-    private static final String BASE_SEARCH_URL = BASE_URL + BASE_SEARCH_QUERY;
-    private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
-    private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
-    private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
-    private static final String BASE_USER_HTML_URL = BASE_URL + "/u/";
-    private static final String BASE_USER_JSON_URL = BASE_URL + "/user/";
+  public static CharSequence accessToken() {
+    return ACCESS_TOKEN_URL;
+  }
 
-    public static URL newUrl(CharSequence url) {
-        try {
-            return new URL(url.toString());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+  public static CharSequence authorize(Context ctx, CharSequence state) {
+    String clientId = ctx.getString(R.string.key_reddit_client_id);
+    return new StringBuilder(WWW_REDDIT_COM)
+        .append(AUTHORIZE_PATH)
+        .append("?client_id=").append(encode(clientId))
+        .append("&response_type=code&state=").append(encode(state))
+        .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
+        .append("&duration=permanent&scope=")
+        .append(encode("edit,history,identity,mysubreddits,privatemessages,"
+            + "read,report,save,submit,subscribe,vote"));
+  }
+
+  public static CharSequence myInfo() {
+    return ME_URL;
+  }
+
+  public static CharSequence thingInfo(String accountName, String thingId) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(INFO_PATH);
+
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
     }
 
-    public static CharSequence aboutMe() {
-        return new StringBuilder(API_ME_URL).append(".json");
+    return sb.append("?id=")
+        .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
+  }
+
+  public static CharSequence mySubreddits() {
+    return MY_SUBREDDITS_URL;
+  }
+
+  public static CharSequence subreddit(
+      String accountName,
+      String subreddit,
+      int filter,
+      @Nullable String more,
+      int count) {
+    return innerSubreddit(accountName, subreddit, filter, more, count,
+        FORMAT_JSON);
+  }
+
+  public static CharSequence subredditLink(String subreddit) {
+    return innerSubreddit(NO_ACCOUNT, subreddit, NO_FILTER, NO_MORE, NO_COUNT,
+        FORMAT_HTML);
+  }
+
+  private static CharSequence innerSubreddit(
+      String accountName,
+      String subreddit,
+      int filter,
+      @Nullable String more,
+      int count,
+      int format) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
+
+    if (!Subreddits.isFrontPage(subreddit)) {
+      sb.append(R_PATH).append(encode(subreddit));
     }
 
-    public static CharSequence aboutUser(String user) {
-        return new StringBuilder(BASE_USER_JSON_URL).append(user).append("/about.json");
+    if (!Subreddits.isRandom(subreddit)) {
+      switch (filter) {
+        case Filter.SUBREDDIT_CONTROVERSIAL:
+          sb.append("/controversial");
+          break;
+
+        case Filter.SUBREDDIT_HOT:
+          sb.append("/hot");
+          break;
+
+        case Filter.SUBREDDIT_NEW:
+          sb.append("/new");
+          break;
+
+        case Filter.SUBREDDIT_RISING:
+          sb.append("/rising");
+          break;
+
+        case Filter.SUBREDDIT_TOP:
+          sb.append("/top");
+          break;
+      }
     }
 
-    public static CharSequence authorize(CharSequence clientId,
-                                         CharSequence state,
-                                         CharSequence redirectUri) {
-        return new StringBuilder(API_AUTHORIZE_URL)
-                .append("?client_id=").append(clientId)
-                .append("&response_type=code&state=").append(state)
-                .append("&redirect_uri=").append(redirectUri)
-                .append("&duration=permanent&scope=read");
+    if (needsJsonExtension(accountName, format)) {
+      sb.append(".json");
     }
 
-    public static CharSequence captcha(String id) {
-        return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
+    boolean appendMore = more != null;
+    boolean appendCount = count > 0;
+
+    if (appendMore || appendCount) {
+      sb.append('?');
+    }
+    if (appendMore) {
+      sb.append("&after=").append(encode(more));
+    }
+    if (appendCount) {
+      sb.append("&count=").append(count);
+    }
+    return sb;
+  }
+
+  public static CharSequence comments(
+      String accountName,
+      String thingId,
+      String linkId,
+      int filter,
+      int numComments) {
+    return innerComments(accountName, thingId, linkId, filter, numComments,
+        FORMAT_JSON);
+  }
+
+  public static CharSequence commentsLink(String thingId, String linkId) {
+    return innerComments(NO_ACCOUNT, thingId, linkId, -1, -1, FORMAT_HTML);
+  }
+
+  private static CharSequence innerComments(
+      String accountName,
+      String thingId,
+      String linkId,
+      int filter,
+      int limit,
+      int format) {
+    thingId = ThingIds.removeTag(thingId);
+
+    boolean hasLinkId = !TextUtils.isEmpty(linkId);
+
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(COMMENTS_PATH)
+        .append(encode(hasLinkId ? ThingIds.removeTag(linkId) : thingId));
+
+    if (needsJsonExtension(accountName, format)) {
+      sb.append(".json");
     }
 
-    public static CharSequence comments() {
-        return API_COMMENTS_URL;
+    boolean hasFilter = filter != NO_FILTER;
+    boolean hasLimit = limit != NO_LIMIT;
+
+    if (hasLinkId || hasFilter || hasLimit) {
+      sb.append('?');
     }
 
-    public static CharSequence commentsQuery(String thingId, String text, String modhash) {
-        return thingTextQuery(thingId, text, modhash);
+    if (hasLinkId) {
+      sb.append("&comment=").append(encode(thingId)).append("&context=3");
+    } else if (hasFilter) {
+      switch (filter) {
+        case Filter.COMMENTS_BEST:
+          sb.append("&sort=confidence");
+          break;
+
+        case Filter.COMMENTS_CONTROVERSIAL:
+          sb.append("&sort=controversial");
+          break;
+
+        case Filter.COMMENTS_HOT:
+          sb.append("&sort=hot");
+          break;
+
+        case Filter.COMMENTS_NEW:
+          sb.append("&sort=new");
+          break;
+
+        case Filter.COMMENTS_OLD:
+          sb.append("&sort=old");
+          break;
+
+        case Filter.COMMENTS_TOP:
+          sb.append("&sort=top");
+          break;
+
+        default:
+          break;
+      }
     }
 
-    public static CharSequence edit() {
-        return API_EDIT_URL;
+    if (hasLimit) {
+      sb.append("&limit=").append(limit);
     }
 
-    public static CharSequence editQuery(String thingId, String text, String modhash) {
-        return thingTextQuery(thingId, text, modhash);
+    return sb;
+  }
+
+  public static CharSequence messages(
+      int filter,
+      @Nullable String more,
+      int count) {
+    StringBuilder sb = new StringBuilder(OAUTH_REDDIT_COM)
+        .append(MESSAGES_PATH);
+
+    switch (filter) {
+      case Filter.MESSAGE_INBOX:
+        sb.append("/inbox");
+        break;
+
+      case Filter.MESSAGE_UNREAD:
+        sb.append("/unread");
+        break;
+
+      case Filter.MESSAGE_SENT:
+        sb.append("/sent");
+        break;
+
+      default:
+        throw new IllegalArgumentException();
     }
 
-    private static CharSequence thingTextQuery(String thingId, String text, String modhash) {
-        return new StringBuilder()
-                .append("thing_id=").append(encode(thingId))
-                .append("&text=").append(encode(text))
-                .append("&uh=").append(encode(modhash))
-                .append("&api_type=json");
+    boolean appendMore = more != null;
+    boolean appendCount = count > 0;
+
+    if (appendMore || appendCount) {
+      sb.append('?');
+    }
+    if (appendMore) {
+      sb.append("&after=").append(encode(more));
+    }
+    if (appendCount) {
+      sb.append("&count=").append(count);
+    }
+    return sb;
+  }
+
+  public static CharSequence profile(
+      String accountName,
+      String user,
+      int filter,
+      @Nullable String more,
+      int count) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(USER_PATH)
+        .append(encode(user));
+    switch (filter) {
+      case Filter.PROFILE_OVERVIEW:
+        sb.append("/overview");
+        break;
+
+      case Filter.PROFILE_COMMENTS:
+        sb.append("/comments");
+        break;
+
+      case Filter.PROFILE_SUBMITTED:
+        sb.append("/submitted");
+        break;
+
+      case Filter.PROFILE_UPVOTED:
+        sb.append("/upvoted");
+        break;
+
+      case Filter.PROFILE_DOWNVOTED:
+        sb.append("/downvoted");
+        break;
+
+      case Filter.PROFILE_HIDDEN:
+        sb.append("/hidden");
+        break;
+
+      case Filter.PROFILE_SAVED:
+        sb.append("/saved");
+        break;
+    }
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
     }
 
-    public static CharSequence commentListing(String id,
-                                              String linkId,
-                                              int filter,
-                                              int numComments,
-                                              int apiType) {
-        boolean hasLinkId = !TextUtils.isEmpty(linkId);
-        boolean hasLimit = numComments != -1;
-        id = ThingIds.removeTag(id);
-        StringBuilder b = new StringBuilder(BASE_COMMENTS_URL);
-        b.append(hasLinkId ? ThingIds.removeTag(linkId) : id);
-        if (apiType == TYPE_JSON) {
-            b.append(".json");
-        }
-        if (hasLinkId || hasLimit || filter != -1) {
-            b.append("?");
-        }
-        if (hasLinkId) {
-            b.append("&comment=").append(id).append("&context=3");
-        } else if (filter != -1) {
-            switch (filter) {
-                case Filter.COMMENTS_BEST:
-                    b.append("&sort=confidence");
-                    break;
+    boolean appendMore = more != null;
+    boolean appendCount = count > 0;
 
-                case Filter.COMMENTS_CONTROVERSIAL:
-                    b.append("&sort=controversial");
-                    break;
+    if (appendMore || appendCount) {
+      sb.append('?');
+    }
+    if (appendMore) {
+      sb.append("&after=").append(encode(more));
+    }
+    if (appendCount) {
+      sb.append("&count=").append(count);
+    }
+    return sb;
+  }
 
-                case Filter.COMMENTS_HOT:
-                    b.append("&sort=hot");
-                    break;
+  public static CharSequence profileLink(String user) {
+    return new StringBuilder(WWW_REDDIT_COM)
+        .append(U_PATH)
+        .append(encode(user));
+  }
 
-                case Filter.COMMENTS_NEW:
-                    b.append("&sort=new");
-                    break;
+  public static CharSequence messageThread(String thingId) {
+    return new StringBuilder(OAUTH_REDDIT_COM)
+        .append(MESSAGE_THREAD_PATH)
+        .append(encode(ThingIds.removeTag(thingId)));
+  }
 
-                case Filter.COMMENTS_OLD:
-                    b.append("&sort=old");
-                    break;
+  public static CharSequence messageThreadLink(String thingId) {
+    return new StringBuilder(WWW_REDDIT_COM)
+        .append(MESSAGE_THREAD_PATH)
+        .append(encode(ThingIds.removeTag(thingId)));
+  }
 
-                case Filter.COMMENTS_TOP:
-                    b.append("&sort=top");
-                    break;
+  public static CharSequence search(
+      String accountName,
+      @Nullable String subreddit,
+      String query,
+      int filter,
+      @Nullable String more,
+      int count) {
+    return innerSearch(accountName, subreddit, false, query, filter, more,
+        count);
+  }
 
-                default:
-                    break;
-            }
-        }
-        if (hasLimit) {
-            b.append("&limit=").append(numComments);
-        }
-        return b;
+  public static CharSequence subredditSearch(
+      String accountName,
+      String query) {
+    return innerSearch(accountName, NO_SUBREDDIT, true, query, NO_FILTER,
+        NO_MORE, NO_COUNT);
+  }
+
+  private static CharSequence innerSearch(
+      String accountName,
+      @Nullable String subreddit,
+      boolean subredditSearch,
+      String query,
+      int filter,
+      @Nullable String more,
+      int count) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName));
+
+    if (subredditSearch) {
+      sb.append(SUBREDDITS_PATH);
+    } else if (!TextUtils.isEmpty(subreddit)) {
+      sb.append(R_PATH).append(encode(subreddit));
     }
 
-    public static CharSequence compose() {
-        return API_COMPOSE_URL;
+    sb.append("/search");
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
     }
+    sb.append("?q=").append(encode(query));
 
-    public static String composeQuery(String to, String subject, String text, String captchaId,
-                                      String captchaGuess, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("to=").append(encode(to));
-        b.append("&subject=").append(encode(subject));
-        b.append("&text=").append(encode(text));
-        if (!TextUtils.isEmpty(captchaId)) {
-            b.append("&iden=").append(encode(captchaId));
-        }
-        if (!TextUtils.isEmpty(captchaGuess)) {
-            b.append("&captcha=").append(encode(captchaGuess));
-        }
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b.toString();
+    switch (filter) {
+      case Filter.SEARCH_RELEVANCE:
+        sb.append("&sort=relevance");
+        break;
+
+      case Filter.SEARCH_NEW:
+        sb.append("&sort=new");
+        break;
+
+      case Filter.SEARCH_HOT:
+        sb.append("&sort=hot");
+        break;
+
+      case Filter.SEARCH_TOP:
+        sb.append("&sort=top");
+        break;
+
+      case Filter.SEARCH_COMMENTS:
+        sb.append("&sort=comments");
+        break;
     }
-
-    public static CharSequence delete() {
-        return API_DELETE_URL;
+    if (count > 0) {
+      sb.append("&count=").append(count);
     }
-
-    public static CharSequence deleteQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
+    if (more != null) {
+      sb.append("&after=").append(encode(more));
     }
-
-    public static CharSequence hide(boolean hide) {
-        return hide ? API_HIDE_URL : API_UNHIDE_URL;
+    if (!TextUtils.isEmpty(subreddit)) {
+      sb.append("&restrict_sr=on");
     }
+    return sb;
+  }
 
-    public static CharSequence hideQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
+  public static CharSequence sidebar(
+      String accountName,
+      String subreddit) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(R_PATH)
+        .append(encode(subreddit))
+        .append("/about");
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
     }
+    return sb;
+  }
 
-    public static CharSequence info(String thingId) {
-        return new StringBuilder(API_INFO_URL)
-                .append(".json?id=")
-                .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
+  public static CharSequence userInfo(String accountName, String user) {
+    StringBuilder sb = new StringBuilder(getBaseUrl(accountName))
+        .append(USER_PATH)
+        .append(encode(user))
+        .append("/about");
+    if (needsJsonExtension(accountName, FORMAT_JSON)) {
+      sb.append(".json");
     }
+    return sb;
+  }
 
-    public static CharSequence loginCookie(String cookie) {
-        StringBuilder b = new StringBuilder();
-        b.append("reddit_session=").append(encode(cookie));
-        return b;
+  // POST requests
+
+  public static CharSequence comment() {
+    return COMMENT_URL;
+  }
+
+  public static CharSequence commentQuery(String thingId, String text) {
+    return thingTextQuery(thingId, text);
+  }
+
+  public static CharSequence compose() {
+    return COMPOSE_URL;
+  }
+
+  public static CharSequence composeQuery(
+      String to,
+      String subject,
+      String text,
+      String captchaId,
+      String captchaGuess) {
+    StringBuilder sb = new StringBuilder("api_type=json");
+    if (!TextUtils.isEmpty(captchaGuess)) {
+      sb.append("&captcha=").append(encode(captchaGuess));
     }
-
-    public static CharSequence login(String userName) {
-        return new StringBuilder(API_LOGIN_URL).append(encode(userName));
+    if (!TextUtils.isEmpty(captchaId)) {
+      sb.append("&iden=").append(encode(captchaId));
     }
+    return sb
+        .append("&subject=").append(encode(subject))
+        .append("&text=").append(encode(text))
+        .append("&to=").append(encode(to));
+  }
 
-    public static CharSequence loginQuery(String userName, String password) {
-        StringBuilder b = new StringBuilder();
-        b.append("user=").append(encode(userName));
-        b.append("&passwd=").append(encode(password));
-        b.append("&api_type=json");
-        return b;
+  public static CharSequence delete() {
+    return DEL_URL;
+  }
+
+  public static CharSequence deleteQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
+  public static CharSequence edit() {
+    return EDIT_URL;
+  }
+
+  public static CharSequence editQuery(String thingId, String text) {
+    return thingTextQuery(thingId, text);
+  }
+
+  public static CharSequence hide(boolean hide) {
+    return hide ? HIDE_URL : UNHIDE_URL;
+  }
+
+  public static CharSequence hideQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
+  public static CharSequence readMessage(boolean read) {
+    return read ? READ_MESSAGE : UNREAD_MESSAGE;
+  }
+
+  public static CharSequence readMessageQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
+  public static CharSequence save(boolean save) {
+    return save ? SAVE_URL : UNSAVE_URL;
+  }
+
+  public static CharSequence saveQuery(String thingId) {
+    return thingQuery(thingId);
+  }
+
+  public static CharSequence submit() {
+    return SUBMIT_URL;
+  }
+
+  public static CharSequence submitQuery(
+      String subreddit,
+      String title,
+      String text,
+      boolean link,
+      String captchaId,
+      String captchaGuess) {
+    StringBuilder sb = new StringBuilder("api_type=json");
+    if (!TextUtils.isEmpty(captchaGuess)) {
+      sb.append("&captcha=").append(encode(captchaGuess));
     }
-
-    public static CharSequence messageThread(String thingId, int apiType) {
-        StringBuilder b = new StringBuilder(BASE_MESSAGE_THREAD_URL);
-        b.append(ThingIds.removeTag(thingId));
-        if (apiType == TYPE_JSON) {
-            b.append(".json");
-        }
-        return b;
+    if (!TextUtils.isEmpty(captchaId)) {
+      sb.append("&iden=").append(encode(captchaId));
     }
+    return sb.append("&kind=").append(link ? "link" : "self")
+        .append("&sr=").append(encode(subreddit))
+        .append(link ? "&url=" : "&text=").append(encode(text))
+        .append("&title=").append(encode(title));
+  }
 
-    public static CharSequence message(int filter, String more, boolean mark, int apiType) {
-        StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
-        switch (filter) {
-            case Filter.MESSAGE_INBOX:
-                b.append("inbox");
-                break;
+  public static CharSequence subscribe() {
+    return SUBSCRIBE_URL;
+  }
 
-            case Filter.MESSAGE_UNREAD:
-                b.append("unread");
-                break;
+  public static CharSequence subscribeData(
+      String subreddit,
+      boolean subscribe) {
+    return new StringBuilder()
+        .append("action=").append(subscribe ? "sub" : "unsub")
+        .append("&sr_name=").append(encode(subreddit));
+  }
 
-            case Filter.MESSAGE_SENT:
-                b.append("sent");
-                break;
+  public static CharSequence vote() {
+    return VOTE_URL;
+  }
 
-            default:
-                throw new IllegalArgumentException(Integer.toString(filter));
-        }
-        if (apiType == TYPE_JSON) {
-            b.append("/.json");
-        }
-        if (more != null || mark) {
-            b.append("?");
-        }
-        if (more != null) {
-            b.append("&count=25&after=").append(encode(more));
-        }
-        if (mark) {
-            b.append("&mark=true");
-        }
-        return b;
+  public static CharSequence voteQuery(String thingId, int vote) {
+    return new StringBuilder()
+        .append("id=").append(thingId)
+        .append("&dir=").append(Integer.toString(vote));
+  }
+
+  // Other links
+
+  public static CharSequence captcha(String id) {
+    return new StringBuilder(CAPTCHA_URL).append(id).append(".png");
+  }
+
+  public static CharSequence permaLink(String perma, String thingId) {
+    StringBuilder sb = new StringBuilder(WWW_REDDIT_COM).append(perma);
+    if (!TextUtils.isEmpty(thingId)) {
+      sb.append(ThingIds.removeTag(thingId));
     }
+    return sb;
+  }
 
-    public static CharSequence newCaptcha() {
-        return API_NEW_CAPTCHA_URL;
+  private static String getBaseUrl(String accountName) {
+    return isOAuth(accountName) ? OAUTH_REDDIT_COM : WWW_REDDIT_COM;
+  }
+
+  private static boolean needsJsonExtension(String accountName, int format) {
+    return !isOAuth(accountName) && format == FORMAT_JSON;
+  }
+
+  private static boolean isOAuth(String accountName) {
+    return AccountUtils.isAccount(accountName);
+  }
+
+  private static CharSequence thingQuery(String thingId) {
+    return new StringBuilder("id=").append(encode(thingId));
+  }
+
+  private static CharSequence thingTextQuery(String thingId, String text) {
+    return new StringBuilder()
+        .append("thing_id=").append(encode(thingId))
+        .append("&text=").append(encode(text));
+  }
+
+
+  public static URL newUrl(CharSequence url) {
+    try {
+      return new URL(url.toString());
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    public static CharSequence newCaptchaQuery() {
-        return "api_type=json";
+  public static String encode(CharSequence param) {
+    try {
+      return URLEncoder.encode(param.toString(), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
     }
-
-    public static CharSequence readMessage() {
-        return API_READ_MESSAGE;
-    }
-
-    public static CharSequence readMessageQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    public static CharSequence saveQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    private static CharSequence thingQuery(String thingId, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("id=").append(encode(thingId));
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b;
-    }
-
-    public static CharSequence subscribeQuery(String subreddit, boolean subscribe,
-                                              String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("action=").append(subscribe ? "sub" : "unsub");
-        b.append("&uh=").append(encode(modhash));
-        b.append("&sr_name=").append(encode(subreddit));
-        b.append("&api_type=json");
-        return b;
-    }
-
-    public static CharSequence perma(String permaLink, String thingId) {
-        StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
-        if (!TextUtils.isEmpty(thingId)) {
-            b.append(ThingIds.removeTag(thingId));
-        }
-        return b;
-    }
-
-    public static CharSequence save(boolean save) {
-        return save ? API_SAVE_URL : API_UNSAVE_URL;
-    }
-
-    public static CharSequence search(String subreddit, String query, int filter, String more) {
-        if (!TextUtils.isEmpty(subreddit)) {
-            StringBuilder b = new StringBuilder(BASE_SUBREDDIT_URL);
-            b.append(encode(subreddit));
-            b.append(BASE_SEARCH_QUERY);
-            return newSearchUrl(b, query, filter, more, true);
-        } else {
-            return newSearchUrl(BASE_SEARCH_URL, query, filter, more, false);
-        }
-    }
-
-    public static CharSequence sidebar(String name) {
-        return new StringBuilder(BASE_SUBREDDIT_URL).append(encode(name)).append("/about.json");
-    }
-
-    public static CharSequence submit() {
-        return API_SUBMIT_URL;
-    }
-
-    public static CharSequence submitQuery(String subreddit,
-                                           String title,
-                                           String text,
-                                           boolean link,
-                                           String captchaId,
-                                           String captchaGuess,
-                                           String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append(link ? "kind=link" : "kind=self");
-        b.append("&uh=").append(encode(modhash));
-        b.append("&sr=").append(encode(subreddit));
-        b.append("&title=").append(encode(title));
-        b.append(link ? "&url=" : "&text=").append(encode(text));
-        if (!TextUtils.isEmpty(captchaId)) {
-            b.append("&iden=").append(encode(captchaId));
-        }
-        if (!TextUtils.isEmpty(captchaGuess)) {
-            b.append("&captcha=").append(encode(captchaGuess));
-        }
-        b.append("&api_type=json");
-        return b;
-    }
-
-    public static CharSequence subreddit(String subreddit, int filter, int apiType) {
-        return subredditMore(subreddit, filter, null, apiType);
-    }
-
-    public static CharSequence subredditMore(String subreddit,
-                                             int filter,
-                                             String more,
-                                             int apiType) {
-        StringBuilder b = new StringBuilder(BASE_URL);
-
-        if (!Subreddits.isFrontPage(subreddit)) {
-            b.append("/r/").append(encode(subreddit));
-        }
-
-        // Only add the filter for non random subreddits.
-        if (!Subreddits.isRandom(subreddit)) {
-            switch (filter) {
-                case Filter.SUBREDDIT_CONTROVERSIAL:
-                    b.append("/controversial");
-                    break;
-
-                case Filter.SUBREDDIT_HOT:
-                    b.append("/hot");
-                    break;
-
-                case Filter.SUBREDDIT_NEW:
-                    b.append("/new");
-                    break;
-
-                case Filter.SUBREDDIT_RISING:
-                    b.append("/rising");
-                    break;
-
-                case Filter.SUBREDDIT_TOP:
-                    b.append("/top");
-                    break;
-            }
-        }
-
-        if (apiType == TYPE_JSON) {
-            b.append("/.json");
-        }
-
-        if (more != null) {
-            b.append("?count=25&after=").append(encode(more));
-        }
-        return b;
-    }
-
-    public static CharSequence subredditList(int limit) {
-        StringBuilder b = new StringBuilder(BASE_SUBREDDIT_LIST_URL);
-        if (limit != -1) {
-            b.append("?limit=").append(limit);
-        }
-        return b;
-    }
-
-    public static CharSequence subredditSearch(String query, String more) {
-        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, -1, more, false);
-    }
-
-    public static CharSequence subscribe() {
-        return API_SUBSCRIBE_URL;
-    }
-
-    public static CharSequence unreadMessage() {
-        return API_UNREAD_MESSAGE;
-    }
-
-    public static CharSequence unreadMessageQuery(String thingId, String modhash) {
-        return thingQuery(thingId, modhash);
-    }
-
-    public static CharSequence user(String user, int filter, String more, int apiType) {
-        StringBuilder b;
-        switch (apiType) {
-            case TYPE_HTML:
-                b = new StringBuilder(BASE_USER_HTML_URL);
-                break;
-
-            case TYPE_JSON:
-                b = new StringBuilder(BASE_USER_JSON_URL);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-        b.append(encode(user));
-
-        switch (filter) {
-            case Filter.PROFILE_OVERVIEW:
-                b.append("/overview");
-                break;
-
-            case Filter.PROFILE_COMMENTS:
-                b.append("/comments");
-                break;
-
-            case Filter.PROFILE_SUBMITTED:
-                b.append("/submitted");
-                break;
-
-            case Filter.PROFILE_LIKED:
-                b.append("/liked");
-                break;
-
-            case Filter.PROFILE_DISLIKED:
-                b.append("/disliked");
-                break;
-
-            case Filter.PROFILE_HIDDEN:
-                b.append("/hidden");
-                break;
-
-            case Filter.PROFILE_SAVED:
-                b.append("/saved");
-                break;
-        }
-        if (apiType == TYPE_JSON) {
-            b.append("/.json");
-        }
-        if (more != null) {
-            b.append("?count=25&after=").append(encode(more));
-        }
-        return b;
-    }
-
-    public static CharSequence vote() {
-        return API_VOTE_URL;
-    }
-
-    public static CharSequence voteQuery(String thingId, int vote, String modhash) {
-        StringBuilder b = new StringBuilder();
-        b.append("id=").append(thingId);
-        b.append("&dir=").append(encode(Integer.toString(vote)));
-        b.append("&uh=").append(encode(modhash));
-        b.append("&api_type=json");
-        return b;
-    }
-
-    private static CharSequence newSearchUrl(CharSequence base, String query, int filter,
-                                             String more, boolean restrict) {
-        StringBuilder b = new StringBuilder(base).append(encode(query));
-        switch (filter) {
-            case Filter.SEARCH_RELEVANCE:
-                b.append("&sort=relevance");
-                break;
-
-            case Filter.SEARCH_NEW:
-                b.append("&sort=new");
-                break;
-
-            case Filter.SEARCH_HOT:
-                b.append("&sort=hot");
-                break;
-
-            case Filter.SEARCH_TOP:
-                b.append("&sort=top");
-                break;
-
-            case Filter.SEARCH_COMMENTS:
-                b.append("&sort=comments");
-                break;
-
-            default:
-                break;
-        }
-        if (more != null) {
-            b.append("&count=25&after=").append(encode(more));
-        }
-        if (restrict) {
-            b.append("&restrict_sr=on");
-        }
-        return b;
-    }
-
-    public static String encode(String param) {
-        try {
-            return URLEncoder.encode(param, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+  }
 }

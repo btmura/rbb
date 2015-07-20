@@ -22,35 +22,31 @@ import com.btmura.android.reddit.R;
 
 public class ThemePrefs extends Prefs {
 
-    private static final String PREF_THEME = "theme";
-    private static final int THEME_LIGHT = 0;
-    private static final int THEME_DARK = 1;
+  private static final String PREF_THEME = "theme";
+  private static final int THEME_LIGHT = 0;
+  private static final int THEME_DARK = 1;
 
-    public static int getTheme(Context context) {
-        return pick(context, R.style.Theme_Light, R.style.Theme_Dark);
-    }
+  public static int getTheme(Context ctx) {
+    return pick(ctx, R.style.Theme_Light, R.style.Theme_Dark);
+  }
 
-    public static int getDialogTheme(Context context) {
-        return pick(context, R.style.Theme_Light_Dialog, R.style.Theme_Dark_Dialog);
-    }
+  public static int getDialogWhenLargeTheme(Context ctx) {
+    return pick(ctx,
+        R.style.Theme_Light_DialogWhenLarge,
+        R.style.Theme_Dark_DialogWhenLarge);
+  }
 
-    public static int getDialogWhenLargeTheme(Context context) {
-        return pick(context, R.style.Theme_Light_DialogWhenLarge,
-                R.style.Theme_Dark_DialogWhenLarge);
-    }
+  public static int getDrawerIcon(Context ctx) {
+    return pick(ctx, R.drawable.ic_drawer_light, R.drawable.ic_drawer_dark);
+  }
 
-    public static int getDrawerIcon(Context context) {
-        return pick(context, R.drawable.ic_drawer_light,
-                R.drawable.ic_drawer_dark);
-    }
+  public static void switchTheme(Context ctx) {
+    int otherTheme = pick(ctx, THEME_DARK, THEME_LIGHT);
+    getInstance(ctx).edit().putInt(PREF_THEME, otherTheme).apply();
+  }
 
-    public static void switchTheme(Context context) {
-        int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);
-        getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();
-    }
-
-    private static int pick(Context context, int lightValue, int darkValue) {
-        return getPrefsInstance(context).getInt(PREF_THEME, THEME_DARK) == THEME_LIGHT ?
-                lightValue : darkValue;
-    }
+  private static int pick(Context ctx, int lightValue, int darkValue) {
+    int theme = getInstance(ctx).getInt(PREF_THEME, THEME_DARK);
+    return theme == THEME_LIGHT ? lightValue : darkValue;
+  }
 }

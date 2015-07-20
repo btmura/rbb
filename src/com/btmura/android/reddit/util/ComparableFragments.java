@@ -20,15 +20,25 @@ import com.btmura.android.reddit.app.ComparableFragment;
 
 public class ComparableFragments {
 
-    public static boolean equalClasses(ComparableFragment o1, ComparableFragment o2) {
-        return o1 != null && o2 != null && o1.getClass() == o2.getClass();
-    }
+  public static boolean equalClasses(
+      ComparableFragment o1,
+      ComparableFragment o2) {
+    return o1 != null && o2 != null && o1.getClass() == o2.getClass();
+  }
 
-    public static boolean equalStrings(ComparableFragment o1, ComparableFragment o2, String key) {
-        return Objects.equals(o1.getArguments().getString(key), o2.getArguments().getString(key));
-    }
+  public static boolean equalStrings(
+      ComparableFragment o1,
+      ComparableFragment o2,
+      String key) {
+    return Objects.equals(o1.getArguments().getString(key),
+        o2.getArguments().getString(key));
+  }
 
-    public static boolean equalInts(ComparableFragment o1, ComparableFragment o2, String key) {
-        return Objects.equals(o1.getArguments().getInt(key), o2.getArguments().getInt(key));
-    }
+  public static boolean equalInts(
+      ComparableFragment o1,
+      ComparableFragment o2,
+      String key) {
+    return Objects.equals(o1.getArguments().getInt(key),
+        o2.getArguments().getInt(key));
+  }
 }

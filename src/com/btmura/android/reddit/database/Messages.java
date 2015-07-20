@@ -20,73 +20,76 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public class Messages implements BaseColumns {
-    public static final String TABLE_NAME = "messages";
+  public static final String TABLE_NAME = "messages";
 
-    /** Account for joining with the votes table. */
-    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
+  /** Account for joining with the votes table. */
+  public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
 
-    public static final String COLUMN_AUTHOR = "author";
-    public static final String COLUMN_BODY = "body";
-    public static final String COLUMN_CONTEXT = "context";
-    public static final String COLUMN_CREATED_UTC = "createdUtc";
-    public static final String COLUMN_DESTINATION = "destination";
-    public static final String COLUMN_KIND = "kind";
-    public static final String COLUMN_LINK_TITLE = "linkTitle";
-    public static final String COLUMN_MESSAGE_ACTION_ID = "messageActionId";
-    public static final String COLUMN_NEW = "new";
-    public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
-    public static final String COLUMN_SUBJECT = "subject";
-    public static final String COLUMN_SUBREDDIT = "subreddit";
-    public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
-    public static final String COLUMN_WAS_COMMENT = "wasComment";
+  public static final String COLUMN_AUTHOR = "author";
+  public static final String COLUMN_BODY = "body";
+  public static final String COLUMN_CONTEXT = "context";
+  public static final String COLUMN_CREATED_UTC = "createdUtc";
+  public static final String COLUMN_DESTINATION = "destination";
+  public static final String COLUMN_KIND = "kind";
+  public static final String COLUMN_LINK_TITLE = "linkTitle";
+  public static final String COLUMN_MESSAGE_ACTION_ID = "messageActionId";
+  public static final String COLUMN_NEW = "new";
+  public static final String COLUMN_SESSION_ID =
+      SharedColumns.COLUMN_SESSION_ID;
+  public static final String COLUMN_SUBJECT = "subject";
+  public static final String COLUMN_SUBREDDIT = "subreddit";
+  public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
+  public static final String COLUMN_WAS_COMMENT = "wasComment";
 
-    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+  public static final String SELECT_BY_ACCOUNT =
+      SharedColumns.SELECT_BY_ACCOUNT;
 
-    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
-            SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
+  public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+      SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
 
-    public static final String SELECT_BY_MESSAGE_ACTION_ID =
-            COLUMN_MESSAGE_ACTION_ID + "=?";
+  public static final String SELECT_BY_MESSAGE_ACTION_ID =
+      COLUMN_MESSAGE_ACTION_ID + "=?";
 
-    public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+  public static final String SELECT_BY_SESSION_ID =
+      SharedColumns.SELECT_BY_SESSION_ID;
 
-    static void create(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_AUTHOR + " TEXT,"
-                + COLUMN_BODY + " TEXT,"
-                + COLUMN_CONTEXT + " TEXT,"
-                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
-                + COLUMN_DESTINATION + " TEXT,"
-                + COLUMN_KIND + " INTEGER NOT NULL,"
-                + COLUMN_LINK_TITLE + " TEXT,"
-                + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
-                + COLUMN_NEW + " INTEGER DEFAULT 0,"
-                + COLUMN_SESSION_ID + " TEXT,"
-                + COLUMN_SUBJECT + " TEXT,"
-                + COLUMN_SUBREDDIT + " TEXT,"
-                + COLUMN_THING_ID + " TEXT,"
-                + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");
-    }
+  static void create(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+        + _ID + " INTEGER PRIMARY KEY,"
+        + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+        + COLUMN_AUTHOR + " TEXT,"
+        + COLUMN_BODY + " TEXT,"
+        + COLUMN_CONTEXT + " TEXT,"
+        + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+        + COLUMN_DESTINATION + " TEXT,"
+        + COLUMN_KIND + " INTEGER NOT NULL,"
+        + COLUMN_LINK_TITLE + " TEXT,"
+        + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
+        + COLUMN_NEW + " INTEGER DEFAULT 0,"
+        + COLUMN_SESSION_ID + " TEXT,"
+        + COLUMN_SUBJECT + " TEXT,"
+        + COLUMN_SUBREDDIT + " TEXT,"
+        + COLUMN_THING_ID + " TEXT,"
+        + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");
+  }
 
-    /** Creates the temporary table used in version 2. Kept for testing upgrades. */
-    static void createTempTableV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_AUTHOR + " TEXT,"
-                + COLUMN_BODY + " TEXT,"
-                + COLUMN_CONTEXT + " TEXT,"
-                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
-                + COLUMN_DESTINATION + " TEXT,"
-                + COLUMN_KIND + " INTEGER NOT NULL,"
-                + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
-                + COLUMN_NEW + " INTEGER DEFAULT 0,"
-                + COLUMN_SESSION_ID + " TEXT,"
-                + COLUMN_SUBJECT + " TEXT,"
-                + COLUMN_SUBREDDIT + " TEXT,"
-                + COLUMN_THING_ID + " TEXT,"
-                + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");
-    }
+  /** Creates the temporary table used in v2. Kept for testing upgrades. */
+  static void createTempTableV2(SQLiteDatabase db) {
+    db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+        + _ID + " INTEGER PRIMARY KEY,"
+        + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+        + COLUMN_AUTHOR + " TEXT,"
+        + COLUMN_BODY + " TEXT,"
+        + COLUMN_CONTEXT + " TEXT,"
+        + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+        + COLUMN_DESTINATION + " TEXT,"
+        + COLUMN_KIND + " INTEGER NOT NULL,"
+        + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
+        + COLUMN_NEW + " INTEGER DEFAULT 0,"
+        + COLUMN_SESSION_ID + " TEXT,"
+        + COLUMN_SUBJECT + " TEXT,"
+        + COLUMN_SUBREDDIT + " TEXT,"
+        + COLUMN_THING_ID + " TEXT,"
+        + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");
+  }
 }

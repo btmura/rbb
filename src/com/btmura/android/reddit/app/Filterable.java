@@ -18,7 +18,7 @@ package com.btmura.android.reddit.app;
 
 interface Filterable {
 
-    int getFilter();
+  int getFilter();
 
-    void setFilter(int filter);
+  void setFilter(int filter);
 }

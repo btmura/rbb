@@ -33,66 +33,67 @@ import com.btmura.android.reddit.content.ThemePrefs;
 
 class Thumbnail {
 
-    private static int THEME;
-    private static int RADIUS;
-    private static int THUMB_WIDTH;
-    private static int THUMB_HEIGHT;
-    private static RectF THUMB_RECT;
-    private static Paint THUMB_OUTLINE_PAINT;
-    private static Paint THUMB_PAINT;
+  private static int THEME;
+  private static int RADIUS;
+  private static int THUMB_WIDTH;
+  private static int THUMB_HEIGHT;
+  private static RectF THUMB_RECT;
+  private static Paint THUMB_OUTLINE_PAINT;
+  private static Paint THUMB_PAINT;
 
-    static void init(Context context) {
-        int theme = ThemePrefs.getTheme(context);
-        if (THEME != theme || THUMB_PAINT == null) {
-            THEME = theme;
-            Resources r = context.getResources();
-            RADIUS = r.getDimensionPixelSize(R.dimen.radius);
-            THUMB_WIDTH = THUMB_HEIGHT = r.getDimensionPixelSize(R.dimen.thumb_width);
-            THUMB_RECT = new RectF(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
+  static void init(Context ctx) {
+    int theme = ThemePrefs.getTheme(ctx);
+    if (THEME != theme || THUMB_PAINT == null) {
+      THEME = theme;
+      Resources r = ctx.getResources();
+      RADIUS = r.getDimensionPixelSize(R.dimen.radius);
+      THUMB_WIDTH = THUMB_HEIGHT = r.getDimensionPixelSize(R.dimen.thumb_width);
+      THUMB_RECT = new RectF(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
 
-            THUMB_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
-            THUMB_PAINT.setFilterBitmap(true);
-            THUMB_OUTLINE_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
-            THUMB_OUTLINE_PAINT.setStyle(Style.STROKE);
-            THUMB_OUTLINE_PAINT.setColor(r.getColor(R.color.thumb_outline));
-        }
+      THUMB_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
+      THUMB_PAINT.setFilterBitmap(true);
+      THUMB_OUTLINE_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
+      THUMB_OUTLINE_PAINT.setStyle(Style.STROKE);
+      THUMB_OUTLINE_PAINT.setColor(r.getColor(R.color.thumb_outline));
+    }
+  }
+
+  static BitmapShader newBitmapShader(Bitmap thumb, Matrix destMatrix) {
+    float scaleX = (float) THUMB_WIDTH / thumb.getWidth();
+    float scaleY = (float) THUMB_HEIGHT / thumb.getHeight();
+    destMatrix.setScale(scaleX, scaleY);
+
+    BitmapShader shader = new BitmapShader(thumb, TileMode.CLAMP,
+        TileMode.CLAMP);
+    shader.setLocalMatrix(destMatrix);
+    return shader;
+  }
+
+  static void setBounds(Rect bounds, int offsetLeft, int offsetTop) {
+    bounds.set(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
+    bounds.offsetTo(offsetLeft, offsetTop);
+  }
+
+  static void draw(Canvas c, BitmapShader thumbShader, int alpha) {
+    // Fade out the outline while fading in the thumbnail.
+    int outlineAlpha = thumbShader != null ? 255 - alpha : 255;
+    if (outlineAlpha > 0) {
+      THUMB_OUTLINE_PAINT.setAlpha(outlineAlpha);
+      c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
     }
 
-    static BitmapShader newBitmapShader(Bitmap thumb, Matrix destMatrix) {
-        float scaleX = (float) THUMB_WIDTH / thumb.getWidth();
-        float scaleY = (float) THUMB_HEIGHT / thumb.getHeight();
-        destMatrix.setScale(scaleX, scaleY);
-
-        BitmapShader shader = new BitmapShader(thumb, TileMode.CLAMP, TileMode.CLAMP);
-        shader.setLocalMatrix(destMatrix);
-        return shader;
+    if (thumbShader != null) {
+      THUMB_PAINT.setShader(thumbShader);
+      THUMB_PAINT.setAlpha(alpha);
+      c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_PAINT);
     }
+  }
 
-    static void setBounds(Rect bounds, int offsetLeft, int offsetTop) {
-        bounds.set(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
-        bounds.offsetTo(offsetLeft, offsetTop);
-    }
+  static int getWidth() {
+    return THUMB_WIDTH;
+  }
 
-    static void draw(Canvas c, BitmapShader thumbShader, int alpha) {
-        // Fade out the outline while fading in the thumbnail.
-        int outlineAlpha = thumbShader != null ? 255 - alpha : 255;
-        if (outlineAlpha > 0) {
-            THUMB_OUTLINE_PAINT.setAlpha(outlineAlpha);
-            c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
-        }
-
-        if (thumbShader != null) {
-            THUMB_PAINT.setShader(thumbShader);
-            THUMB_PAINT.setAlpha(alpha);
-            c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_PAINT);
-        }
-    }
-
-    static int getWidth() {
-        return THUMB_WIDTH;
-    }
-
-    static int getHeight() {
-        return THUMB_HEIGHT;
-    }
+  static int getHeight() {
+    return THUMB_HEIGHT;
+  }
 }

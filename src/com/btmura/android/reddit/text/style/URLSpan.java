@@ -33,58 +33,58 @@ import com.btmura.android.reddit.net.UriHelper;
  */
 public class URLSpan extends ClickableSpan {
 
-    // This is pretty much the same as the platform URLSpan class but with
-    // additional checking of the uri at click time and handling of
-    // ActivityNotFoundExceptions.
+  // This is pretty much the same as the platform URLSpan class but with
+  // additional checking of the uri at click time and handling of
+  // ActivityNotFoundExceptions.
 
-    // TODO(btmura): rename class to avoid naming clash with framework URLSpan.
+  // TODO(btmura): rename class to avoid naming clash with framework URLSpan.
 
-    private final String url;
+  private final String url;
 
-    public URLSpan(String url) {
-        this.url = url;
+  public URLSpan(String url) {
+    this.url = url;
+  }
+
+  public String getURL() {
+    return url;
+  }
+
+  @Override
+  public void onClick(View widget) {
+    Context ctx = widget.getContext();
+    Uri uri = Uri.parse(url);
+    if (UriHelper.hasSubreddit(uri)) {
+      startSubredditActivity(ctx, uri);
+    } else if (UriHelper.hasUser(uri)) {
+      startUserActivity(ctx, uri);
+    } else {
+      startBrowserActivity(ctx, uri);
     }
+  }
 
-    public String getURL() {
-        return url;
-    }
+  private void startSubredditActivity(Context ctx, Uri uri) {
+    Intent intent = new Intent(ctx, BrowserActivity.class);
+    intent.setData(uri);
+    Contexts.startActivity(ctx, intent);
+  }
 
-    @Override
-    public void onClick(View widget) {
-        Context context = widget.getContext();
-        Uri uri = Uri.parse(url);
-        if (UriHelper.hasSubreddit(uri)) {
-            startSubredditActivity(context, uri);
-        } else if (UriHelper.hasUser(uri)) {
-            startUserActivity(context, uri);
-        } else {
-            startBrowserActivity(context, uri);
-        }
-    }
+  private void startUserActivity(Context ctx, Uri uri) {
+    Intent intent = new Intent(ctx, UserProfileActivity.class);
+    intent.setData(uri);
+    Contexts.startActivity(ctx, intent);
+  }
 
-    private void startSubredditActivity(Context context, Uri uri) {
-        Intent intent = new Intent(context, BrowserActivity.class);
+  private void startBrowserActivity(Context ctx, Uri uri) {
+    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+    intent.putExtra(Browser.EXTRA_APPLICATION_ID, ctx.getPackageName());
+    if (!Contexts.startActivity(ctx, intent)) {
+      // There was no activity found so try adding an http scheme if it
+      // was missing and some authority is present.
+      if (uri.getScheme() == null) {
+        uri = uri.buildUpon().scheme("http").build();
         intent.setData(uri);
-        Contexts.startActivity(context, intent);
+        Contexts.startActivity(ctx, intent);
+      }
     }
-
-    private void startUserActivity(Context context, Uri uri) {
-        Intent intent = new Intent(context, UserProfileActivity.class);
-        intent.setData(uri);
-        Contexts.startActivity(context, intent);
-    }
-
-    private void startBrowserActivity(Context context, Uri uri) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-        if (!Contexts.startActivity(context, intent)) {
-            // There was no activity found so try adding an http scheme if it
-            // was missing and some authority is present.
-            if (uri.getScheme() == null) {
-                uri = uri.buildUpon().scheme("http").build();
-                intent.setData(uri);
-                Contexts.startActivity(context, intent);
-            }
-        }
-    }
+  }
 }

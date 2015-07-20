@@ -15,7 +15,6 @@
      limitations under the License.
 -->
 <resources>
-
     <string name="account_app_storage">App storage</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
@@ -49,7 +48,10 @@
     <string name="empty_list">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
     <string name="error_account_required">You need an account to do this…</string>
+    <string name="error_bad_access_token">Reddit returned an invalid access token… Try again?</string>
     <string name="error_blank_field">This field cannot be blank…</string>
+    <string name="error_initializing_account">Couldn\'t initialize account…</string>
+    <string name="error_io">Technical difficulties. Try again?</string>
     <string name="filter_category">Filters</string>
     <string name="filter_comments_best">best</string>
     <string name="filter_comments_controversial">controversial</string>
@@ -63,8 +65,8 @@
     <string name="filter_profile_overview">overview</string>
     <string name="filter_profile_comments">comments</string>
     <string name="filter_profile_submitted">submitted</string>
-    <string name="filter_profile_liked">liked</string>
-    <string name="filter_profile_disliked">disliked</string>
+    <string name="filter_profile_upvoted">upvoted</string>
+    <string name="filter_profile_downvoted">downvoted</string>
     <string name="filter_profile_hidden">hidden</string>
     <string name="filter_profile_saved">saved</string>
     <string name="filter_search_comments">comments</string>
@@ -80,9 +82,7 @@
     <string name="front_page">front page</string>
     <string name="hint_captcha">Captcha</string>
     <string name="hint_comment">Comment</string>
-    <string name="hint_login">Login</string>
     <string name="hint_message">Message</string>
-    <string name="hint_password">Password</string>
     <string name="hint_subject">Subject</string>
     <string name="hint_subreddit">Subreddit</string>
     <string name="hint_text_or_link">Text or link</string>
@@ -91,8 +91,6 @@
     <string name="karma_count">%1$,d</string>
     <string name="label_accounts">Accounts</string>
     <string name="loading">Loading…</string>
-    <string name="login_error">There was a problem: %1$s</string>
-    <string name="login_importing_error">There was a problem importing your subreddits…</string>
     <string name="menu_accounts">Accounts</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
@@ -135,7 +133,6 @@
     <string name="provider_things">Things</string>
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
-    <string name="show_password">Show password</string>
     <string name="subreddits_category">Subreddits</string>
     <string name="subtitle_profile">profile</string>
     <string name="subtitle_messages">messages</string>
@@ -143,6 +140,8 @@
     <string name="tab_posts">Posts</string>
     <string name="tab_related">Related</string>
     <string name="tab_subreddits">Subreddits</string>
+    <string name="title_add_account">Add Account</string>
+    <string name="title_login">Login</string>
+    <string name="title_login_to">Login to %1$s</string>
     <string name="view_table">View table</string>
-
 </resources>

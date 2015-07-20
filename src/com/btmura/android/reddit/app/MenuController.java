@@ -22,9 +22,9 @@ import android.view.MenuItem;
 
 interface MenuController {
 
-    void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
+  void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
 
-    void onPrepareOptionsMenu(Menu menu);
+  void onPrepareOptionsMenu(Menu menu);
 
-    boolean onOptionsItemSelected(MenuItem item);
+  boolean onOptionsItemSelected(MenuItem item);
 }

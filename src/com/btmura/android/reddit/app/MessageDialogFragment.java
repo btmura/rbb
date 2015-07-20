@@ -19,29 +19,33 @@ package com.btmura.android.reddit.app;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 
 public class MessageDialogFragment extends DialogFragment {
 
-    public static final String TAG = "MessageDialogFragment";
+  public static final String TAG = "MessageDialogFragment";
 
-    private static final String ARG_MESSAGE = "m";
+  private static final String ARG_MESSAGE = "m";
 
-    public static MessageDialogFragment showMessage(FragmentManager fm, CharSequence message) {
-        Bundle args = new Bundle(1);
-        args.putCharSequence(ARG_MESSAGE, message);
-        MessageDialogFragment frag = new MessageDialogFragment();
-        frag.setArguments(args);
-        frag.show(fm, TAG);
-        return frag;
-    }
+  public static MessageDialogFragment showMessage(
+      FragmentManager fm,
+      CharSequence message) {
+    Bundle args = new Bundle(1);
+    args.putCharSequence(ARG_MESSAGE, message);
+    MessageDialogFragment frag = new MessageDialogFragment();
+    frag.setArguments(args);
+    frag.show(fm, TAG);
+    return frag;
+  }
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new AlertDialog.Builder(getActivity())
-                .setPositiveButton(android.R.string.ok, null)
-                .setMessage(getArguments().getCharSequence(ARG_MESSAGE))
-                .create();
-    }
+  @NonNull
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
+    return new AlertDialog.Builder(getActivity())
+        .setPositiveButton(android.R.string.ok, null)
+        .setMessage(getArguments().getCharSequence(ARG_MESSAGE))
+        .create();
+  }
 }

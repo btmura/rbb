@@ -25,34 +25,37 @@ import com.btmura.android.reddit.widget.MessageThreadAdapter;
  * {@link ListFragment} for showing the messages in a thread.
  */
 public class MessageThreadListFragment
-        extends AbstractListFragment<MessageThreadListController,
-        NoMenuController,
-        MessageThreadListController,
-        MessageThreadAdapter> {
+    extends AbstractListFragment<MessageThreadListController,
+    NoMenuController,
+    MessageThreadListController,
+    MessageThreadAdapter> {
 
-    public static MessageThreadListFragment newInstance(String accountName, String thingId) {
-        Bundle args = new Bundle(2);
-        args.putString(MessageThreadListController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(MessageThreadListController.EXTRA_THING_ID, thingId);
+  public static MessageThreadListFragment newInstance(
+      String accountName,
+      String thingId) {
+    Bundle args = new Bundle(2);
+    args.putString(MessageThreadListController.EXTRA_ACCOUNT_NAME, accountName);
+    args.putString(MessageThreadListController.EXTRA_THING_ID, thingId);
 
-        MessageThreadListFragment frag = new MessageThreadListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
+    MessageThreadListFragment frag = new MessageThreadListFragment();
+    frag.setArguments(args);
+    return frag;
+  }
 
-    @Override
-    protected MessageThreadListController createController() {
-        return new MessageThreadListController(getActivity(), getArguments());
-    }
+  @Override
+  protected MessageThreadListController createController() {
+    return new MessageThreadListController(getActivity(), getArguments());
+  }
 
-    @Override
-    protected NoMenuController createMenuController(MessageThreadListController controller) {
-        return NoMenuController.INSTANCE;
-    }
+  @Override
+  protected NoMenuController createMenuController(
+      MessageThreadListController controller) {
+    return NoMenuController.INSTANCE;
+  }
 
-    @Override
-    protected MessageThreadListController
-            createActionModeController(MessageThreadListController controller) {
-        return controller;
-    }
+  @Override
+  protected MessageThreadListController createActionModeController(
+      MessageThreadListController controller) {
+    return controller;
+  }
 }

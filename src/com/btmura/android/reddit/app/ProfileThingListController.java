@@ -26,48 +26,52 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class ProfileThingListController extends ThingTableListController {
 
-    static final String EXTRA_PROFILE_USER = "profileUser";
-    static final String EXTRA_FILTER = "filter";
+  static final String EXTRA_PROFILE_USER = "profileUser";
+  static final String EXTRA_FILTER = "filter";
 
-    private final String profileUser;
-    private final int swipeAction;
+  private final String profileUser;
+  private final int swipeAction;
 
-    ProfileThingListController(Context context, Bundle args, OnThingViewClickListener listener) {
-        super(context, args, listener);
-        this.profileUser = getProfileUserExtra(args);
-        this.swipeAction = getSwipeActionExtra(args);
+  ProfileThingListController(
+      Context context,
+      Bundle args,
+      OnThingViewClickListener listener) {
+    super(context, args, listener);
+    this.profileUser = getProfileUserExtra(args);
+    this.swipeAction = getSwipeActionExtra(args);
+  }
+
+  @Override
+  public Loader<Cursor> createLoader() {
+    return new ProfileThingLoader(ctx,
+        getAccountName(),
+        profileUser,
+        getFilter(),
+        getMoreId(),
+        getCount(),
+        getCursorExtras());
+  }
+
+  public String getProfileUser() {
+    return profileUser;
+  }
+
+  @Override
+  public int getSwipeAction() {
+    return swipeAction;
+  }
+
+  private String getProfileUserExtra(Bundle extras) {
+    return extras.getString(EXTRA_PROFILE_USER);
+  }
+
+  private int getSwipeActionExtra(Bundle extras) {
+    switch (getFilterExtra(extras)) {
+      case Filter.PROFILE_HIDDEN:
+        return SWIPE_ACTION_UNHIDE;
+
+      default:
+        return SWIPE_ACTION_NONE;
     }
-
-    @Override
-    public Loader<Cursor> createLoader() {
-        return new ProfileThingLoader(context,
-                getAccountName(),
-                profileUser,
-                getFilter(),
-                getMoreId(),
-                getCursorExtras());
-    }
-
-    public String getProfileUser() {
-        return profileUser;
-    }
-
-    @Override
-    public int getSwipeAction() {
-        return swipeAction;
-    }
-
-    private String getProfileUserExtra(Bundle extras) {
-        return extras.getString(EXTRA_PROFILE_USER);
-    }
-
-    private int getSwipeActionExtra(Bundle extras) {
-        switch (getFilterExtra(extras)) {
-            case Filter.PROFILE_HIDDEN:
-                return SWIPE_ACTION_UNHIDE;
-
-            default:
-                return SWIPE_ACTION_NONE;
-        }
-    }
+  }
 }

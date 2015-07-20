@@ -14,14 +14,15 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.btmura.android.reddit"
-          android:versionCode="11"
-          android:versionName="3.4">
+<manifest
+    package="com.btmura.android.reddit"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="12"
+    android:versionName="3.5">
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="18"/>
+        android:targetSdkVersion="22"/>
 
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
@@ -38,21 +39,7 @@
         android:theme="@style/Theme.Transition">
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
-            android:label="@string/add_account"
-            android:theme="@android:style/Theme.Holo.Dialog"/>
-        <activity android:name=".accounts.OAuthActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="oauth"
-                    android:pathPrefix="/"
-                    android:scheme="rbb"/>
-            </intent-filter>
-        </activity>
+            android:label="@string/add_account"/>
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
             android:label="@string/label_accounts">
@@ -94,6 +81,7 @@
         <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser"/>
+
         <activity
             android:name=".app.MarkdownTableActivity"
             android:theme="@style/Theme.Transition.DialogWhenLarge">

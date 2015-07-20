@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.widget;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,206 +31,224 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.util.Objects;
 
+import java.util.ArrayList;
+
 /**
  * Adapter used for showing accounts in the navigation drawer.
  */
-public class AccountResultAdapter extends BaseAdapter implements OnClickListener {
+public class AccountResultAdapter extends BaseAdapter
+    implements OnClickListener {
 
-    private final ArrayList<Item> items = new ArrayList<Item>();
-    private final Context context;
-    private final LayoutInflater inflater;
-    private final int layout;
-    private final boolean hideAppStorageIfNoAccounts;
+  private final ArrayList<Item> items = new ArrayList<Item>();
+  private final Context context;
+  private final LayoutInflater inflater;
+  private final int layout;
+  private final boolean hideAppStorageIfNoAccounts;
 
-    private OnAccountMessagesSelectedListener listener;
-    private String selectedAccountName;
+  private OnAccountMessagesSelectedListener listener;
+  private String selectedAccountName;
 
-    public interface OnAccountMessagesSelectedListener {
-        void onAccountMessagesSelected(String accountName);
+  public interface OnAccountMessagesSelectedListener {
+    void onAccountMessagesSelected(String accountName);
+  }
+
+  public static class Item {
+
+    private final String accountName;
+    private final String linkKarma;
+    private final String commentKarma;
+    private final boolean hasMail;
+
+    private Item(
+        String accountName,
+        String linkKarma,
+        String commentKarma,
+        boolean hasMail) {
+      this.accountName = accountName;
+      this.linkKarma = linkKarma;
+      this.commentKarma = commentKarma;
+      this.hasMail = hasMail;
     }
 
-    public static class Item {
+    public String getAccountName() {
+      return accountName;
+    }
+  }
 
-        private final String accountName;
-        private final String linkKarma;
-        private final String commentKarma;
-        private final boolean hasMail;
+  public static AccountResultAdapter newNavigationFragmentInstance(Context context) {
+    return new AccountResultAdapter(context, R.layout.account_navigation_row,
+        true);
+  }
 
-        private Item(String accountName, String linkKarma, String commentKarma, boolean hasMail) {
-            this.accountName = accountName;
-            this.linkKarma = linkKarma;
-            this.commentKarma = commentKarma;
-            this.hasMail = hasMail;
-        }
+  public static AccountResultAdapter newAccountListInstance(Context context) {
+    return new AccountResultAdapter(context, R.layout.account_list_row, false);
+  }
 
-        public String getAccountName() {
-            return accountName;
-        }
+  public static AccountResultAdapter newAccountNameListInstance(Context context) {
+    return new AccountResultAdapter(context, R.layout.account_name_row, false);
+  }
+
+  private AccountResultAdapter(
+      Context context,
+      int layout,
+      boolean hideAppStorageIfNoAccounts) {
+    this.context = context;
+    this.inflater = LayoutInflater.from(context);
+    this.layout = layout;
+    this.hideAppStorageIfNoAccounts = hideAppStorageIfNoAccounts;
+
+  }
+
+  public void setOnAccountMessagesSelectedListener(
+      OnAccountMessagesSelectedListener listener) {
+    this.listener = listener;
+  }
+
+  public void setSelectedAccountName(String accountName) {
+    if (!Objects.equals(this.selectedAccountName, accountName)) {
+      this.selectedAccountName = accountName;
+      notifyDataSetChanged();
+    }
+  }
+
+  public void setAccountResult(AccountResult result) {
+    items.clear();
+    if (hasVisibleAccounts(result)) {
+      int count = result.accountNames.length;
+      for (int i = 0; i < count; i++) {
+        String linkKarma = getKarmaCount(result.linkKarma, i);
+        String commentKarma = getKarmaCount(result.commentKarma, i);
+        boolean hasMail = getHasMail(result.hasMail, i);
+        add(result.accountNames[i], linkKarma, commentKarma, hasMail);
+      }
+    }
+    notifyDataSetChanged();
+  }
+
+  private boolean hasVisibleAccounts(AccountResult result) {
+    return result != null
+        && result.accountNames != null
+        && (!hideAppStorageIfNoAccounts
+        || result.accountNames.length != 1
+        || AccountUtils.isAccount(result.accountNames[0]));
+  }
+
+  private String getKarmaCount(int[] karmaCounts, int index) {
+    if (karmaCounts != null && karmaCounts[index] != -1) {
+      return context.getString(R.string.karma_count, karmaCounts[index]);
+    }
+    return null;
+  }
+
+  private boolean getHasMail(boolean[] hasMail, int index) {
+    return hasMail != null && hasMail[index];
+  }
+
+  private void add(
+      String accountName,
+      String linkKarma,
+      String commentKarma,
+      boolean hasMail) {
+    items.add(new Item(accountName, linkKarma, commentKarma, hasMail));
+  }
+
+  public int findAccountName(String accountName) {
+    int count = items.size();
+    for (int i = 0; i < count; i++) {
+      Item item = getItem(i);
+      if (accountName.equals(item.accountName)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public Item getItem(int pos) {
+    return items.get(pos);
+  }
+
+  @Override
+  public long getItemId(int pos) {
+    return pos;
+  }
+
+  @Override
+  public int getCount() {
+    return items.size();
+  }
+
+  static class ViewHolder {
+    TextView accountName;
+    ImageButton messagesButton;
+    TextView linkKarma;
+    TextView commentKarma;
+  }
+
+  @Override
+  public View getView(int position, View convertView, ViewGroup parent) {
+    View v = convertView;
+    if (v == null) {
+      v = inflater.inflate(layout, parent, false);
+      ViewHolder vh = new ViewHolder();
+      vh.accountName = (TextView) v.findViewById(R.id.account_name);
+      vh.messagesButton = (ImageButton) v.findViewById(R.id.messages_button);
+      vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
+      vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
+      v.setTag(vh);
+    }
+    setView(v, position);
+    return v;
+  }
+
+  private void setView(View view, int position) {
+    Item item = getItem(position);
+    boolean activated = Objects.equals(selectedAccountName, item.accountName);
+    ViewHolder vh = (ViewHolder) view.getTag();
+
+    if (vh.accountName != null) {
+      vh.accountName.setText(Accounts.getTitle(context, item.accountName));
+      vh.accountName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+      vh.accountName.setActivated(activated);
     }
 
-    public static AccountResultAdapter newNavigationFragmentInstance(Context context) {
-        return new AccountResultAdapter(context, R.layout.account_navigation_row, true);
+    if (vh.messagesButton != null) {
+      vh.messagesButton.setVisibility(item.hasMail ? View.VISIBLE : View.GONE);
+      vh.messagesButton.setTag(item.accountName);
+      vh.messagesButton.setOnClickListener(this);
     }
 
-    public static AccountResultAdapter newAccountListInstance(Context context) {
-        return new AccountResultAdapter(context, R.layout.account_list_row, false);
+    if (vh.linkKarma != null) {
+      vh.linkKarma.setText(item.linkKarma);
+      vh.linkKarma.setActivated(activated);
     }
 
-    public static AccountResultAdapter newAccountNameListInstance(Context context) {
-        return new AccountResultAdapter(context, R.layout.account_name_row, false);
+    if (vh.commentKarma != null) {
+      vh.commentKarma.setText(item.commentKarma);
+      vh.commentKarma.setActivated(activated);
     }
+  }
 
-    private AccountResultAdapter(Context context,
-            int layout,
-            boolean hideAppStorageIfNoAccounts) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
-        this.layout = layout;
-        this.hideAppStorageIfNoAccounts = hideAppStorageIfNoAccounts;
-
+  @Override
+  public View getDropDownView(
+      int pos,
+      View convertView,
+      ViewGroup parent) {
+    Item item = getItem(pos);
+    TextView tv = (TextView) convertView;
+    if (tv == null) {
+      tv = (TextView) inflater.inflate(R.layout.account_name_dropdown_row,
+          parent, false);
     }
+    tv.setText(Accounts.getTitle(context, item.accountName));
+    return tv;
+  }
 
-    public void setOnAccountMessagesSelectedListener(OnAccountMessagesSelectedListener listener) {
-        this.listener = listener;
+  @Override
+  public void onClick(View v) {
+    if (listener != null) {
+      String accountName = (String) v.getTag();
+      listener.onAccountMessagesSelected(accountName);
     }
-
-    public void setSelectedAccountName(String accountName) {
-        if (!Objects.equals(this.selectedAccountName, accountName)) {
-            this.selectedAccountName = accountName;
-            notifyDataSetChanged();
-        }
-    }
-
-    public void setAccountResult(AccountResult result) {
-        items.clear();
-        if (hasVisibleAccounts(result)) {
-            int count = result.accountNames.length;
-            for (int i = 0; i < count; i++) {
-                String linkKarma = getKarmaCount(result.linkKarma, i);
-                String commentKarma = getKarmaCount(result.commentKarma, i);
-                boolean hasMail = getHasMail(result.hasMail, i);
-                add(result.accountNames[i], linkKarma, commentKarma, hasMail);
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    private boolean hasVisibleAccounts(AccountResult result) {
-        return result != null
-                && result.accountNames != null
-                && (!hideAppStorageIfNoAccounts
-                        || result.accountNames.length != 1
-                        || AccountUtils.isAccount(result.accountNames[0]));
-    }
-
-    private String getKarmaCount(int[] karmaCounts, int index) {
-        if (karmaCounts != null && karmaCounts[index] != -1) {
-            return context.getString(R.string.karma_count, karmaCounts[index]);
-        }
-        return null;
-    }
-
-    private boolean getHasMail(boolean[] hasMail, int index) {
-        return hasMail != null && hasMail[index];
-    }
-
-    private void add(String accountName, String linkKarma, String commentKarma, boolean hasMail) {
-        items.add(new Item(accountName, linkKarma, commentKarma, hasMail));
-    }
-
-    public int findAccountName(String accountName) {
-        int count = items.size();
-        for (int i = 0; i < count; i++) {
-            Item item = getItem(i);
-            if (accountName.equals(item.accountName)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public Item getItem(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public int getCount() {
-        return items.size();
-    }
-
-    static class ViewHolder {
-        TextView accountName;
-        ImageButton messagesButton;
-        TextView linkKarma;
-        TextView commentKarma;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
-            v = inflater.inflate(layout, parent, false);
-            ViewHolder vh = new ViewHolder();
-            vh.accountName = (TextView) v.findViewById(R.id.account_name);
-            vh.messagesButton = (ImageButton) v.findViewById(R.id.messages_button);
-            vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
-            vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
-            v.setTag(vh);
-        }
-        setView(v, position);
-        return v;
-    }
-
-    private void setView(View view, int position) {
-        Item item = getItem(position);
-        boolean activated = Objects.equals(selectedAccountName, item.accountName);
-        ViewHolder vh = (ViewHolder) view.getTag();
-
-        if (vh.accountName != null) {
-            vh.accountName.setText(Accounts.getTitle(context, item.accountName));
-            vh.accountName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-            vh.accountName.setActivated(activated);
-        }
-
-        if (vh.messagesButton != null) {
-            vh.messagesButton.setVisibility(item.hasMail ? View.VISIBLE : View.GONE);
-            vh.messagesButton.setTag(item.accountName);
-            vh.messagesButton.setOnClickListener(this);
-        }
-
-        if (vh.linkKarma != null) {
-            vh.linkKarma.setText(item.linkKarma);
-            vh.linkKarma.setActivated(activated);
-        }
-
-        if (vh.commentKarma != null) {
-            vh.commentKarma.setText(item.commentKarma);
-            vh.commentKarma.setActivated(activated);
-        }
-    }
-
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        Item item = getItem(position);
-        TextView tv = (TextView) convertView;
-        if (tv == null) {
-            tv = (TextView) inflater.inflate(R.layout.account_name_dropdown_row, parent, false);
-        }
-        tv.setText(Accounts.getTitle(context, item.accountName));
-        return tv;
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (listener != null) {
-            String accountName = (String) v.getTag();
-            listener.onAccountMessagesSelected(accountName);
-        }
-    }
+  }
 }

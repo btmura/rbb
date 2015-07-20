@@ -24,39 +24,41 @@ import com.btmura.android.reddit.provider.ThingProvider;
 
 public class SearchSubredditLoader extends AbstractSessionLoader {
 
-    public static final int INDEX_NAME = 1;
-    public static final int INDEX_SUBSCRIBERS = 2;
-    public static final int INDEX_OVER_18 = 3;
+  public static final int INDEX_NAME = 1;
+  public static final int INDEX_SUBSCRIBERS = 2;
+  public static final int INDEX_OVER_18 = 3;
 
-    private static final String[] PROJECTION = {
-            SubredditResults._ID,
-            SubredditResults.COLUMN_NAME,
-            SubredditResults.COLUMN_SUBSCRIBERS,
-            SubredditResults.COLUMN_OVER_18,
-    };
+  private static final String[] PROJECTION = {
+      SubredditResults._ID,
+      SubredditResults.COLUMN_NAME,
+      SubredditResults.COLUMN_SUBSCRIBERS,
+      SubredditResults.COLUMN_OVER_18,
+  };
 
-    private final String accountName;
-    private final String query;
+  private final String accountName;
+  private final String query;
 
-    public SearchSubredditLoader(Context context,
-            String accountName,
-            String query,
-            Bundle cursorExtras) {
-        super(context,
-                ThingProvider.SUBREDDITS_URI, PROJECTION,
-                SubredditResults.SELECT_BY_SESSION_ID,
-                SubredditResults.SORT_BY_NAME,
-                cursorExtras,
-                null);
-        this.accountName = accountName;
-        this.query = query;
-    }
+  public SearchSubredditLoader(
+      Context ctx,
+      String accountName,
+      String query,
+      Bundle cursorExtras) {
+    super(ctx,
+        ThingProvider.SUBREDDITS_URI, PROJECTION,
+        SubredditResults.SELECT_BY_SESSION_ID,
+        SubredditResults.SORT_BY_NAME,
+        NO_MORE,
+        NO_COUNT,
+        cursorExtras);
+    this.accountName = accountName;
+    this.query = query;
+  }
 
-    @Override
-    protected Bundle getSession(Bundle sessionData, String more) {
-        return ThingProvider.getSubredditSearchSession(getContext(),
-                accountName,
-                query,
-                sessionData);
-    }
+  @Override
+  protected Bundle getSession(Bundle sessionData, String more, int count) {
+    return ThingProvider.getSubredditSearchSession(getContext(),
+        accountName,
+        query,
+        sessionData);
+  }
 }

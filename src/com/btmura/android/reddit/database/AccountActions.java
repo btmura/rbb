@@ -22,29 +22,31 @@ import android.provider.BaseColumns;
 /** Table for actions to be done on accounts like marking messages read. */
 public class AccountActions implements BaseColumns {
 
-    /** Name of the table to use in SQL queries. */
-    public static final String TABLE_NAME = "accountActions";
+  /** Name of the table to use in SQL queries. */
+  public static final String TABLE_NAME = "accountActions";
 
-    /** Name of the account to perform the action on. */
-    public static final String COLUMN_ACCOUNT = "account";
+  /** Name of the account to perform the action on. */
+  public static final String COLUMN_ACCOUNT = "account";
 
-    /** Action to perform on the account. */
-    public static final String COLUMN_ACTION = "action";
+  /** Action to perform on the account. */
+  public static final String COLUMN_ACTION = "action";
 
-    /** Action that marks the account's messages read. */
-    public static final int ACTION_MARK_MESSAGES_READ = 1;
+  /** Action that marks the account's messages read. */
+  @Deprecated // Marking messages doesn't do anything anymore.
+  public static final int ACTION_MARK_MESSAGES_READ = 1;
 
-    /** Where clause fragment to select actions by ID. */
-    public static final String SELECT_BY_ID = SharedColumns.SELECT_BY_ID;
+  /** Where clause fragment to select actions by ID. */
+  public static final String SELECT_BY_ID = SharedColumns.SELECT_BY_ID;
 
-    /** Where clause fragment to select actions by account name. */
-    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+  /** Where clause fragment to select actions by account name. */
+  public static final String SELECT_BY_ACCOUNT =
+      SharedColumns.SELECT_BY_ACCOUNT;
 
-    /** Runs SQL to create the table. */
-    static void create(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL)");
-    }
+  /** Runs SQL to create the table. */
+  static void create(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+        + _ID + " INTEGER PRIMARY KEY,"
+        + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+        + COLUMN_ACTION + " INTEGER NOT NULL)");
+  }
 }

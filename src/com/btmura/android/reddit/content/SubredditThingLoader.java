@@ -18,44 +18,50 @@ package com.btmura.android.reddit.content;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 
 /**
- * {@link ThingProjection} that loads a subreddit's things.
+ * Loader that loads a subreddit's things.
  */
-public class SubredditThingLoader extends AbstractSessionLoader implements ThingProjection {
+public class SubredditThingLoader extends AbstractSessionLoader
+    implements ThingProjection {
 
-    private final String accountName;
-    private final String subreddit;
-    private final int filter;
+  private final String accountName;
+  private final String subreddit;
+  private final int filter;
 
-    public SubredditThingLoader(Context context,
-            String accountName,
-            String subreddit,
-            int filter,
-            String more,
-            Bundle sessionData) {
-        super(context,
-                ThingProvider.THINGS_URI,
-                PROJECTION,
-                Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,
-                null,
-                sessionData,
-                more);
-        this.accountName = accountName;
-        this.subreddit = subreddit;
-        this.filter = filter;
-    }
+  public SubredditThingLoader(
+      Context ctx,
+      String accountName,
+      String subreddit,
+      int filter,
+      @Nullable String more,
+      int count,
+      Bundle sessionData) {
+    super(ctx,
+        ThingProvider.THINGS_URI,
+        PROJECTION,
+        Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,
+        NO_SORT,
+        more,
+        count,
+        sessionData);
+    this.accountName = accountName;
+    this.subreddit = subreddit;
+    this.filter = filter;
+  }
 
-    @Override
-    protected Bundle getSession(Bundle sessionData, String more) {
-        return ThingProvider.getSubredditSession(getContext(),
-                accountName,
-                subreddit,
-                filter,
-                sessionData,
-                more);
-    }
+  @Override
+  protected Bundle getSession(Bundle sessionData, String more, int count) {
+    return ThingProvider.getSubredditSession(getContext(),
+        accountName,
+        subreddit,
+        filter,
+        more,
+        count,
+        sessionData);
+  }
 }

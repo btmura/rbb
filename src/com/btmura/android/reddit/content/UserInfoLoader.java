@@ -16,47 +16,44 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
 
+import java.io.IOException;
+
 /**
- * {@link AsyncTaskLoader} that loads a user's account info.
+ * {@link BaseAsyncTaskLoader} that loads a user's account info.
+ * It used to show a user's karma count in the action bar dropdown.
  */
-public class UserInfoLoader extends AsyncTaskLoader<AccountInfoResult> {
+public class UserInfoLoader extends BaseAsyncTaskLoader<AccountInfoResult> {
 
-    public static final String TAG = "UserInfoLoader";
+  public static final String TAG = "UserInfoLoader";
 
-    private final String user;
-    private AccountInfoResult result;
+  private final String accountName;
+  private final String user;
 
-    public UserInfoLoader(Context context, String user) {
-        super(context.getApplicationContext());
-        this.user = user;
+  public UserInfoLoader(Context ctx, String accountName, String user) {
+    super(ctx.getApplicationContext());
+    this.accountName = accountName;
+    this.user = user;
+  }
+
+  @Override
+  public AccountInfoResult loadInBackground() {
+    try {
+      return RedditApi.getUserInfo(getContext(), accountName, user);
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
     }
-
-    @Override
-    protected void onStartLoading() {
-        super.onStartLoading();
-        if (result != null) {
-            deliverResult(result);
-        } else {
-            forceLoad();
-        }
-    }
-
-    @Override
-    public AccountInfoResult loadInBackground() {
-        try {
-            return RedditApi.aboutUser(user, null);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return null;
-    }
+    return null;
+  }
 }

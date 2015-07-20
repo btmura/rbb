@@ -16,82 +16,63 @@
 
 package com.btmura.android.reddit.widget;
 
-import java.util.Arrays;
-
 import android.content.Context;
 import android.database.Cursor;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.btmura.android.reddit.util.Objects;
 
 /** BaseAdapter that handles lists of subreddits. */
 public abstract class SubredditAdapter extends BaseCursorAdapter {
 
-    public static final String TAG = "SubredditAdapter";
+  public static final String TAG = "SubredditAdapter";
 
-    protected final boolean singleChoice;
-    protected String accountName;
-    protected String selectedSubreddit;
+  protected final boolean singleChoice;
+  protected String accountName;
+  protected String selectedSubreddit;
 
-    protected SubredditAdapter(Context context, boolean singleChoice) {
-        super(context, null, 0);
-        this.singleChoice = singleChoice;
+  protected SubredditAdapter(Context ctx, boolean singleChoice) {
+    super(ctx, null, 0);
+    this.singleChoice = singleChoice;
+  }
+
+  @Override
+  public View newView(Context ctx, Cursor c, ViewGroup parent) {
+    return new SubredditView(ctx);
+  }
+
+  public void setAccountName(String accountName) {
+    if (!Objects.equals(this.accountName, accountName)) {
+      this.accountName = accountName;
+      notifyDataSetChanged();
     }
+  }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return new SubredditView(context);
+  public String getSelectedSubreddit() {
+    return selectedSubreddit;
+  }
+
+  public void setSelectedSubreddit(String subreddit) {
+    if (!Objects.equals(selectedSubreddit, subreddit)) {
+      selectedSubreddit = subreddit;
+      notifyDataSetChanged();
     }
+  }
 
-    public void setAccountName(String accountName) {
-        if (!Objects.equals(this.accountName, accountName)) {
-            this.accountName = accountName;
-            notifyDataSetChanged();
-        }
-    }
+  public String setSelectedPosition(int pos) {
+    String subreddit = getName(pos);
+    setSelectedSubreddit(subreddit);
+    return subreddit;
+  }
 
-    public String getSelectedSubreddit() {
-        return selectedSubreddit;
-    }
+  public abstract String getName(int pos);
 
-    public void setSelectedSubreddit(String subreddit) {
-        if (!Objects.equals(selectedSubreddit, subreddit)) {
-            selectedSubreddit = subreddit;
-            notifyDataSetChanged();
-        }
-    }
+  public boolean isDeletable(int pos) {
+    return true;
+  }
 
-    public String setSelectedPosition(int position) {
-        String subreddit = getName(position);
-        setSelectedSubreddit(subreddit);
-        return subreddit;
-    }
-
-    public abstract String getName(int position);
-
-    public boolean isDeletable(int position) {
-        return true;
-    }
-
-    public boolean isSingleChoice() {
-        return singleChoice;
-    }
-
-    public String[] getCheckedSubreddits(ListView listView) {
-        SparseBooleanArray checked = listView.getCheckedItemPositions();
-        int checkedCount = listView.getCheckedItemCount();
-        String[] subreddits = new String[checkedCount];
-
-        int j = 0;
-        int count = listView.getCount();
-        for (int i = 0; i < count; i++) {
-            if (checked.get(i) && isDeletable(i)) {
-                subreddits[j++] = getName(i);
-            }
-        }
-        return Arrays.copyOf(subreddits, j);
-    }
+  public boolean isSingleChoice() {
+    return singleChoice;
+  }
 }

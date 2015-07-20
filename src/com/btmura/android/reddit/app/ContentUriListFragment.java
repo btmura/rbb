@@ -31,52 +31,52 @@ import com.btmura.android.reddit.provider.ThingProvider;
 
 public class ContentUriListFragment extends ListFragment {
 
-    public static final String TAG = "ContentUriListFragment";
+  public static final String TAG = "ContentUriListFragment";
 
-    interface OnUriClickListener {
-        void onUriClick(Uri uri);
+  interface OnUriClickListener {
+    void onUriClick(Uri uri);
+  }
+
+  private OnUriClickListener listener;
+  private ArrayAdapter<Uri> adapter;
+
+  public static ContentUriListFragment newInstance() {
+    return new ContentUriListFragment();
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (activity instanceof OnUriClickListener) {
+      listener = (OnUriClickListener) activity;
     }
+  }
 
-    private OnUriClickListener listener;
-    private ArrayAdapter<Uri> adapter;
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    adapter = new ArrayAdapter<Uri>(getActivity(), R.layout.content_uri_row);
+    adapter.add(AccountProvider.ACCOUNT_ACTIONS_URI);
+    adapter.add(AccountProvider.ACCOUNTS_URI);
+    adapter.add(SubredditProvider.SUBREDDITS_URI);
+    adapter.add(ThingProvider.THINGS_URI);
+    adapter.add(ThingProvider.COMMENTS_URI);
+    adapter.add(ThingProvider.MESSAGES_URI);
+    adapter.add(ThingProvider.SUBREDDITS_URI);
+    adapter.add(ThingProvider.SESSIONS_URI);
+    adapter.add(ThingProvider.COMMENT_ACTIONS_URI);
+    adapter.add(ThingProvider.HIDE_ACTIONS_URI);
+    adapter.add(ThingProvider.MESSAGE_ACTIONS_URI);
+    adapter.add(ThingProvider.READ_ACTIONS_URI);
+    adapter.add(ThingProvider.SAVE_ACTIONS_URI);
+    adapter.add(ThingProvider.VOTE_ACTIONS_URI);
+    setListAdapter(adapter);
+  }
 
-    public static ContentUriListFragment newInstance() {
-        return new ContentUriListFragment();
+  @Override
+  public void onListItemClick(ListView l, View v, int position, long id) {
+    if (listener != null) {
+      listener.onUriClick(adapter.getItem(position));
     }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnUriClickListener) {
-            listener = (OnUriClickListener) activity;
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        adapter = new ArrayAdapter<Uri>(getActivity(), R.layout.content_uri_row);
-        adapter.add(AccountProvider.ACCOUNT_ACTIONS_URI);
-        adapter.add(AccountProvider.ACCOUNTS_URI);
-        adapter.add(SubredditProvider.SUBREDDITS_URI);
-        adapter.add(ThingProvider.THINGS_URI);
-        adapter.add(ThingProvider.COMMENTS_URI);
-        adapter.add(ThingProvider.MESSAGES_URI);
-        adapter.add(ThingProvider.SUBREDDITS_URI);
-        adapter.add(ThingProvider.SESSIONS_URI);
-        adapter.add(ThingProvider.COMMENT_ACTIONS_URI);
-        adapter.add(ThingProvider.HIDE_ACTIONS_URI);
-        adapter.add(ThingProvider.MESSAGE_ACTIONS_URI);
-        adapter.add(ThingProvider.READ_ACTIONS_URI);
-        adapter.add(ThingProvider.SAVE_ACTIONS_URI);
-        adapter.add(ThingProvider.VOTE_ACTIONS_URI);
-        setListAdapter(adapter);
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        if (listener != null) {
-            listener.onUriClick(adapter.getItem(position));
-        }
-    }
+  }
 }

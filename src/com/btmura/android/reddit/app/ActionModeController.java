@@ -23,17 +23,21 @@ import android.widget.ListView;
 
 interface ActionModeController {
 
-    void invalidateActionMode();
+  void invalidateActionMode();
 
-    // ActionMode MultiChoiceModeListener-like methods
+  // ActionMode MultiChoiceModeListener-like methods
 
-    boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView);
+  boolean onCreateActionMode(ActionMode mode, Menu menu, ListView lv);
 
-    boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView);
+  boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView lv);
 
-    boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView);
+  boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView lv);
 
-    void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked);
+  void onItemCheckedStateChanged(
+      ActionMode mode,
+      int pos,
+      long id,
+      boolean checked);
 
-    void onDestroyActionMode(ActionMode mode);
+  void onDestroyActionMode(ActionMode mode);
 }

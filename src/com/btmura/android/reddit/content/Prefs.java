@@ -21,15 +21,17 @@ import android.content.SharedPreferences;
 
 class Prefs {
 
-    // The first preferences were stored in "accountPreferences" so keep this even if it's wrong.
-    private static final String PREFS_NAME = "accountPreferences";
+  // The first preferences were stored in "accountPreferences" so keep this
+  // even if the key is not correct.
+  private static final String PREFS_NAME = "accountPreferences";
 
-    private static SharedPreferences PREFS_INSTANCE;
+  private static SharedPreferences PREFS_INSTANCE;
 
-    synchronized static SharedPreferences getPrefsInstance(Context context) {
-        if (PREFS_INSTANCE == null) {
-            PREFS_INSTANCE = context.getApplicationContext().getSharedPreferences(PREFS_NAME, 0);
-        }
-        return PREFS_INSTANCE;
+  synchronized static SharedPreferences getInstance(Context ctx) {
+    if (PREFS_INSTANCE == null) {
+      PREFS_INSTANCE = ctx.getApplicationContext()
+          .getSharedPreferences(PREFS_NAME, 0);
     }
+    return PREFS_INSTANCE;
+  }
 }

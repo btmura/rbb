@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2015 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,274 +16,250 @@
 
 package com.btmura.android.reddit.app;
 
-import java.io.IOException;
-
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.os.AsyncTask;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.text.method.PasswordTransformationMethod;
-import android.text.method.TransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.content.AccountPrefs;
-import com.btmura.android.reddit.net.LoginResult;
-import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.content.AddAccountLoader;
 import com.btmura.android.reddit.text.InputFilters;
 
-public class AddAccountFragment extends Fragment implements
-        OnCheckedChangeListener,
-        OnClickListener {
+public class AddAccountFragment extends DialogFragment
+    implements OnClickListener, LoaderManager.LoaderCallbacks<Bundle> {
 
-    public static final String TAG = "AddAccountFragment";
+  private static final String ARG_FIXED_ACCOUNT_NAME = "fan";
+  private static final String ARG_CODE = "c";
 
-    private static final String ARG_LOGIN = "login";
+  private static final String STATE_SUBMITTED_ACCOUNT_NAME = "san";
+  private static final String STATE_SUBMIT_ERROR = "se";
 
-    public interface OnAccountAddedListener {
-        void onAccountAdded(Bundle result);
+  private OnAddAccountListener listener;
+  private String submittedAccountName;
+  private String submitError;
 
-        void onAccountCancelled();
+  private EditText accountNameText;
+  private ProgressBar progressBar;
+  private Button addButton;
+  private Button cancelButton;
+  private AlertDialog errorDialog;
+
+  public interface OnAddAccountListener {
+    void onAddAccountSuccess(Bundle result);
+
+    void onAddAccountCancelled();
+  }
+
+  public static AddAccountFragment newInstance(
+      String fixedAccountName,
+      String code) {
+    Bundle args = new Bundle(2);
+    args.putString(ARG_FIXED_ACCOUNT_NAME, fixedAccountName);
+    args.putString(ARG_CODE, code);
+
+    AddAccountFragment frag = new AddAccountFragment();
+    frag.setArguments(args);
+    return frag;
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (activity instanceof OnAddAccountListener) {
+      listener = (OnAddAccountListener) activity;
+    }
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    if (savedInstanceState != null) {
+      submittedAccountName =
+          savedInstanceState.getString(STATE_SUBMITTED_ACCOUNT_NAME);
+      submitError = savedInstanceState.getString(STATE_SUBMIT_ERROR);
+    }
+  }
+
+  @Override
+  public View onCreateView(
+      LayoutInflater inflater,
+      ViewGroup container,
+      Bundle savedInstanceState) {
+    getDialog().setTitle(R.string.title_add_account);
+
+    View v = inflater.inflate(R.layout.add_account_frag, container, false);
+
+    accountNameText = (EditText) v.findViewById(R.id.account_name_text);
+    accountNameText.setFilters(InputFilters.NO_SPACE_FILTERS);
+
+    // Don't allow editing if re-adding an existing account.
+    if (hasFixedAccountName()) {
+      accountNameText.setText(getFixedAccountName());
+      accountNameText.setEnabled(false);
     }
 
-    private OnAccountAddedListener listener;
-    private LoginTask task;
+    progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
 
-    private EditText login;
-    private EditText password;
-    private CheckBox showPassword;
-    private ProgressBar progress;
-    private Button ok;
-    private Button cancel;
+    cancelButton = (Button) v.findViewById(R.id.cancel);
+    cancelButton.setOnClickListener(this);
 
-    public static AddAccountFragment newInstance(String login) {
-        Bundle args = new Bundle(1);
-        args.putString(ARG_LOGIN, login);
+    addButton = (Button) v.findViewById(R.id.ok);
+    addButton.setOnClickListener(this);
 
-        AddAccountFragment frag = new AddAccountFragment();
-        frag.setArguments(args);
-        return frag;
+    return v;
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    refresh();
+    if (!TextUtils.isEmpty(submittedAccountName)) {
+      getLoaderManager().initLoader(0, null, this);
     }
+  }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnAccountAddedListener) {
-            listener = (OnAccountAddedListener) activity;
-        }
+  private void refresh() {
+    if (!TextUtils.isEmpty(submittedAccountName)) {
+      showProgressBar();
+    } else {
+      hideProgressBar();
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+    if (!TextUtils.isEmpty(submitError)) {
+      showErrorDialog();
+    } else {
+      hideErrorDialog();
     }
+  }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.add_account, container, false);
+  private void showProgressBar() {
+    progressBar.setVisibility(View.VISIBLE);
+    accountNameText.setEnabled(false);
+    cancelButton.setEnabled(false);
+    addButton.setEnabled(false);
+  }
 
-        login = (EditText) v.findViewById(R.id.login);
-        login.setFilters(InputFilters.NO_SPACE_FILTERS);
-        login.setText(getArguments().getString(ARG_LOGIN));
+  private void hideProgressBar() {
+    progressBar.setVisibility(View.INVISIBLE);
+    accountNameText.setEnabled(!hasFixedAccountName());
+    cancelButton.setEnabled(true);
+    addButton.setEnabled(true);
+  }
 
-        password = (EditText) v.findViewById(R.id.password);
-        if (!TextUtils.isEmpty(login.getText())) {
-            password.requestFocus();
-        }
-
-        showPassword = (CheckBox) v.findViewById(R.id.show_password);
-        showPassword.setOnCheckedChangeListener(this);
-
-        progress = (ProgressBar) v.findViewById(R.id.progress);
-
-        cancel = (Button) v.findViewById(R.id.cancel);
-        cancel.setOnClickListener(this);
-
-        ok = (Button) v.findViewById(R.id.ok);
-        ok.setOnClickListener(this);
-
-        hideProgress();
-
-        return v;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (task != null) {
-            showProgress();
-        } else {
-            hideProgress();
-        }
-    }
-
-    private void showProgress() {
-        progress.setVisibility(View.VISIBLE);
-        login.setEnabled(false);
-        password.setEnabled(false);
-        showPassword.setEnabled(false);
-        cancel.setEnabled(false);
-        ok.setEnabled(false);
-    }
-
-    private void hideProgress() {
-        progress.setVisibility(View.INVISIBLE);
-        login.setEnabled(true);
-        password.setEnabled(true);
-        showPassword.setEnabled(true);
-        cancel.setEnabled(true);
-        ok.setEnabled(true);
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        TransformationMethod method = null;
-        if (!isChecked) {
-            method = PasswordTransformationMethod.getInstance();
-        }
-        password.setTransformationMethod(method);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v == cancel) {
-            handleCancel();
-        } else if (v == ok) {
-            handleAdd();
-        }
-    }
-
-    private void handleCancel() {
-        if (listener != null) {
-            listener.onAccountCancelled();
-        }
-    }
-
-    private void handleAdd() {
-        if (login.getText().length() <= 0) {
-            login.setError(getString(R.string.error_blank_field));
-            return;
-        }
-        if (password.getText().length() <= 0) {
-            password.setError(getString(R.string.error_blank_field));
-            return;
-        }
-        if (login.getError() == null && password.getError() == null && listener != null) {
-            if (task != null) {
-                task.cancel(true);
-            }
-            task = new LoginTask(getActivity(), login.getText(), password.getText());
-            task.execute();
-        }
-    }
-
-    class LoginTask extends AsyncTask<Void, Integer, Bundle> {
-
-        private final Context context;
-        private final String login;
-        private final String password;
-
-        LoginTask(Context context, CharSequence login, CharSequence password) {
-            this.context = context.getApplicationContext();
-            this.login = login.toString();
-            this.password = password.toString();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            showProgress();
-        }
-
-        @Override
-        protected Bundle doInBackground(Void... params) {
-            try {
-                LoginResult result = RedditApi.login(login, password);
-                if (result.error != null) {
-                    return errorBundle(R.string.reddit_error, result.error);
+  private void showErrorDialog() {
+    if (errorDialog == null) {
+      errorDialog = new AlertDialog.Builder(getActivity())
+          .setPositiveButton(android.R.string.ok,
+              new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                  reset();
                 }
-
-                // Initialize database data for the account. If somehow we fail
-                // to add the account later to the AccountManager, then this
-                // data will just sit there in the db. If there is an existing
-                // account, then they will still see their subreddits but any
-                // pending actions will be erased...
-                if (!AccountProvider.initializeAccount(context, login, result.cookie)) {
-                    return errorBundle(R.string.login_importing_error);
-                }
-
-                // Set this account as the last account to make the UI switch to
-                // the new account after the user returns to the app. If somehow
-                // we crash before the account is added, that is ok, because the
-                // AccountLoader will fall back to the app storage account.
-                AccountPrefs.setLastAccount(context, login);
-
-                String accountType = AccountAuthenticator.getAccountType(context);
-                Account account = new Account(login, accountType);
-
-                AccountManager manager = AccountManager.get(context);
-                manager.addAccountExplicitly(account, null, null);
-                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, result.cookie);
-                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH,
-                        result.modhash);
-
-                ContentResolver.setSyncAutomatically(account, AccountProvider.AUTHORITY, true);
-                ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
-                ContentResolver.setSyncAutomatically(account, ThingProvider.AUTHORITY, true);
-
-                Bundle b = new Bundle(2);
-                b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                b.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                return b;
-
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-                return errorBundle(R.string.login_error, e.getMessage());
+              })
+          .setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              reset();
             }
-        }
-
-        @Override
-        protected void onCancelled(Bundle result) {
-            hideProgress();
-        }
-
-        @Override
-        protected void onPostExecute(Bundle result) {
-            task = null;
-            String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
-            if (error != null) {
-                MessageDialogFragment.showMessage(getFragmentManager(), error);
-                hideProgress();
-            } else if (listener != null) {
-                listener.onAccountAdded(result);
-            }
-        }
-
-        private Bundle errorBundle(int resId, String... formatArgs) {
-            Bundle b = new Bundle(1);
-            b.putString(AccountManager.KEY_ERROR_MESSAGE,
-                    context.getString(resId, (Object[]) formatArgs));
-            return b;
-        }
+          })
+          .create();
     }
+    errorDialog.setMessage(submitError);
+    errorDialog.show();
+  }
+
+  private void hideErrorDialog() {
+    if (errorDialog != null) {
+      errorDialog.hide();
+    }
+  }
+
+  private void submit(String username) {
+    submittedAccountName = username;
+    submitError = null;
+    refresh();
+    getLoaderManager().initLoader(0, null, this);
+  }
+
+  private void reset() {
+    submittedAccountName = null;
+    submitError = null;
+    refresh();
+    getLoaderManager().destroyLoader(0);
+  }
+
+  @Override
+  public void onClick(View v) {
+    if (v == addButton) {
+      handleAdd();
+    } else if (v == cancelButton) {
+      handleCancel();
+    }
+  }
+
+  private void handleAdd() {
+    if (TextUtils.isEmpty(accountNameText.getText())) {
+      accountNameText.setError(getString(R.string.error_blank_field));
+      return;
+    }
+    if (accountNameText.getError() == null) {
+      submit(accountNameText.getText().toString());
+    }
+  }
+
+  private void handleCancel() {
+    if (listener != null) {
+      listener.onAddAccountCancelled();
+    }
+    dismiss();
+  }
+
+  @Override
+  public Loader<Bundle> onCreateLoader(int i, Bundle args) {
+    return new AddAccountLoader(getActivity(), submittedAccountName, getCode());
+  }
+
+  @Override
+  public void onLoadFinished(Loader<Bundle> loader, Bundle result) {
+    submitError = result.getString(AccountManager.KEY_ERROR_MESSAGE);
+    refresh();
+    if (TextUtils.isEmpty(submitError) && listener != null) {
+      listener.onAddAccountSuccess(result);
+    }
+  }
+
+  @Override
+  public void onLoaderReset(Loader<Bundle> loader) {
+    refresh();
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putString(STATE_SUBMITTED_ACCOUNT_NAME, submittedAccountName);
+    outState.putString(STATE_SUBMIT_ERROR, submitError);
+  }
+
+  private boolean hasFixedAccountName() {
+    return !TextUtils.isEmpty(getFixedAccountName());
+  }
+
+  private String getFixedAccountName() {
+    return getArguments().getString(ARG_FIXED_ACCOUNT_NAME);
+  }
+
+  private String getCode() {
+    return getArguments().getString(ARG_CODE);
+  }
 }

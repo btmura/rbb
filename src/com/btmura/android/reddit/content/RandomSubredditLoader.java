@@ -23,7 +23,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
@@ -35,35 +34,42 @@ import java.net.HttpURLConnection;
 
 public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
-    private static final String TAG = "RandomSubredditLoader";
+  private static final String TAG = "RandomSubredditLoader";
+  private static final boolean DEBUG = BuildConfig.DEBUG;
 
-    private final String accountName;
+  private final String accountName;
 
-    public RandomSubredditLoader(Context context, String accountName) {
-        super(context);
-        this.accountName = accountName;
+  public RandomSubredditLoader(Context ctx, String accountName) {
+    super(ctx);
+    this.accountName = accountName;
+  }
+
+  @Override
+  public String loadInBackground() {
+    if (DEBUG) {
+      Log.d(TAG, "loadInBackground");
     }
 
-    @Override
-    public String loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-
-        try {
-            CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM, Filter.SUBREDDIT_HOT, Urls.TYPE_HTML);
-            String cookie = AccountUtils.getCookie(getContext(), accountName);
-            HttpURLConnection conn = RedditApi.connect(url, cookie, false);
-            if (conn.getResponseCode() == 302) {
-                return UriHelper.getSubreddit(Uri.parse(conn.getHeaderField("Location")));
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return null;
+    HttpURLConnection conn = null;
+    try {
+      CharSequence url = Urls.subreddit(accountName, Subreddits.NAME_RANDOM,
+          Filter.SUBREDDIT_HOT, Urls.NO_MORE, Urls.NO_COUNT);
+      conn = RedditApi.connect(getContext(), accountName, url);
+      if (conn.getResponseCode() == 302) {
+        String location = conn.getHeaderField("Location");
+        return UriHelper.getSubreddit(Uri.parse(location));
+      }
+    } catch (IOException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (OperationCanceledException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } catch (AuthenticatorException e) {
+      Log.e(TAG, e.getMessage(), e);
+    } finally {
+      if (conn != null) {
+        conn.disconnect();
+      }
     }
+    return null;
+  }
 }

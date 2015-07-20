@@ -22,99 +22,100 @@ import com.btmura.android.reddit.text.MarkdownFormatter.CodeBlock;
 
 public class MarkdownFormatter_CodeBlockTest extends AbstractFormatterTest {
 
-	private String[] lines;
+  private String[] lines;
 
-	/**
-	 * Tests that the underlying regular expression catches indented lines
-	 * properly.
-	 */
-	public void testPattern() throws Exception {
-		// Line with 3 spaces shouldn't match.
-		setLines("   line1");
-		assertFalse(matcher.find());
+  /**
+   * Tests that the underlying regular expression catches indented lines
+   * properly.
+   */
+  public void testPattern() throws Exception {
+    // Line with 3 spaces shouldn't match.
+    setLines("   line1");
+    assertFalse(matcher.find());
 
-		// Line with some text before the indentation shouldn't match.
-		setLines("first    line1");
-		assertFalse(matcher.find());
+    // Line with some text before the indentation shouldn't match.
+    setLines("first    line1");
+    assertFalse(matcher.find());
 
-		// Line with 4 spaces should match.
-		setLines("    line1");
-		assertTrue(matcher.find());
-		assertEquals(lines[0], matcher.group());
-		assertFalse(matcher.find());
+    // Line with 4 spaces should match.
+    setLines("    line1");
+    assertTrue(matcher.find());
+    assertEquals(lines[0], matcher.group());
+    assertFalse(matcher.find());
 
-		// Line with 5 spaces should still match.
-		setLines("     line1");
-		assertTrue(matcher.find());
-		assertEquals(lines[0], matcher.group());
-		assertFalse(matcher.find());
+    // Line with 5 spaces should still match.
+    setLines("     line1");
+    assertTrue(matcher.find());
+    assertEquals(lines[0], matcher.group());
+    assertFalse(matcher.find());
 
-		// Line with 1 tab should match.
-		setLines("\tline1");
-		assertTrue(matcher.find());
-		assertEquals(lines[0], matcher.group());
-		assertFalse(matcher.find());
+    // Line with 1 tab should match.
+    setLines("\tline1");
+    assertTrue(matcher.find());
+    assertEquals(lines[0], matcher.group());
+    assertFalse(matcher.find());
 
-		// Line with 2 tabs should match.
-		setLines("\t\tline1");
-		assertTrue(matcher.find());
-		assertEquals(lines[0], matcher.group());
-		assertFalse(matcher.find());
+    // Line with 2 tabs should match.
+    setLines("\t\tline1");
+    assertTrue(matcher.find());
+    assertEquals(lines[0], matcher.group());
+    assertFalse(matcher.find());
 
-		// Two lines with indentation and a third without.
-		setLines("    line1", "    line2", "last");
-		assertTrue(matcher.find());
-		assertEquals(lines[0], matcher.group());
-		assertTrue(matcher.find());
-		assertEquals(lines[1], matcher.group());
-		assertFalse(matcher.find());
+    // Two lines with indentation and a third without.
+    setLines("    line1", "    line2", "last");
+    assertTrue(matcher.find());
+    assertEquals(lines[0], matcher.group());
+    assertTrue(matcher.find());
+    assertEquals(lines[1], matcher.group());
+    assertFalse(matcher.find());
 
-		// Two lines with spaces and tabs.
-		setLines("    line1", "\tline2", "last");
-		assertTrue(matcher.find());
-		assertEquals(lines[0], matcher.group());
-		assertTrue(matcher.find());
-		assertEquals(lines[1], matcher.group());
-		assertFalse(matcher.find());
-	}
+    // Two lines with spaces and tabs.
+    setLines("    line1", "\tline2", "last");
+    assertTrue(matcher.find());
+    assertEquals(lines[0], matcher.group());
+    assertTrue(matcher.find());
+    assertEquals(lines[1], matcher.group());
+    assertFalse(matcher.find());
+  }
 
-	private void setLines(String firstLine, String... moreLines) {
-		int lineCount = 1;
-		if (moreLines != null) {
-			lineCount += moreLines.length;
-		}
+  private void setLines(String firstLine, String... moreLines) {
+    int lineCount = 1;
+    if (moreLines != null) {
+      lineCount += moreLines.length;
+    }
 
-		// Save the lines in an array to refer to them easily in the test.
-		lines = new String[lineCount];
-		for (int i = 0; i < lineCount; i++) {
-			lines[i] = i == 0 ? firstLine : moreLines[i - 1];
-		}
+    // Save the lines in an array to refer to them easily in the test.
+    lines = new String[lineCount];
+    for (int i = 0; i < lineCount; i++) {
+      lines[i] = i == 0 ? firstLine : moreLines[i - 1];
+    }
 
-		// Join all the lines together to pass to the matcher.
-		StringBuilder joinedLines = new StringBuilder();
-		joinedLines.append(firstLine);
-		for (String line : moreLines) {
-			joinedLines.append("\n").append(line);
-		}
+    // Join all the lines together to pass to the matcher.
+    StringBuilder joinedLines = new StringBuilder();
+    joinedLines.append(firstLine);
+    for (String line : moreLines) {
+      joinedLines.append("\n").append(line);
+    }
 
-		// Set the lines on the matcher.
-		matcher = CodeBlock.PATTERN_CODE_BLOCK.matcher(joinedLines);
-	}
+    // Set the lines on the matcher.
+    matcher = CodeBlock.PATTERN_CODE_BLOCK.matcher(joinedLines);
+  }
 
-	/** Tests that the formatter properly applies spans to regions of the text. */
-	public void testFormat() throws Exception {
-		CharSequence cs = assertCodeBlockFormat("    line1", "line1");
-		assertCodeBlockSpan(cs, 0, 5);
+  /** Tests that the formatter properly applies spans to regions of the text. */
+  public void testFormat() throws Exception {
+    CharSequence cs = assertCodeBlockFormat("    line1", "line1");
+    assertCodeBlockSpan(cs, 0, 5);
 
-        // Multiple code block lines should collapse into a single span.
-        cs = assertCodeBlockFormat("\tline1\n\tline2\n\tline3", "line1\nline2\nline3");
-        assertCodeBlockSpan(cs, 0, 17);
+    // Multiple code block lines should collapse into a single span.
+    cs = assertCodeBlockFormat("\tline1\n\tline2\n\tline3",
+        "line1\nline2\nline3");
+    assertCodeBlockSpan(cs, 0, 17);
 
-        // Two blocks surrounding one non indented line.
-        cs = assertCodeBlockFormat("\tline1\nline2\n\tline3\n\tline4",
-                "line1\nline2\nline3\nline4");
-        assertCodeBlockSpan(cs, 0, 5);
-        assertNoSpans(cs, 6, 11, TypefaceSpan.class);
-        assertCodeBlockSpan(cs, 12, 23);
-	}
+    // Two blocks surrounding one non indented line.
+    cs = assertCodeBlockFormat("\tline1\nline2\n\tline3\n\tline4",
+        "line1\nline2\nline3\nline4");
+    assertCodeBlockSpan(cs, 0, 5);
+    assertNoSpans(cs, 6, 11, TypefaceSpan.class);
+    assertCodeBlockSpan(cs, 12, 23);
+  }
 }

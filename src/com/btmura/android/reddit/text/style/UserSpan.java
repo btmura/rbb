@@ -28,17 +28,17 @@ import com.btmura.android.reddit.net.Urls;
 
 public class UserSpan extends ClickableSpan {
 
-    public final String user;
+  public final String user;
 
-    public UserSpan(String user) {
-        this.user = user;
-    }
+  public UserSpan(String user) {
+    this.user = user;
+  }
 
-    @Override
-    public void onClick(View widget) {
-        Context context = widget.getContext();
-        Intent intent = new Intent(context, UserProfileActivity.class);
-        intent.setData(Uri.parse(Urls.user(user, -1, null, Urls.TYPE_HTML).toString()));
-        Contexts.startActivity(context, intent);
-    }
+  @Override
+  public void onClick(View widget) {
+    Context ctx = widget.getContext();
+    Intent intent = new Intent(ctx, UserProfileActivity.class);
+    intent.setData(Uri.parse(Urls.profileLink(user).toString()));
+    Contexts.startActivity(ctx, intent);
+  }
 }

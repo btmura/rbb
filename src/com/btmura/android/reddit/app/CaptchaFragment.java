@@ -37,133 +37,137 @@ import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class CaptchaFragment extends DialogFragment
-        implements LoaderCallbacks<CaptchaResult>, OnClickListener {
+    implements LoaderCallbacks<CaptchaResult>, OnClickListener {
 
-    public static final String TAG = "CaptchaFragment";
+  public static final String TAG = "CaptchaFragment";
 
-    private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-            InputFilters.NO_SPACE_FILTER,
-    };
+  private static final InputFilter[] INPUT_FILTERS = new InputFilter[]{
+      InputFilters.NO_SPACE_FILTER,
+  };
 
-    private static final String ARG_CAPTCHA_ID = "captchaId";
+  private static final String ARG_CAPTCHA_ID = "captchaId";
 
-    public interface OnCaptchaGuessListener {
-        void onCaptchaGuess(String id, String guess);
+  public interface OnCaptchaGuessListener {
+    void onCaptchaGuess(String id, String guess);
 
-        void onCaptchaCancelled();
+    void onCaptchaCancelled();
+  }
+
+  private OnCaptchaGuessListener listener;
+  private String captchaId;
+
+  private View progress;
+  private ViewStub errorStub;
+  private ImageView captcha;
+  private EditText guess;
+  private Button cancel;
+  private Button ok;
+
+  public static CaptchaFragment newInstance(String captchaId) {
+    Bundle args = new Bundle(1);
+    args.putString(ARG_CAPTCHA_ID, captchaId);
+
+    CaptchaFragment frag = new CaptchaFragment();
+    frag.setArguments(args);
+    return frag;
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (getTargetFragment() instanceof OnCaptchaGuessListener) {
+      listener = (OnCaptchaGuessListener) getTargetFragment();
     }
+  }
 
-    private OnCaptchaGuessListener listener;
-    private String captchaId;
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    captchaId = getArguments().getString(ARG_CAPTCHA_ID);
+  }
 
-    private View progress;
-    private ViewStub errorStub;
-    private ImageView captcha;
-    private EditText guess;
-    private Button cancel;
-    private Button ok;
+  @Override
+  public View onCreateView(
+      LayoutInflater inflater,
+      ViewGroup container,
+      Bundle savedInstanceState) {
+    getDialog().setTitle(R.string.captcha_title);
+    View v = inflater.inflate(R.layout.captcha, container, false);
 
-    public static CaptchaFragment newInstance(String captchaId) {
-        Bundle args = new Bundle(1);
-        args.putString(ARG_CAPTCHA_ID, captchaId);
+    progress = v.findViewById(R.id.progress_bar);
+    errorStub = (ViewStub) v.findViewById(R.id.error_stub);
+    captcha = (ImageView) v.findViewById(R.id.captcha);
 
-        CaptchaFragment frag = new CaptchaFragment();
-        frag.setArguments(args);
-        return frag;
+    guess = (EditText) v.findViewById(R.id.guess);
+    guess.setFilters(INPUT_FILTERS);
+
+    cancel = (Button) v.findViewById(R.id.cancel);
+    cancel.setOnClickListener(this);
+
+    ok = (Button) v.findViewById(R.id.ok);
+    ok.setOnClickListener(this);
+    ok.setEnabled(false);
+    return v;
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    getLoaderManager().initLoader(0, null, this);
+  }
+
+  @Override
+  public Loader<CaptchaResult> onCreateLoader(int id, Bundle args) {
+    return new CaptchaLoader(getActivity(), captchaId);
+  }
+
+  @Override
+  public void onLoadFinished(
+      Loader<CaptchaResult> loader,
+      CaptchaResult result) {
+    progress.setVisibility(View.GONE);
+    if (result == null) {
+      if (errorStub != null) {
+        errorStub.inflate();
+        errorStub = null;
+      }
+      return;
     }
+    captchaId = result.iden;
+    captcha.setImageBitmap(result.captchaBitmap);
+    ok.setEnabled(true);
+  }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (getTargetFragment() instanceof OnCaptchaGuessListener) {
-            listener = (OnCaptchaGuessListener) getTargetFragment();
-        }
+  @Override
+  public void onLoaderReset(Loader<CaptchaResult> loader) {
+    captcha.setImageBitmap(null);
+  }
+
+  @Override
+  public void onClick(View v) {
+    if (v == cancel) {
+      handleCancel();
+    } else if (v == ok) {
+      handleOk();
     }
+  }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        captchaId = getArguments().getString(ARG_CAPTCHA_ID);
+  private void handleCancel() {
+    if (listener != null) {
+      listener.onCaptchaCancelled();
     }
+    dismiss();
+  }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        getDialog().setTitle(R.string.captcha_title);
-        View v = inflater.inflate(R.layout.captcha, container, false);
-
-        progress = v.findViewById(R.id.progress);
-        errorStub = (ViewStub) v.findViewById(R.id.error_stub);
-        captcha = (ImageView) v.findViewById(R.id.captcha);
-
-        guess = (EditText) v.findViewById(R.id.guess);
-        guess.setFilters(INPUT_FILTERS);
-
-        cancel = (Button) v.findViewById(R.id.cancel);
-        cancel.setOnClickListener(this);
-
-        ok = (Button) v.findViewById(R.id.ok);
-        ok.setOnClickListener(this);
-        ok.setEnabled(false);
-        return v;
+  private void handleOk() {
+    if (guess.getText().length() <= 0) {
+      guess.setError(getString(R.string.error_blank_field));
+      return;
     }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
+    // TODO: Disable widgets if captcha image wasn't retrieved.
+    if (listener != null) {
+      listener.onCaptchaGuess(captchaId, guess.getText().toString());
     }
-
-    @Override
-    public Loader<CaptchaResult> onCreateLoader(int id, Bundle args) {
-        return new CaptchaLoader(getActivity(), captchaId);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<CaptchaResult> loader, CaptchaResult result) {
-        progress.setVisibility(View.GONE);
-        if (result == null) {
-            if (errorStub != null) {
-                errorStub.inflate();
-                errorStub = null;
-            }
-            return;
-        }
-        captchaId = result.iden;
-        captcha.setImageBitmap(result.captchaBitmap);
-        ok.setEnabled(true);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<CaptchaResult> loader) {
-        captcha.setImageBitmap(null);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v == cancel) {
-            handleCancel();
-        } else if (v == ok) {
-            handleOk();
-        }
-    }
-
-    private void handleCancel() {
-        if (listener != null) {
-            listener.onCaptchaCancelled();
-        }
-        dismiss();
-    }
-
-    private void handleOk() {
-        if (guess.getText().length() <= 0) {
-            guess.setError(getString(R.string.error_blank_field));
-            return;
-        }
-        // TODO: Disable widgets if captcha image wasn't retrieved.
-        if (listener != null) {
-            listener.onCaptchaGuess(captchaId, guess.getText().toString());
-        }
-        dismiss();
-    }
+    dismiss();
+  }
 }

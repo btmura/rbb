@@ -16,58 +16,134 @@
 
 package com.btmura.android.reddit.accounts;
 
-import java.io.IOException;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.btmura.android.reddit.R;
 
+import java.io.IOException;
+
 public class AccountUtils {
 
-    public static boolean isAccount(String accountName) {
-        return !TextUtils.isEmpty(accountName);
-    }
+  private static final String TAG = "AccountUtils";
 
-    public static Account getAccount(Context context, String accountName) {
-        return new Account(accountName, context.getString(R.string.account_type));
-    }
+  public static final String NO_ACCOUNT = "";
 
-    public static String getCookie(AccountManager manager, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-    }
+  public static boolean isAccount(String accountName) {
+    return !TextUtils.isEmpty(accountName);
+  }
 
-    public static String getCookie(Context context, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        return getCookie(AccountManager.get(context), account);
-    }
+  public static Account getAccount(Context ctx, String accountName) {
+    return new Account(accountName, getAccountType(ctx));
+  }
 
-    public static String getCookie(Context context, String accountName)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        if (!isAccount(accountName)) {
-            return null;
-        }
+  public static String getAccountType(Context ctx) {
+    return ctx.getString(R.string.account_type);
+  }
 
-        Account account = new Account(accountName, AccountAuthenticator.getAccountType(context));
-        return getCookie(context, account);
-    }
+  @Nullable
+  public static String getAccessToken(Context ctx, String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    return getAuthToken(ctx, accountName, AccountAuthenticator.ACCESS_TOKEN);
+  }
 
-    public static String getModhash(AccountManager manager, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
-    }
+  @Nullable
+  public static String getRefreshToken(Context ctx, String accountName) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    return getAuthToken(ctx, accountName, AccountAuthenticator.REFRESH_TOKEN);
+  }
 
-    public static String getModhash(Context context, Account account)
-            throws OperationCanceledException, AuthenticatorException, IOException {
-        AccountManager manager = AccountManager.get(context);
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+  @Nullable
+  private static String getAuthToken(
+      Context ctx,
+      String accountName,
+      String authTokenType) throws
+      AuthenticatorException,
+      OperationCanceledException,
+      IOException {
+    if (!isAccount(accountName)) {
+      return null;
     }
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    return am.blockingGetAuthToken(a, authTokenType, true /* notify */);
+  }
 
-    private AccountUtils() {
+  public static boolean hasCredentials(Context ctx, String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    return !isAccount(accountName)
+        || getAccessToken(ctx, accountName) != null
+        && getRefreshToken(ctx, accountName) != null;
+  }
+
+  public static boolean hasExpiredCredentials(Context ctx, String accountName)
+      throws AuthenticatorException, OperationCanceledException, IOException {
+    if (!isAccount(accountName) || !hasCredentials(ctx, accountName)) {
+      return false;
     }
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    String expValue = am.getUserData(a, AccountAuthenticator.EXPIRATION_MS);
+    if (TextUtils.isEmpty(expValue)) {
+      Log.wtf(TAG, "expiration is missing");
+      return true;
+    }
+    try {
+      long expirationMs = Long.valueOf(expValue);
+      return System.currentTimeMillis() >= expirationMs;
+    } catch (NumberFormatException e) {
+      Log.wtf(TAG, e);
+      return true;
+    }
+  }
+
+  public static boolean addAccount(
+      Context ctx,
+      String accountName,
+      String accessToken,
+      String refreshToken,
+      long expirationMs,
+      String scopes) {
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+
+    // This returns false if an account already exists.
+    // We will just overwrite the existing tokens and info.
+    boolean exists = am.addAccountExplicitly(a, null, null);
+
+    am.setAuthToken(a, AccountAuthenticator.ACCESS_TOKEN, accessToken);
+    am.setAuthToken(a, AccountAuthenticator.REFRESH_TOKEN, refreshToken);
+    am.setUserData(a, AccountAuthenticator.EXPIRATION_MS,
+        Long.toString(expirationMs));
+    am.setUserData(a, AccountAuthenticator.SCOPES, scopes);
+
+    return exists;
+  }
+
+  public static void updateAccount(
+      Context ctx,
+      String accountName,
+      String accessToken,
+      long expirationMs,
+      String scopes) {
+    Account a = getAccount(ctx, accountName);
+    AccountManager am = AccountManager.get(ctx);
+    am.setAuthToken(a, AccountAuthenticator.ACCESS_TOKEN, accessToken);
+    am.setUserData(a, AccountAuthenticator.EXPIRATION_MS,
+        Long.toString(expirationMs));
+    am.setUserData(a, AccountAuthenticator.SCOPES, scopes);
+  }
+
+  private AccountUtils() {
+  }
 }

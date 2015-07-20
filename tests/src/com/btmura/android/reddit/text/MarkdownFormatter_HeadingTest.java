@@ -18,10 +18,10 @@ package com.btmura.android.reddit.text;
 
 public class MarkdownFormatter_HeadingTest extends AbstractFormatterTest {
 
-    public void testFormat() {
-        assertHeadingFormat("#Hello", "Hello");
-        assertHeadingFormat("##Hello", "Hello");
-        assertHeadingFormat("#Hello#", "Hello");
-        assertHeadingFormat("##Hello##", "Hello");
-    }
+  public void testFormat() {
+    assertHeadingFormat("#Hello", "Hello");
+    assertHeadingFormat("##Hello", "Hello");
+    assertHeadingFormat("#Hello#", "Hello");
+    assertHeadingFormat("##Hello##", "Hello");
+  }
 }

@@ -27,52 +27,53 @@ import android.support.v4.content.Loader;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.widget.ContentAdapter;
 
-public class ContentRowListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
+public class ContentRowListFragment extends ListFragment
+    implements LoaderCallbacks<Cursor> {
 
-    private static final String ARG_URI = "uri";
+  private static final String ARG_URI = "uri";
 
-    private ContentAdapter adapter;
+  private ContentAdapter adapter;
 
-    public static ContentRowListFragment newInstance(Uri uri) {
-        Bundle args = new Bundle(2);
-        args.putString(ARG_URI, uri.toString());
+  public static ContentRowListFragment newInstance(Uri uri) {
+    Bundle args = new Bundle(1);
+    args.putString(ARG_URI, uri.toString());
 
-        ContentRowListFragment frag = new ContentRowListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
+    ContentRowListFragment frag = new ContentRowListFragment();
+    frag.setArguments(args);
+    return frag;
+  }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getActivity().setTitle(getArguments().getString(ARG_URI));
-        adapter = new ContentAdapter(getActivity());
-    }
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    getActivity().setTitle(getArguments().getString(ARG_URI));
+    adapter = new ContentAdapter(getActivity());
+  }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setListAdapter(adapter);
-        setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
-    }
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+    setListAdapter(adapter);
+    setListShown(false);
+    getLoaderManager().initLoader(0, null, this);
+  }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri uri = Uri.parse(getArguments().getString(ARG_URI));
-        return new CursorLoader(getActivity(), uri, null, null, null, null);
-    }
+  @Override
+  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    Uri uri = Uri.parse(getArguments().getString(ARG_URI));
+    return new CursorLoader(getActivity(), uri, null, null, null, null);
+  }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        adapter.swapCursor(cursor);
-        setListShown(true);
-        setEmptyText(getString(R.string.empty_list));
-    }
+  @Override
+  public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    adapter.swapCursor(cursor);
+    setListShown(true);
+    setEmptyText(getString(R.string.empty_list));
+  }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
-        // No ListView available at this time to update.
-    }
+  @Override
+  public void onLoaderReset(Loader<Cursor> loader) {
+    adapter.swapCursor(null);
+    // No ListView available at this time to update.
+  }
 }

@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.database;
 
-import java.util.ArrayList;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,136 +26,141 @@ import android.text.TextUtils;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
 
+import java.util.ArrayList;
+
 public class Subreddits implements BaseColumns {
-    public static final String TABLE_NAME = "subreddits";
+  public static final String TABLE_NAME = "subreddits";
 
-    public static final String COLUMN_ACCOUNT = "account";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_STATE = "state";
-    public static final String COLUMN_EXPIRATION = "expiration";
+  public static final String COLUMN_ACCOUNT = "account";
+  public static final String COLUMN_NAME = "name";
+  public static final String COLUMN_STATE = "state";
+  public static final String COLUMN_EXPIRATION = "expiration";
 
-    public static final String ACCOUNT_NONE = "";
+  public static final String ACCOUNT_NONE = "";
 
-    public static final String NAME_FRONT_PAGE = "";
-    public static final String NAME_ALL = "all";
-    public static final String NAME_RANDOM = "random";
+  public static final String NAME_FRONT_PAGE = "";
+  public static final String NAME_ALL = "all";
+  public static final String NAME_RANDOM = "random";
 
-    public static final int STATE_NORMAL = 0;
-    public static final int STATE_INSERTING = 1;
-    public static final int STATE_DELETING = 2;
+  public static final int STATE_NORMAL = 0;
+  public static final int STATE_INSERTING = 1;
+  public static final int STATE_DELETING = 2;
 
-    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
-    public static final String SELECT_BY_ACCOUNT_NOT_DELETED =
-            SELECT_BY_ACCOUNT + " AND " + COLUMN_STATE + "!= " + STATE_DELETING;
-    public static final String SELECT_BY_ACCOUNT_AND_NAME =
-            SELECT_BY_ACCOUNT + " AND " + COLUMN_NAME + "= ?";
-    public static final String SELECT_NOT_DELETED_BY_ACCOUNT_AND_LIKE_NAME =
-            SELECT_BY_ACCOUNT_NOT_DELETED + " AND " + COLUMN_NAME + " LIKE ?";
+  public static final String SELECT_BY_ACCOUNT =
+      SharedColumns.SELECT_BY_ACCOUNT;
+  public static final String SELECT_BY_ACCOUNT_NOT_DELETED =
+      SELECT_BY_ACCOUNT + " AND " + COLUMN_STATE + "!= " + STATE_DELETING;
+  public static final String SELECT_BY_ACCOUNT_AND_NAME =
+      SELECT_BY_ACCOUNT + " AND " + COLUMN_NAME + "= ?";
+  public static final String SELECT_NOT_DELETED_BY_ACCOUNT_AND_LIKE_NAME =
+      SELECT_BY_ACCOUNT_NOT_DELETED + " AND " + COLUMN_NAME + " LIKE ?";
 
-    public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
+  public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
 
-    public static boolean isFrontPage(String subreddit) {
-        return TextUtils.isEmpty(subreddit);
+  public static boolean isFrontPage(String subreddit) {
+    return TextUtils.isEmpty(subreddit);
+  }
+
+  public static boolean isAll(String subreddit) {
+    return NAME_ALL.equalsIgnoreCase(subreddit);
+  }
+
+  public static boolean isRandom(String subreddit) {
+    return NAME_RANDOM.equalsIgnoreCase(subreddit);
+  }
+
+  public static boolean hasSidebar(String subreddit) {
+    return !isFrontPage(subreddit) && !isAll(subreddit) && !isRandom(subreddit);
+  }
+
+  public static boolean isSyncable(String subreddit) {
+    return hasSidebar(subreddit);
+  }
+
+  public static String getTitle(Context ctx, String subreddit) {
+    return isFrontPage(subreddit)
+        ? ctx.getString(R.string.front_page)
+        : subreddit;
+  }
+
+  static void createV2(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + TABLE_NAME + "("
+        + _ID + " INTEGER PRIMARY KEY,"
+        + COLUMN_ACCOUNT + " TEXT DEFAULT '',"
+        + COLUMN_NAME + " TEXT NOT NULL,"
+        + COLUMN_STATE + " INTEGER DEFAULT 0,"
+        + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
+        + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_NAME + "))");
+  }
+
+  static void create(SQLiteDatabase db) {
+    db.execSQL("CREATE TABLE " + TABLE_NAME + "("
+        + _ID + " INTEGER PRIMARY KEY,"
+        + COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
+    db.execSQL("CREATE UNIQUE INDEX " + COLUMN_NAME
+        + " ON " + TABLE_NAME + " ("
+        + COLUMN_NAME + " ASC)");
+  }
+
+  static void insertDefaults(SQLiteDatabase db) {
+    String[] defaultSubreddits = {
+        "AdviceAnimals",
+        "announcements",
+        "AskReddit",
+        "askscience",
+        "atheism",
+        "aww",
+        "blog",
+        "funny",
+        "gaming",
+        "IAmA",
+        "movies",
+        "Music",
+        "pics",
+        "politics",
+        "science",
+        "technology",
+        "todayilearned",
+        "videos",
+        "worldnews",
+        "WTF",};
+
+    for (int i = 0; i < defaultSubreddits.length; i++) {
+      ContentValues values = new ContentValues(1);
+      values.put(COLUMN_NAME, defaultSubreddits[i]);
+      db.insert(TABLE_NAME, null, values);
     }
+  }
 
-    public static boolean isAll(String subreddit) {
-        return NAME_ALL.equalsIgnoreCase(subreddit);
+  static void upgradeToV2(SQLiteDatabase db) {
+    // 1. Back up the old subreddit rows into ContentValues.
+    ArrayList<ContentValues> rows = getSubredditNames(db);
+
+    // 2. Drop the old table and index.
+    db.execSQL("DROP INDEX " + COLUMN_NAME);
+    db.execSQL("DROP TABLE " + TABLE_NAME);
+
+    // 3. Create the new table and import the backed up subreddits.
+    createV2(db);
+    int count = rows.size();
+    for (int i = 0; i < count; i++) {
+      db.insert(TABLE_NAME, null, rows.get(i));
     }
+  }
 
-    public static boolean isRandom(String subreddit) {
-        return NAME_RANDOM.equalsIgnoreCase(subreddit);
+  private static ArrayList<ContentValues> getSubredditNames(SQLiteDatabase db) {
+    Cursor c = db.query(TABLE_NAME, Array.of(COLUMN_NAME),
+        null, null, null, null, null);
+    ArrayList<ContentValues> rows = new ArrayList<ContentValues>(c.getCount());
+    while (c.moveToNext()) {
+      String subreddit = c.getString(0);
+      if (Subreddits.isSyncable(subreddit)) {
+        ContentValues values = new ContentValues(1);
+        values.put(COLUMN_NAME, subreddit);
+        rows.add(values);
+      }
     }
-
-    public static boolean hasSidebar(String subreddit) {
-        return !isFrontPage(subreddit) && !isAll(subreddit) && !isRandom(subreddit);
-    }
-
-    public static boolean isSyncable(String subreddit) {
-        return hasSidebar(subreddit);
-    }
-
-    public static String getTitle(Context c, String subreddit) {
-        return isFrontPage(subreddit) ? c.getString(R.string.front_page) : subreddit;
-    }
-
-    static void createV2(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT DEFAULT '',"
-                + COLUMN_NAME + " TEXT NOT NULL,"
-                + COLUMN_STATE + " INTEGER DEFAULT 0,"
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
-                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_NAME + "))");
-    }
-
-    static void create(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
-        db.execSQL("CREATE UNIQUE INDEX " + COLUMN_NAME
-                + " ON " + TABLE_NAME + " ("
-                + COLUMN_NAME + " ASC)");
-    }
-
-    static void insertDefaults(SQLiteDatabase db) {
-        String[] defaultSubreddits = {
-                "AdviceAnimals",
-                "announcements",
-                "AskReddit",
-                "askscience",
-                "atheism",
-                "aww",
-                "blog",
-                "funny",
-                "gaming",
-                "IAmA",
-                "movies",
-                "Music",
-                "pics",
-                "politics",
-                "science",
-                "technology",
-                "todayilearned",
-                "videos",
-                "worldnews",
-                "WTF",};
-
-        for (int i = 0; i < defaultSubreddits.length; i++) {
-            ContentValues values = new ContentValues(1);
-            values.put(COLUMN_NAME, defaultSubreddits[i]);
-            db.insert(TABLE_NAME, null, values);
-        }
-    }
-
-    static void upgradeToV2(SQLiteDatabase db) {
-        // 1. Back up the old subreddit rows into ContentValues.
-        ArrayList<ContentValues> rows = getSubredditNames(db);
-
-        // 2. Drop the old table and index.
-        db.execSQL("DROP INDEX " + COLUMN_NAME);
-        db.execSQL("DROP TABLE " + TABLE_NAME);
-
-        // 3. Create the new table and import the backed up subreddits.
-        createV2(db);
-        int count = rows.size();
-        for (int i = 0; i < count; i++) {
-            db.insert(TABLE_NAME, null, rows.get(i));
-        }
-    }
-
-    private static ArrayList<ContentValues> getSubredditNames(SQLiteDatabase db) {
-        Cursor c = db.query(TABLE_NAME, Array.of(COLUMN_NAME),
-                null, null, null, null, null);
-        ArrayList<ContentValues> rows = new ArrayList<ContentValues>(c.getCount());
-        while (c.moveToNext()) {
-            String subreddit = c.getString(0);
-            if (Subreddits.isSyncable(subreddit)) {
-                ContentValues values = new ContentValues(1);
-                values.put(COLUMN_NAME, subreddit);
-                rows.add(values);
-            }
-        }
-        c.close();
-        return rows;
-    }
+    c.close();
+    return rows;
+  }
 }

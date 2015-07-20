@@ -24,48 +24,50 @@ import com.btmura.android.reddit.provider.ThingProvider;
 
 public class MessageThreadLoader extends AbstractSessionLoader {
 
-    private static final String[] PROJECTION = {
-            Messages._ID,
-            Messages.COLUMN_AUTHOR,
-            Messages.COLUMN_BODY,
-            Messages.COLUMN_CREATED_UTC,
-            Messages.COLUMN_KIND,
-            Messages.COLUMN_NEW,
-            Messages.COLUMN_SUBJECT,
-            Messages.TABLE_NAME + "." + Messages.COLUMN_THING_ID,
-    };
+  private static final String[] PROJECTION = {
+      Messages._ID,
+      Messages.COLUMN_AUTHOR,
+      Messages.COLUMN_BODY,
+      Messages.COLUMN_CREATED_UTC,
+      Messages.COLUMN_KIND,
+      Messages.COLUMN_NEW,
+      Messages.COLUMN_SUBJECT,
+      Messages.TABLE_NAME + "." + Messages.COLUMN_THING_ID,
+  };
 
-    public static final int INDEX_AUTHOR = 1;
-    public static final int INDEX_BODY = 2;
-    public static final int INDEX_CREATED_UTC = 3;
-    public static final int INDEX_KIND = 4;
-    public static final int INDEX_NEW = 5;
-    public static final int INDEX_SUBJECT = 6;
-    public static final int INDEX_THING_ID = 7;
+  public static final int INDEX_AUTHOR = 1;
+  public static final int INDEX_BODY = 2;
+  public static final int INDEX_CREATED_UTC = 3;
+  public static final int INDEX_KIND = 4;
+  public static final int INDEX_NEW = 5;
+  public static final int INDEX_SUBJECT = 6;
+  public static final int INDEX_THING_ID = 7;
 
-    private final String accountName;
-    private final String thingId;
+  private final String accountName;
+  private final String thingId;
 
-    public MessageThreadLoader(Context context,
-            String accountName,
-            String thingId,
-            Bundle cursorExtras) {
-        super(context,
-                ThingProvider.MESSAGES_URI,
-                PROJECTION,
-                Messages.SELECT_BY_SESSION_ID,
-                null,
-                cursorExtras,
-                null);
-        this.accountName = accountName;
-        this.thingId = thingId;
-    }
+  public MessageThreadLoader(
+      Context ctx,
+      String accountName,
+      String thingId,
+      Bundle cursorExtras) {
+    super(ctx,
+        ThingProvider.MESSAGES_URI,
+        PROJECTION,
+        Messages.SELECT_BY_SESSION_ID,
+        NO_SORT,
+        NO_MORE,
+        NO_COUNT,
+        cursorExtras);
+    this.accountName = accountName;
+    this.thingId = thingId;
+  }
 
-    @Override
-    protected Bundle getSession(Bundle sessionData, String more) {
-        return ThingProvider.getMessageThreadSession(getContext(),
-                accountName,
-                thingId,
-                sessionData);
-    }
+  @Override
+  protected Bundle getSession(Bundle sessionData, String more, int count) {
+    return ThingProvider.getMessageThreadSession(getContext(),
+        accountName,
+        thingId,
+        sessionData);
+  }
 }

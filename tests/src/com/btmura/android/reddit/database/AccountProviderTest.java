@@ -25,14 +25,15 @@ import com.btmura.android.reddit.provider.AccountProvider;
  */
 public class AccountProviderTest extends ProviderTestCase2<AccountProvider> {
 
-    public AccountProviderTest() {
-        super(AccountProvider.class, AccountProvider.AUTHORITY);
-    }
+  public AccountProviderTest() {
+    super(AccountProvider.class, AccountProvider.AUTHORITY);
+  }
 
-    public void testQuery() {
-        AccountProvider provider = getProvider();
-        Cursor c = provider.query(AccountProvider.ACCOUNTS_URI, null, null, null, null);
-        assertNotNull(c);
-        c.close();
-    }
+  public void testQuery() {
+    AccountProvider provider = getProvider();
+    Cursor c = provider.query(AccountProvider.ACCOUNTS_URI, null, null, null,
+        null);
+    assertNotNull(c);
+    c.close();
+  }
 }

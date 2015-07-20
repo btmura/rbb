@@ -28,56 +28,58 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class SearchThingListController extends ThingTableListController {
 
-    /** String extra specifying the search query to use. */
-    static final String EXTRA_QUERY = "query";
+  /** String extra specifying the search query to use. */
+  static final String EXTRA_QUERY = "query";
 
-    private String query;
+  private String query;
 
-    public SearchThingListController(Context context,
-            Bundle args,
-            OnThingViewClickListener listener) {
-        super(context, args, listener);
+  public SearchThingListController(
+      Context context,
+      Bundle args,
+      OnThingViewClickListener listener) {
+    super(context, args, listener);
+  }
+
+  @Override
+  public Loader<Cursor> createLoader() {
+    return new SearchThingLoader(ctx,
+        getAccountName(),
+        getSubreddit(),
+        getQuery(),
+        getFilter(),
+        getMoreId(),
+        getCount(),
+        getCursorExtras());
+  }
+
+  @Override
+  public void restoreInstanceState(Bundle state) {
+    super.restoreInstanceState(state);
+    state = Objects.nullToEmpty(state);
+    if (state.containsKey(EXTRA_QUERY)) {
+      query = state.getString(EXTRA_QUERY);
     }
+  }
 
-    @Override
-    public Loader<Cursor> createLoader() {
-        return new SearchThingLoader(context,
-                getAccountName(),
-                getSubreddit(),
-                getQuery(),
-                getFilter(),
-                getMoreId(),
-                getCursorExtras());
-    }
+  @Override
+  public void saveInstanceState(Bundle state) {
+    super.saveInstanceState(state);
+    state.putString(EXTRA_QUERY, query);
+  }
 
-    @Override
-    public void restoreInstanceState(Bundle state) {
-        super.restoreInstanceState(state);
-        state = Objects.nullToEmpty(state);
-        if (state.containsKey(EXTRA_QUERY)) {
-            query = state.getString(EXTRA_QUERY);
-        }
-    }
+  @Override
+  public String getQuery() {
+    return query;
+  }
 
-    @Override
-    public void saveInstanceState(Bundle state) {
-        super.saveInstanceState(state);
-        state.putString(EXTRA_QUERY, query);
-    }
+  @Override
+  public int getSwipeAction() {
+    return SWIPE_ACTION_HIDE;
+  }
 
-    @Override
-    public String getQuery() {
-        return query;
-    }
-
-    @Override
-    public int getSwipeAction() {
-        return SWIPE_ACTION_HIDE;
-    }
-
-    @Override
-    public void setFilter(int filter) {
-        super.setFilter(filter);
-        AccountPrefs.setLastSearchFilter(context, filter);
-    }
+  @Override
+  public void setFilter(int filter) {
+    super.setFilter(filter);
+    AccountPrefs.setLastSearchFilter(ctx, filter);
+  }
 }

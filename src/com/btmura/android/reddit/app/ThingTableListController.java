@@ -27,195 +27,218 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 abstract class ThingTableListController
-        implements ThingListController<ThingListAdapter>, ThingProjection, Filterable {
+    implements ThingListController<ThingListAdapter>,
+    ThingProjection,
+    Filterable {
 
-    static final String EXTRA_ACCOUNT_NAME = "accountName";
-    static final String EXTRA_PARENT_SUBREDDIT = "parentSubreddit";
-    static final String EXTRA_SUBREDDIT = "subreddit";
-    static final String EXTRA_FILTER = "filter";
-    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
-    static final String EXTRA_SELECTED_LINK_ID = "selectedLinkId";
-    static final String EXTRA_SELECTED_THING_ID = "selectedThingId";
-    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
+  static final String EXTRA_ACCOUNT_NAME = "accountName";
+  static final String EXTRA_PARENT_SUBREDDIT = "parentSubreddit";
+  static final String EXTRA_SUBREDDIT = "subreddit";
+  static final String EXTRA_FILTER = "filter";
+  static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+  static final String EXTRA_SELECTED_LINK_ID = "selectedLinkId";
+  static final String EXTRA_SELECTED_THING_ID = "selectedThingId";
+  static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
-    protected final Context context;
-    private final ThingListAdapter adapter;
+  protected final Context ctx;
+  private final ThingListAdapter adapter;
 
-    private final String accountName;
-    private int filter;
-    private String moreId;
-    private Bundle cursorExtras;
+  private final String accountName;
+  private int filter;
+  private String moreId;
+  private int count;
+  private Bundle cursorExtras;
 
-    ThingTableListController(Context context, Bundle args, OnThingViewClickListener listener) {
-        this.context = context;
-        this.accountName = getAccountNameExtra(args);
-        this.adapter = new ThingListAdapter(context,
-                accountName,
-                listener,
-                getSingleChoiceExtra(args));
-        restoreInstanceState(args);
+  ThingTableListController(
+      Context ctx,
+      Bundle args,
+      OnThingViewClickListener listener) {
+    this.ctx = ctx;
+    this.accountName = getAccountNameExtra(args);
+    this.adapter = new ThingListAdapter(ctx, accountName, listener,
+        getSingleChoiceExtra(args));
+    restoreInstanceState(args);
+  }
+
+  @Override
+  public void restoreInstanceState(Bundle savedInstanceState) {
+    setFilter(getFilterExtra(savedInstanceState));
+    setParentSubreddit(getParentSubredditExtra(savedInstanceState));
+    setSubreddit(getSubredditExtra(savedInstanceState));
+    setSelectedThing(getSelectedThingId(savedInstanceState),
+        getSelectedLinkId(savedInstanceState));
+    cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
+  }
+
+  @Override
+  public void saveInstanceState(Bundle state) {
+    state.putInt(EXTRA_FILTER, getFilter());
+    state.putString(EXTRA_PARENT_SUBREDDIT, adapter.getParentSubreddit());
+    state.putString(EXTRA_SELECTED_LINK_ID, adapter.getSelectedLinkId());
+    state.putString(EXTRA_SELECTED_THING_ID, adapter.getSelectedThingId());
+    state.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
+    state.putString(EXTRA_SUBREDDIT, getSubreddit());
+  }
+
+  @Override
+  public void swapCursor(Cursor cursor) {
+    moreId = null;
+    adapter.swapCursor(cursor);
+    cursorExtras = cursor != null ? cursor.getExtras() : null;
+  }
+
+  @Override
+  public ThingBundle getThingBundle(int position) {
+    return adapter.getThingBundle(position);
+  }
+
+  @Override
+  public void onThingSelected(int position) {
+  }
+
+  // Getters.
+
+  @Override
+  public String getNextMoreId() {
+    Cursor c = adapter.getCursor();
+    if (c != null && c.moveToLast()) {
+      if (c.getInt(INDEX_KIND) == Kinds.KIND_MORE) {
+        return c.getString(INDEX_THING_ID);
+      }
     }
+    return null;
+  }
 
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        setFilter(getFilterExtra(savedInstanceState));
-        setParentSubreddit(getParentSubredditExtra(savedInstanceState));
-        setSubreddit(getSubredditExtra(savedInstanceState));
-        setSelectedThing(getSelectedThingId(savedInstanceState),
-                getSelectedLinkId(savedInstanceState));
-        cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
+  @Override
+  public boolean hasNextMoreId() {
+    return !TextUtils.isEmpty(getNextMoreId());
+  }
+
+  @Override
+  public int getNextCount() {
+    Cursor c = adapter.getCursor();
+    if (c != null) {
+      return c.getCount() - 1;
     }
+    return 0;
+  }
 
-    @Override
-    public void saveInstanceState(Bundle state) {
-        state.putInt(EXTRA_FILTER, getFilter());
-        state.putString(EXTRA_PARENT_SUBREDDIT, adapter.getParentSubreddit());
-        state.putString(EXTRA_SELECTED_LINK_ID, adapter.getSelectedLinkId());
-        state.putString(EXTRA_SELECTED_THING_ID, adapter.getSelectedThingId());
-        state.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
-        state.putString(EXTRA_SUBREDDIT, getSubreddit());
-    }
+  @Override
+  public boolean isSingleChoice() {
+    return adapter.isSingleChoice();
+  }
 
-    @Override
-    public void swapCursor(Cursor cursor) {
-        moreId = null;
-        adapter.swapCursor(cursor);
-        cursorExtras = cursor != null ? cursor.getExtras() : null;
-    }
+  // Simple getters for state members.
 
-    @Override
-    public ThingBundle getThingBundle(int position) {
-        return adapter.getThingBundle(position);
-    }
+  @Override
+  public String getAccountName() {
+    return accountName;
+  }
 
-    @Override
-    public void onThingSelected(int position) {
-    }
+  @Override
+  public ThingListAdapter getAdapter() {
+    return adapter;
+  }
 
-    // Getters.
+  @Override
+  public int getFilter() {
+    return filter;
+  }
 
-    @Override
-    public String getNextMoreId() {
-        Cursor c = adapter.getCursor();
-        if (c != null && c.moveToLast()) {
-            if (c.getInt(INDEX_KIND) == Kinds.KIND_MORE) {
-                return c.getString(INDEX_THING_ID);
-            }
-        }
-        return null;
-    }
+  @Override
+  public String getMoreId() {
+    return moreId;
+  }
 
-    @Override
-    public boolean hasNextMoreId() {
-        return !TextUtils.isEmpty(getNextMoreId());
-    }
+  @Override
+  public int getCount() {
+    return count;
+  }
 
-    @Override
-    public boolean isSingleChoice() {
-        return adapter.isSingleChoice();
-    }
+  // TODO: Remove this method.
+  @Override
+  public String getQuery() {
+    return null;
+  }
 
-    // Simple getters for state members.
+  @Override
+  public String getSubreddit() {
+    return adapter.getSubreddit();
+  }
 
-    @Override
-    public String getAccountName() {
-        return accountName;
-    }
+  protected Bundle getCursorExtras() {
+    return cursorExtras;
+  }
 
-    @Override
-    public ThingListAdapter getAdapter() {
-        return adapter;
-    }
+  // Simple setters for state members.
 
-    @Override
-    public int getFilter() {
-        return filter;
-    }
+  @Override
+  public void setFilter(int filter) {
+    this.filter = filter;
+  }
 
-    @Override
-    public String getMoreId() {
-        return moreId;
-    }
+  @Override
+  public void setMoreId(String moreId) {
+    this.moreId = moreId;
+  }
 
-    // TODO: Remove this method.
-    @Override
-    public String getQuery() {
-        return null;
-    }
+  @Override
+  public void setCount(int count) {
+    this.count = count;
+  }
 
-    @Override
-    public String getSubreddit() {
-        return adapter.getSubreddit();
-    }
+  @Override
+  public void setParentSubreddit(String parentSubreddit) {
+    adapter.setParentSubreddit(parentSubreddit);
+  }
 
-    protected Bundle getCursorExtras() {
-        return cursorExtras;
-    }
+  @Override
+  public void setSelectedPosition(int position) {
+    adapter.setSelectedPosition(position);
+  }
 
-    // Simple setters for state members.
+  @Override
+  public void setSelectedThing(String thingId, String linkId) {
+    adapter.setSelectedThing(thingId, linkId);
+  }
 
-    @Override
-    public void setFilter(int filter) {
-        this.filter = filter;
-    }
+  @Override
+  public void setSubreddit(String subreddit) {
+    adapter.setSubreddit(subreddit);
+  }
 
-    @Override
-    public void setMoreId(String moreId) {
-        this.moreId = moreId;
-    }
+  @Override
+  public void setThingBodyWidth(int thingBodyWidth) {
+    adapter.setThingBodyWidth(thingBodyWidth);
+  }
 
-    @Override
-    public void setParentSubreddit(String parentSubreddit) {
-        adapter.setParentSubreddit(parentSubreddit);
-    }
+  // Getters for extras
 
-    @Override
-    public void setSelectedPosition(int position) {
-        adapter.setSelectedPosition(position);
-    }
+  private static String getAccountNameExtra(Bundle extras) {
+    return extras.getString(EXTRA_ACCOUNT_NAME);
+  }
 
-    @Override
-    public void setSelectedThing(String thingId, String linkId) {
-        adapter.setSelectedThing(thingId, linkId);
-    }
+  private static String getParentSubredditExtra(Bundle extras) {
+    return extras.getString(EXTRA_PARENT_SUBREDDIT);
+  }
 
-    @Override
-    public void setSubreddit(String subreddit) {
-        adapter.setSubreddit(subreddit);
-    }
+  private static String getSubredditExtra(Bundle extras) {
+    return extras.getString(EXTRA_SUBREDDIT);
+  }
 
-    @Override
-    public void setThingBodyWidth(int thingBodyWidth) {
-        adapter.setThingBodyWidth(thingBodyWidth);
-    }
+  protected static int getFilterExtra(Bundle extras) {
+    return extras.getInt(EXTRA_FILTER);
+  }
 
-    // Getters for extras
+  private static boolean getSingleChoiceExtra(Bundle extras) {
+    return extras.getBoolean(EXTRA_SINGLE_CHOICE);
+  }
 
-    private static String getAccountNameExtra(Bundle extras) {
-        return extras.getString(EXTRA_ACCOUNT_NAME);
-    }
+  private static String getSelectedThingId(Bundle extras) {
+    return extras.getString(EXTRA_SELECTED_THING_ID);
+  }
 
-    private static String getParentSubredditExtra(Bundle extras) {
-        return extras.getString(EXTRA_PARENT_SUBREDDIT);
-    }
-
-    private static String getSubredditExtra(Bundle extras) {
-        return extras.getString(EXTRA_SUBREDDIT);
-    }
-
-    protected static int getFilterExtra(Bundle extras) {
-        return extras.getInt(EXTRA_FILTER);
-    }
-
-    private static boolean getSingleChoiceExtra(Bundle extras) {
-        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
-    }
-
-    private static String getSelectedThingId(Bundle extras) {
-        return extras.getString(EXTRA_SELECTED_THING_ID);
-    }
-
-    private static String getSelectedLinkId(Bundle extras) {
-        return extras.getString(EXTRA_SELECTED_LINK_ID);
-    }
+  private static String getSelectedLinkId(Bundle extras) {
+    return extras.getString(EXTRA_SELECTED_LINK_ID);
+  }
 }

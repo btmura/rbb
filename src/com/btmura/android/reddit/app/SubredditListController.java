@@ -18,17 +18,18 @@ package com.btmura.android.reddit.app;
 
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-interface SubredditListController<A extends SubredditAdapter> extends Controller<A> {
+interface SubredditListController<A extends SubredditAdapter>
+    extends Controller<A> {
 
-    // Getters
+  // Getters
 
-    String getSelectedSubreddit();
+  String getSelectedSubreddit();
 
-    boolean isSingleChoice();
+  boolean isSingleChoice();
 
-    // Setters
+  // Setters
 
-    String setSelectedPosition(int position);
+  String setSelectedPosition(int position);
 
-    void setSelectedSubreddit(String subreddit);
+  void setSelectedSubreddit(String subreddit);
 }

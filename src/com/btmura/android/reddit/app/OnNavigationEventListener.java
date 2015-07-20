@@ -17,16 +17,23 @@
 package com.btmura.android.reddit.app;
 
 public interface OnNavigationEventListener {
-    void onNavigationSubredditSelected(String accountName,
-                                       String subreddit,
-                                       boolean isRandom,
-                                       int filter,
-                                       ThingBundle thingBundle,
-                                       boolean force);
+  void onNavigationSubredditSelected(
+      String accountName,
+      String subreddit,
+      boolean isRandom,
+      int filter,
+      ThingBundle thingBundle,
+      boolean force);
 
-    void onNavigationProfileSelected(String accountName, int filter, boolean force);
+  void onNavigationProfileSelected(
+      String accountName,
+      int filter,
+      boolean force);
 
-    void onNavigationSavedSelected(String accountName, int filter, boolean force);
+  void onNavigationSavedSelected(String accountName, int filter, boolean force);
 
-    void onNavigationMessagesSelected(String accountName, int filter, boolean force);
+  void onNavigationMessagesSelected(
+      String accountName,
+      int filter,
+      boolean force);
 }

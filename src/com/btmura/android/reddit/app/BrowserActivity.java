@@ -37,224 +37,237 @@ import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
+public class BrowserActivity extends AbstractBrowserActivity
+    implements OnNavigationListener {
 
-    public static final String EXTRA_SUBREDDIT = "subreddit";
+  public static final String EXTRA_SUBREDDIT = "subreddit";
 
-    /** Requested subreddit from intent data to view. */
-    private String requestedSubreddit;
+  /** Requested subreddit from intent data to view. */
+  private String requestedSubreddit;
 
-    /** Requested thing bundle from intent data. */
-    private ThingBundle requestedThingBundle;
+  /** Requested thing bundle from intent data. */
+  private ThingBundle requestedThingBundle;
 
-    private boolean hasLeftFragment;
-    private boolean showDrawer;
+  private boolean hasLeftFragment;
+  private boolean showDrawer;
 
-    private FilterAdapter filterAdapter;
-    private ActionBarDrawerToggle drawerToggle;
+  private FilterAdapter filterAdapter;
+  private ActionBarDrawerToggle drawerToggle;
 
-    public BrowserActivity() {
-        super(ThingActivity.class);
+  public BrowserActivity() {
+    super(ThingActivity.class);
+  }
+
+  @Override
+  protected void setContentView() {
+    setTheme(ThemePrefs.getTheme(this));
+    setContentView(R.layout.browser);
+  }
+
+  @Override
+  protected boolean skipSetup(Bundle savedInstanceState) {
+    Intent intent = getIntent();
+    if (intent.hasExtra(EXTRA_SUBREDDIT)) {
+      requestedSubreddit = Strings.emptyToNull(
+          intent.getStringExtra(EXTRA_SUBREDDIT));
+    } else if (intent.getData() != null) {
+      Uri data = intent.getData();
+      requestedSubreddit = Strings.emptyToNull(UriHelper.getSubreddit(data));
+      requestedThingBundle = UriHelper.getThingBundle(data);
     }
 
-    @Override
-    protected void setContentView() {
-        setTheme(ThemePrefs.getTheme(this));
-        setContentView(R.layout.browser);
+    hasLeftFragment = !isSinglePane && drawerLayout == null
+        && requestedSubreddit == null;
+    showDrawer = drawerLayout != null && requestedSubreddit == null;
+
+    if (isSinglePane && requestedSubreddit != null
+        && requestedThingBundle != null) {
+      selectThingSinglePane(null, requestedThingBundle);
+      finish();
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  protected void doSetup(Bundle savedInstanceState) {
+    if (drawerLayout != null) {
+      if (hasLeftFragment || !showDrawer) {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+      } else {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        drawerToggle = new ActionBarDrawerToggle(this,
+            drawerLayout,
+            ThemePrefs.getDrawerIcon(this),
+            R.string.drawer_open,
+            R.string.drawer_close);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+            GravityCompat.START);
+        bar.setHomeButtonEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
+      }
     }
 
-    @Override
-    protected boolean skipSetup(Bundle savedInstanceState) {
-        Intent intent = getIntent();
-        if (intent.hasExtra(EXTRA_SUBREDDIT)) {
-            requestedSubreddit = Strings.emptyToNull(intent.getStringExtra(EXTRA_SUBREDDIT));
-        } else if (intent.getData() != null) {
-            Uri data = intent.getData();
-            requestedSubreddit = Strings.emptyToNull(UriHelper.getSubreddit(data));
-            requestedThingBundle = UriHelper.getThingBundle(data);
-        }
+    filterAdapter = new FilterAdapter(this);
+    bar.setDisplayShowTitleEnabled(false);
+    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        hasLeftFragment = !isSinglePane && drawerLayout == null && requestedSubreddit == null;
-        showDrawer = drawerLayout != null && requestedSubreddit == null;
-
-        if (isSinglePane && requestedSubreddit != null && requestedThingBundle != null) {
-            selectThingSinglePane(null, requestedThingBundle);
-            finish();
-            return true;
-        }
-        return false;
+    if (savedInstanceState == null) {
+      setBrowserFragments(requestedSubreddit, requestedThingBundle);
     }
+  }
 
-    @Override
-    protected void doSetup(Bundle savedInstanceState) {
-        if (drawerLayout != null) {
-            if (hasLeftFragment || !showDrawer) {
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            } else {
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                drawerToggle = new ActionBarDrawerToggle(this,
-                        drawerLayout,
-                        ThemePrefs.getDrawerIcon(this),
-                        R.string.drawer_open,
-                        R.string.drawer_close);
-                drawerLayout.setDrawerListener(drawerToggle);
-                drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-                bar.setHomeButtonEnabled(true);
-                bar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
-
-        filterAdapter = new FilterAdapter(this);
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
-        if (savedInstanceState == null) {
-            setBrowserFragments(requestedSubreddit, requestedThingBundle);
-        }
+  @Override
+  public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+    NavigationFragment navFrag = getNavigationFragment();
+    if (navFrag != null) {
+      int newFilter = filterAdapter.getFilter(itemPosition);
+      navFrag.setFilter(newFilter);
+      return true;
     }
+    return false;
+  }
 
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        NavigationFragment navFrag = getNavigationFragment();
-        if (navFrag != null) {
-            int newFilter = filterAdapter.getFilter(itemPosition);
-            navFrag.setFilter(newFilter);
-            return true;
-        }
-        return false;
+  @Override
+  protected void refreshActionBar(ControlFragment controlFrag) {
+    if (controlFrag != null) {
+      bar.setDisplayHomeAsUpEnabled(isSinglePane
+          || drawerLayout != null
+          || requestedSubreddit != null
+          || controlFrag.getThingBundle() != null);
+      switch (controlFrag.getNavigation()) {
+        case ControlFragment.NAVIGATION_SUBREDDIT:
+          updateSubredditActionBar(controlFrag);
+          break;
+
+        case ControlFragment.NAVIGATION_PROFILE:
+        case ControlFragment.NAVIGATION_SAVED:
+          updateProfileActionBar(controlFrag);
+          break;
+
+        case ControlFragment.NAVIGATION_MESSAGES:
+          updateMessagesActionBar(controlFrag);
+          break;
+      }
     }
+  }
 
-    @Override
-    protected void refreshActionBar(ControlFragment controlFrag) {
-        if (controlFrag != null) {
-            bar.setDisplayHomeAsUpEnabled(isSinglePane
-                    || drawerLayout != null
-                    || requestedSubreddit != null
-                    || controlFrag.getThingBundle() != null);
-            switch (controlFrag.getNavigation()) {
-                case ControlFragment.NAVIGATION_SUBREDDIT:
-                    updateSubredditActionBar(controlFrag);
-                    break;
+  private void updateSubredditActionBar(ControlFragment controlFrag) {
+    String accountName = controlFrag.getAccountName();
+    setActionBarTitle(accountName,
+        Subreddits.getTitle(this, controlFrag.getSubreddit()));
 
-                case ControlFragment.NAVIGATION_PROFILE:
-                case ControlFragment.NAVIGATION_SAVED:
-                    updateProfileActionBar(controlFrag);
-                    break;
+    filterAdapter.clear();
+    filterAdapter.addSubredditFilters(this);
+    bar.setListNavigationCallbacks(filterAdapter, this);
+    bar.setSelectedNavigationItem(
+        filterAdapter.findFilter(controlFrag.getFilter()));
+  }
 
-                case ControlFragment.NAVIGATION_MESSAGES:
-                    updateMessagesActionBar(controlFrag);
-                    break;
-            }
-        }
+  private void updateProfileActionBar(ControlFragment controlFrag) {
+    String accountName = controlFrag.getAccountName();
+    setActionBarTitle(accountName, getString(R.string.subtitle_profile));
+
+    filterAdapter.clear();
+    filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
+    bar.setListNavigationCallbacks(filterAdapter, this);
+    bar.setSelectedNavigationItem(
+        filterAdapter.findFilter(controlFrag.getFilter()));
+  }
+
+  private void updateMessagesActionBar(ControlFragment controlFrag) {
+    String accountName = controlFrag.getAccountName();
+    setActionBarTitle(accountName, getString(R.string.subtitle_messages));
+
+    filterAdapter.clear();
+    filterAdapter.addMessageFilters(this);
+    bar.setListNavigationCallbacks(filterAdapter, this);
+    bar.setSelectedNavigationItem(
+        filterAdapter.findFilter(controlFrag.getFilter()));
+  }
+
+  private void setActionBarTitle(String accountName, String subtitle) {
+    String title = !TextUtils.isEmpty(accountName) ? accountName : getString(
+        R.string.app_name);
+    filterAdapter.setTitle(title);
+    filterAdapter.setSubtitle(subtitle);
+  }
+
+  @Override
+  protected void onPostCreate(Bundle savedInstanceState) {
+    super.onPostCreate(savedInstanceState);
+    if (drawerToggle != null) {
+      drawerToggle.syncState();
     }
+  }
 
-    private void updateSubredditActionBar(ControlFragment controlFrag) {
-        String accountName = controlFrag.getAccountName();
-        setActionBarTitle(accountName, Subreddits.getTitle(this, controlFrag.getSubreddit()));
-
-        filterAdapter.clear();
-        filterAdapter.addSubredditFilters(this);
-        bar.setListNavigationCallbacks(filterAdapter, this);
-        bar.setSelectedNavigationItem(filterAdapter.findFilter(controlFrag.getFilter()));
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    if (drawerToggle != null) {
+      drawerToggle.onConfigurationChanged(newConfig);
     }
+  }
 
-    private void updateProfileActionBar(ControlFragment controlFrag) {
-        String accountName = controlFrag.getAccountName();
-        setActionBarTitle(accountName, getString(R.string.subtitle_profile));
+  @Override
+  protected boolean hasLeftFragment() {
+    return hasLeftFragment;
+  }
 
-        filterAdapter.clear();
-        filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
-        bar.setListNavigationCallbacks(filterAdapter, this);
-        bar.setSelectedNavigationItem(filterAdapter.findFilter(controlFrag.getFilter()));
-    }
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.browser_menu, menu);
+    return true;
+  }
 
-    private void updateMessagesActionBar(ControlFragment controlFrag) {
-        String accountName = controlFrag.getAccountName();
-        setActionBarTitle(accountName, getString(R.string.subtitle_messages));
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    super.onPrepareOptionsMenu(menu);
+    menu.setGroupVisible(R.id.menu_group_last,
+        requestedSubreddit == null && !hasThing());
+    return true;
+  }
 
-        filterAdapter.clear();
-        filterAdapter.addMessageFilters(this);
-        bar.setListNavigationCallbacks(filterAdapter, this);
-        bar.setSelectedNavigationItem(filterAdapter.findFilter(controlFrag.getFilter()));
-    }
-
-    private void setActionBarTitle(String accountName, String subtitle) {
-        String title = !TextUtils.isEmpty(accountName) ? accountName : getString(R.string.app_name);
-        filterAdapter.setTitle(title);
-        filterAdapter.setSubtitle(subtitle);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        if (drawerToggle != null) {
-            drawerToggle.syncState();
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (drawerToggle != null) {
-            drawerToggle.onConfigurationChanged(newConfig);
-        }
-    }
-
-    @Override
-    protected boolean hasLeftFragment() {
-        return hasLeftFragment;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.browser_menu, menu);
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        handleHome(item);
         return true;
-    }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.setGroupVisible(R.id.menu_group_last, requestedSubreddit == null && !hasThing());
+      case R.id.menu_accounts:
+        handleAccounts();
         return true;
+
+      case R.id.menu_switch_themes:
+        handleSwitchThemes();
+        return true;
+
+      default:
+        return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                handleHome(item);
-                return true;
+  }
 
-            case R.id.menu_accounts:
-                handleAccounts();
-                return true;
-
-            case R.id.menu_switch_themes:
-                handleSwitchThemes();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
+  private void handleHome(MenuItem item) {
+    if (drawerToggle != null
+        && getSupportFragmentManager().getBackStackEntryCount() == 0) {
+      // TODO: Use return value when support library is fixed to not
+      //       always return false.
+      drawerToggle.onOptionsItemSelected(item);
+    } else {
+      super.onOptionsItemSelected(item);
     }
+  }
 
-    private void handleHome(MenuItem item) {
-        if (drawerToggle != null && getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            // TODO: Use return value when support library is fixed to not always return false.
-            drawerToggle.onOptionsItemSelected(item);
-        } else {
-            super.onOptionsItemSelected(item);
-        }
-    }
+  private void handleAccounts() {
+    MenuHelper.startAccountListActivity(this);
+  }
 
-    private void handleAccounts() {
-        MenuHelper.startAccountListActivity(this);
-    }
-
-    private void handleSwitchThemes() {
-        ThemePrefs.switchTheme(this);
-        recreate();
-    }
+  private void handleSwitchThemes() {
+    ThemePrefs.switchTheme(this);
+    recreate();
+  }
 }

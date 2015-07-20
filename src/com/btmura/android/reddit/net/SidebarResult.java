@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.net;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
@@ -26,69 +24,63 @@ import android.util.JsonReader;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.JsonParser;
 
-/**
- * {@link SidebarResult} is the result of calling the
- * {@link RedditApi#getSidebar(Context, String, String)} method. It contains information about the
- * subreddit itself.
- */
+import java.io.IOException;
+
 public class SidebarResult extends JsonParser {
 
-    public String subreddit;
-    public String headerImage;
-    public CharSequence title;
-    public CharSequence description;
-    public int subscribers;
+  public String subreddit;
+  public String headerImage;
+  public CharSequence title;
+  public CharSequence description;
+  public int subscribers;
+  public Bitmap headerImageBitmap;
 
-    public Bitmap headerImageBitmap;
+  private final MarkdownFormatter formatter = new MarkdownFormatter();
+  private final Context ctx;
 
-    private final MarkdownFormatter formatter = new MarkdownFormatter();
-    private final Context context;
-
-    public static SidebarResult fromJsonReader(Context context, JsonReader reader)
-            throws IOException {
-        SidebarResult result = new SidebarResult(context);
-        result.parseEntity(reader);
-        if (!TextUtils.isEmpty(result.headerImage)) {
-            result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
-        }
-        return result;
+  public static SidebarResult getSidebar(Context ctx, JsonReader r)
+      throws IOException {
+    SidebarResult result = new SidebarResult(ctx);
+    result.parseEntity(r);
+    if (!TextUtils.isEmpty(result.headerImage)) {
+      result.headerImageBitmap = RedditApi.getBitmap(result.headerImage);
     }
+    return result;
+  }
 
-    private SidebarResult(Context context) {
-        this.context = context.getApplicationContext();
+  private SidebarResult(Context ctx) {
+    this.ctx = ctx.getApplicationContext();
+  }
+
+  public void recycle() {
+    if (headerImageBitmap != null) {
+      headerImageBitmap.recycle();
+      headerImageBitmap = null;
     }
+  }
 
-    public void recycle() {
-        if (headerImageBitmap != null) {
-            headerImageBitmap.recycle();
-            headerImageBitmap = null;
-        }
-    }
+  @Override
+  public void onDisplayName(JsonReader r, int i) throws IOException {
+    subreddit = readString(r, "");
+  }
 
-    // JSON attribute parsing methods
+  @Override
+  public void onHeaderImage(JsonReader r, int i) throws IOException {
+    headerImage = readString(r, "");
+  }
 
-    @Override
-    public void onDisplayName(JsonReader reader, int index) throws IOException {
-        subreddit = reader.nextString();
-    }
+  @Override
+  public void onTitle(JsonReader r, int i) throws IOException {
+    title = formatter.formatNoSpans(readString(r, ""));
+  }
 
-    @Override
-    public void onHeaderImage(JsonReader reader, int index) throws IOException {
-        headerImage = readString(reader, null);
-    }
+  @Override
+  public void onDescription(JsonReader r, int i) throws IOException {
+    description = formatter.formatAll(ctx, readString(r, ""));
+  }
 
-    @Override
-    public void onTitle(JsonReader reader, int index) throws IOException {
-        title = formatter.formatNoSpans(context, readString(reader, ""));
-    }
-
-    @Override
-    public void onDescription(JsonReader reader, int index) throws IOException {
-        description = formatter.formatAll(context, readString(reader, ""));
-    }
-
-    @Override
-    public void onSubscribers(JsonReader reader, int index) throws IOException {
-        subscribers = reader.nextInt();
-    }
+  @Override
+  public void onSubscribers(JsonReader r, int i) throws IOException {
+    subscribers = readInt(r, 0);
+  }
 }

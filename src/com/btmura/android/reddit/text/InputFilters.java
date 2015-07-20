@@ -21,37 +21,47 @@ import android.text.Spanned;
 
 public class InputFilters {
 
-    public static InputFilter NO_SPACE_FILTER = new InputFilter() {
-        public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
-                int dstart, int dend) {
-            for (int i = start; i < end; i++) {
-                char c = source.charAt(i);
-                if (Character.isWhitespace(c)) {
-                    return "";
-                }
-            }
-            return null;
+  public static InputFilter NO_SPACE_FILTER = new InputFilter() {
+    public CharSequence filter(
+        CharSequence source,
+        int start,
+        int end,
+        Spanned dest,
+        int dstart,
+        int dend) {
+      for (int i = start; i < end; i++) {
+        char c = source.charAt(i);
+        if (Character.isWhitespace(c)) {
+          return "";
         }
-    };
+      }
+      return null;
+    }
+  };
 
-    public static InputFilter SUBREDDIT_NAME_FILTER = new InputFilter() {
-        public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
-                int dstart, int dend) {
-            for (int i = start; i < end; i++) {
-                char c = source.charAt(i);
-                if (!Character.isLetterOrDigit(c) && c != '_') {
-                    return "";
-                }
-            }
-            return null;
+  public static InputFilter SUBREDDIT_NAME_FILTER = new InputFilter() {
+    public CharSequence filter(
+        CharSequence source,
+        int start,
+        int end,
+        Spanned dest,
+        int dstart,
+        int dend) {
+      for (int i = start; i < end; i++) {
+        char c = source.charAt(i);
+        if (!Character.isLetterOrDigit(c) && c != '_') {
+          return "";
         }
-    };
+      }
+      return null;
+    }
+  };
 
-    public static final InputFilter[] NO_SPACE_FILTERS = new InputFilter[] {
-            NO_SPACE_FILTER,
-    };
+  public static final InputFilter[] NO_SPACE_FILTERS = new InputFilter[]{
+      NO_SPACE_FILTER,
+  };
 
-    public static final InputFilter[] SUBREDDIT_NAME_FILTERS = {
-            SUBREDDIT_NAME_FILTER,
-    };
+  public static final InputFilter[] SUBREDDIT_NAME_FILTERS = {
+      SUBREDDIT_NAME_FILTER,
+  };
 }

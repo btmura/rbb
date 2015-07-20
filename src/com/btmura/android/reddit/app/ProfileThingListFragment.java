@@ -21,38 +21,38 @@ import android.os.Bundle;
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class ProfileThingListFragment
-        extends ThingTableListFragment<ProfileThingListController> {
+    extends ThingTableListFragment<ProfileThingListController> {
 
-    public static ProfileThingListFragment newInstance(String accountName, String profileUser,
-            int filter, boolean singleChoice) {
-        Bundle args = new Bundle(4);
-        args.putString(ProfileThingListController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(ProfileThingListController.EXTRA_PROFILE_USER, profileUser);
-        args.putInt(ProfileThingListController.EXTRA_FILTER, filter);
-        args.putBoolean(ProfileThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
+  public static ProfileThingListFragment newInstance(
+      String accountName,
+      String profileUser,
+      int filter,
+      boolean singleChoice) {
+    Bundle args = new Bundle(4);
+    args.putString(ProfileThingListController.EXTRA_ACCOUNT_NAME, accountName);
+    args.putString(ProfileThingListController.EXTRA_PROFILE_USER, profileUser);
+    args.putInt(ProfileThingListController.EXTRA_FILTER, filter);
+    args.putBoolean(ProfileThingListController.EXTRA_SINGLE_CHOICE,
+        singleChoice);
 
-        ProfileThingListFragment frag = new ProfileThingListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
+    ProfileThingListFragment frag = new ProfileThingListFragment();
+    frag.setArguments(args);
+    return frag;
+  }
 
-    @Override
-    protected ProfileThingListController createController() {
-        return new ProfileThingListController(getActivity(), getArguments(), this);
-    }
+  @Override
+  protected ProfileThingListController createController() {
+    return new ProfileThingListController(getActivity(), getArguments(), this);
+  }
 
-    public String getProfileUser() {
-        return controller.getProfileUser();
-    }
-
-    @Override
-    public boolean equalFragments(ComparableFragment o) {
-        return ComparableFragments.equalClasses(this, o)
-                && ComparableFragments.equalStrings(this, o,
-                        ProfileThingListController.EXTRA_ACCOUNT_NAME)
-                && ComparableFragments.equalStrings(this, o,
-                        ProfileThingListController.EXTRA_PROFILE_USER)
-                && ComparableFragments.equalInts(this, o,
-                        ProfileThingListController.EXTRA_FILTER);
-    }
+  @Override
+  public boolean equalFragments(ComparableFragment o) {
+    return ComparableFragments.equalClasses(this, o)
+        && ComparableFragments.equalStrings(this, o,
+        ProfileThingListController.EXTRA_ACCOUNT_NAME)
+        && ComparableFragments.equalStrings(this, o,
+        ProfileThingListController.EXTRA_PROFILE_USER)
+        && ComparableFragments.equalInts(this, o,
+        ProfileThingListController.EXTRA_FILTER);
+  }
 }

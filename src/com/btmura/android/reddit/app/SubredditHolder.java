@@ -17,5 +17,5 @@
 package com.btmura.android.reddit.app;
 
 public interface SubredditHolder {
-    String getSubreddit();
+  String getSubreddit();
 }

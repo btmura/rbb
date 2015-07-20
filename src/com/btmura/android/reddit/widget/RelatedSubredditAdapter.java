@@ -25,20 +25,21 @@ import com.btmura.android.reddit.util.Objects;
 
 public class RelatedSubredditAdapter extends SubredditAdapter {
 
-    public RelatedSubredditAdapter(Context context, boolean singleChoice) {
-        super(context, singleChoice);
-    }
+  public RelatedSubredditAdapter(Context ctx, boolean singleChoice) {
+    super(ctx, singleChoice);
+  }
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        String name = cursor.getString(RelatedSubredditLoader.INDEX_NAME);
-        SubredditView v = (SubredditView) view;
-        v.setData(name, false, -1);
-        v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
-    }
+  @Override
+  public void bindView(View v, Context ctx, Cursor c) {
+    String name = c.getString(RelatedSubredditLoader.INDEX_NAME);
+    SubredditView sv = (SubredditView) v;
+    sv.setData(name, false, -1);
+    sv.setChosen(singleChoice
+        && Objects.equalsIgnoreCase(selectedSubreddit, name));
+  }
 
-    @Override
-    public String getName(int position) {
-        return getString(position, RelatedSubredditLoader.INDEX_NAME);
-    }
+  @Override
+  public String getName(int pos) {
+    return getString(pos, RelatedSubredditLoader.INDEX_NAME);
+  }
 }

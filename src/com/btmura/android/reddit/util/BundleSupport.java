@@ -20,23 +20,19 @@ import android.os.Bundle;
 
 public abstract class BundleSupport {
 
-    protected static boolean getBoolean(Bundle bundle, String key) {
-        return bundle != null ? bundle.getBoolean(key) : null;
-    }
+  protected static boolean getBoolean(Bundle bundle, String key) {
+    return bundle != null ? bundle.getBoolean(key) : null;
+  }
 
-    protected static int getInt(Bundle bundle, String key) {
-        return bundle != null ? bundle.getInt(key) : null;
-    }
+  protected static int getInt(Bundle bundle, String key) {
+    return bundle != null ? bundle.getInt(key) : null;
+  }
 
-    protected static long getLong(Bundle bundle, String key) {
-        return bundle != null ? bundle.getLong(key) : null;
-    }
+  protected static long getLong(Bundle bundle, String key) {
+    return bundle != null ? bundle.getLong(key) : null;
+  }
 
-    protected static String getString(Bundle bundle, String key) {
-        return bundle != null ? bundle.getString(key) : null;
-    }
-
-    protected static CharSequence getCharSequence(Bundle bundle, String key) {
-        return bundle != null ? bundle.getCharSequence(key) : null;
-    }
+  protected static String getString(Bundle bundle, String key) {
+    return bundle != null ? bundle.getString(key) : null;
+  }
 }

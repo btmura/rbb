@@ -25,63 +25,68 @@ import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
 public class SearchSubredditListFragment
-        extends SubredditListFragment<SearchSubredditListController,
-        NoMenuController,
-        SubredditActionModeController,
-        SearchSubredditAdapter>
-        implements LeftFragment, RightFragment {
+    extends SubredditListFragment<SearchSubredditListController,
+    NoMenuController,
+    SubredditActionModeController,
+    SearchSubredditAdapter>
+    implements LeftFragment, RightFragment {
 
-    private AccountResultHolder accountResultHolder;
+  private AccountResultHolder accountResultHolder;
 
-    public static SearchSubredditListFragment newInstance(String accountName, String query,
-            boolean singleChoice) {
-        Bundle args = new Bundle(3);
-        args.putString(SearchSubredditListController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(SearchSubredditListController.EXTRA_QUERY, query);
-        args.putBoolean(SearchSubredditListController.EXTRA_SINGLE_CHOICE, singleChoice);
+  public static SearchSubredditListFragment newInstance(
+      String accountName,
+      String query,
+      boolean singleChoice) {
+    Bundle args = new Bundle(3);
+    args.putString(SearchSubredditListController.EXTRA_ACCOUNT_NAME,
+        accountName);
+    args.putString(SearchSubredditListController.EXTRA_QUERY, query);
+    args.putBoolean(SearchSubredditListController.EXTRA_SINGLE_CHOICE,
+        singleChoice);
 
-        SearchSubredditListFragment frag = new SearchSubredditListFragment();
-        frag.setArguments(args);
-        return frag;
+    SearchSubredditListFragment frag = new SearchSubredditListFragment();
+    frag.setArguments(args);
+    return frag;
+  }
+
+  @Override
+  public boolean equalFragments(ComparableFragment o) {
+    return ComparableFragments.equalClasses(this, o)
+        && ComparableFragments.equalStrings(this, o,
+        SearchSubredditListController.EXTRA_ACCOUNT_NAME)
+        && ComparableFragments.equalStrings(this, o,
+        SearchSubredditListController.EXTRA_QUERY);
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (activity instanceof AccountResultHolder) {
+      accountResultHolder = (AccountResultHolder) activity;
     }
+  }
 
-    @Override
-    public boolean equalFragments(ComparableFragment o) {
-        return ComparableFragments.equalClasses(this, o)
-                && ComparableFragments.equalStrings(this, o,
-                        SearchSubredditListController.EXTRA_ACCOUNT_NAME)
-                && ComparableFragments.equalStrings(this, o,
-                        SearchSubredditListController.EXTRA_QUERY);
-    }
+  @Override
+  protected SearchSubredditListController createController() {
+    return new SearchSubredditListController(getActivity(), getArguments());
+  }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof AccountResultHolder) {
-            accountResultHolder = (AccountResultHolder) activity;
-        }
-    }
+  @Override
+  protected NoMenuController createMenuController(
+      SearchSubredditListController controller) {
+    return NoMenuController.INSTANCE;
+  }
 
-    @Override
-    protected SearchSubredditListController createController() {
-        return new SearchSubredditListController(getActivity(), getArguments());
-    }
+  @Override
+  protected SubredditActionModeController createActionModeController(
+      SearchSubredditListController controller) {
+    return new SubredditActionModeController(getActivity(),
+        getFragmentManager(),
+        controller.getAdapter(),
+        accountResultHolder);
+  }
 
-    @Override
-    protected NoMenuController createMenuController(SearchSubredditListController controller) {
-        return NoMenuController.INSTANCE;
-    }
-
-    @Override
-    protected SubredditActionModeController
-            createActionModeController(SearchSubredditListController controller) {
-        return new SubredditActionModeController(getActivity(),
-                getFragmentManager(),
-                controller.getAdapter(),
-                accountResultHolder);
-    }
-
-    @Override
-    public void setSelectedThing(String thingId, String linkId) {
-    }
+  @Override
+  public void setSelectedThing(String thingId, String linkId) {
+  }
 }

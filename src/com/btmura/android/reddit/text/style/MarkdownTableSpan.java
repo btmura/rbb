@@ -26,17 +26,17 @@ import com.btmura.android.reddit.content.Contexts;
 
 public class MarkdownTableSpan extends ClickableSpan {
 
-    private final String tableData;
+  private final String tableData;
 
-    public MarkdownTableSpan(String tableData) {
-        this.tableData = tableData;
-    }
+  public MarkdownTableSpan(String tableData) {
+    this.tableData = tableData;
+  }
 
-    @Override
-    public void onClick(View widget) {
-        Context context = widget.getContext();
-        Intent intent = new Intent(context, MarkdownTableActivity.class);
-        intent.putExtra(MarkdownTableActivity.EXTRA_TABLE_DATA, tableData);
-        Contexts.startActivity(widget.getContext(), intent);
-    }
+  @Override
+  public void onClick(View widget) {
+    Context ctx = widget.getContext();
+    Intent intent = new Intent(ctx, MarkdownTableActivity.class);
+    intent.putExtra(MarkdownTableActivity.EXTRA_TABLE_DATA, tableData);
+    Contexts.startActivity(widget.getContext(), intent);
+  }
 }

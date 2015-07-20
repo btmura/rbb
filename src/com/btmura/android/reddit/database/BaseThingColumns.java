@@ -18,80 +18,80 @@ package com.btmura.android.reddit.database;
 
 public interface BaseThingColumns {
 
-    // The following columns allow us to show pending saves to the user before
-    // we have had a chance to sync them back to the server.
+  // The following columns allow us to show pending saves to the user before
+  // we have had a chance to sync them back to the server.
 
-    /** String author name of the saved item. */
-    public static final String COLUMN_AUTHOR = Things.COLUMN_AUTHOR;
+  /** String author name of the saved item. */
+  String COLUMN_AUTHOR = Things.COLUMN_AUTHOR;
 
-    /** Long UTC creation time of the saved item. */
-    public static final String COLUMN_CREATED_UTC = Things.COLUMN_CREATED_UTC;
+  /** Long UTC creation time of the saved item. */
+  String COLUMN_CREATED_UTC = Things.COLUMN_CREATED_UTC;
 
-    /** String domain of the thing. */
-    public static final String COLUMN_DOMAIN = Things.COLUMN_DOMAIN;
+  /** String domain of the thing. */
+  String COLUMN_DOMAIN = Things.COLUMN_DOMAIN;
 
-    /** Integer number of downvotes. */
-    public static final String COLUMN_DOWNS = Things.COLUMN_DOWNS;
+  /** Integer number of downvotes. */
+  String COLUMN_DOWNS = Things.COLUMN_DOWNS;
 
-    /** Integer either -1, 0, 1 to represent if the user liked it. */
-    public static final String COLUMN_LIKES = Things.COLUMN_LIKES;
+  /** Integer either -1, 0, 1 to represent if the user liked it. */
+  String COLUMN_LIKES = Things.COLUMN_LIKES;
 
-    /** Integer indicating whether hidden. 0 is false. 1 is true. */
-    public static final String COLUMN_HIDDEN = Things.COLUMN_HIDDEN;
+  /** Integer indicating whether hidden. 0 is false. 1 is true. */
+  String COLUMN_HIDDEN = Things.COLUMN_HIDDEN;
 
-    /** Integer number of comments. */
-    public static final String COLUMN_NUM_COMMENTS = Things.COLUMN_NUM_COMMENTS;
+  /** Integer number of comments. */
+  String COLUMN_NUM_COMMENTS = Things.COLUMN_NUM_COMMENTS;
 
-    /** Boolean indicating whether this is for over 18 folks. */
-    public static final String COLUMN_OVER_18 = Things.COLUMN_OVER_18;
+  /** Boolean indicating whether this is for over 18 folks. */
+  String COLUMN_OVER_18 = Things.COLUMN_OVER_18;
 
-    /** String URL on reddit of the thing. */
-    public static final String COLUMN_PERMA_LINK = Things.COLUMN_PERMA_LINK;
+  /** String URL on reddit of the thing. */
+  String COLUMN_PERMA_LINK = Things.COLUMN_PERMA_LINK;
 
-    /** Column indicating whether this thing has been saved. */
-    public static final String COLUMN_SAVED = "saved";
+  /** Column indicating whether this thing has been saved. */
+  String COLUMN_SAVED = "saved";
 
-    /** Boolean indicating whether this is a self post or link. */
-    public static final String COLUMN_SELF = "self";
+  /** Boolean indicating whether this is a self post or link. */
+  String COLUMN_SELF = "self";
 
-    /** Integer score of the thing. */
-    public static final String COLUMN_SCORE = Things.COLUMN_SCORE;
+  /** Integer score of the thing. */
+  String COLUMN_SCORE = Things.COLUMN_SCORE;
 
-    /** String subreddit name of the thing. */
-    public static final String COLUMN_SUBREDDIT = Things.COLUMN_SUBREDDIT;
+  /** String subreddit name of the thing. */
+  String COLUMN_SUBREDDIT = Things.COLUMN_SUBREDDIT;
 
-    /** String title of this thing. */
-    public static final String COLUMN_TITLE = "title";
+  /** String title of this thing. */
+  String COLUMN_TITLE = "title";
 
-    /** String URL of the thumbnail. */
-    public static final String COLUMN_THUMBNAIL_URL = Things.COLUMN_THUMBNAIL_URL;
+  /** String URL of the thumbnail. */
+  String COLUMN_THUMBNAIL_URL = Things.COLUMN_THUMBNAIL_URL;
 
-    /** Integer amount of upvotes for this thing. */
-    public static final String COLUMN_UPS = "ups";
+  /** Integer amount of upvotes for this thing. */
+  String COLUMN_UPS = "ups";
 
-    /** String URL of the thing. */
-    public static final String COLUMN_URL = Things.COLUMN_URL;
+  /** String URL of the thing. */
+  String COLUMN_URL = Things.COLUMN_URL;
 
-    static final String CREATE_THING_COLUMNS = ""
-            // The following columns are for storing enough information so
-            // we can show the user we're going to save their item.
-            + COLUMN_AUTHOR + " TEXT,"
-            + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
-            + COLUMN_DOMAIN + " TEXT,"
-            + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
-            + COLUMN_LIKES + " INTEGER DEFAULT 0, "
-            + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
-            + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
-            + COLUMN_PERMA_LINK + " TEXT,"
-            + COLUMN_SCORE + " INTEGER DEFAULT 0,"
-            + COLUMN_SELF + " INTEGER DEFAULT 0, "
-            + COLUMN_SUBREDDIT + " TEXT,"
-            + COLUMN_TITLE + " TEXT,"
-            + COLUMN_THUMBNAIL_URL + " TEXT,"
-            + COLUMN_UPS + " INTEGER DEFAULT 0,"
-            + COLUMN_URL + " TEXT";
+  String CREATE_THING_COLUMNS = ""
+      // The following columns are for storing enough information so
+      // we can show the user we're going to save their item.
+      + COLUMN_AUTHOR + " TEXT,"
+      + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+      + COLUMN_DOMAIN + " TEXT,"
+      + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
+      + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+      + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
+      + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
+      + COLUMN_PERMA_LINK + " TEXT,"
+      + COLUMN_SCORE + " INTEGER DEFAULT 0,"
+      + COLUMN_SELF + " INTEGER DEFAULT 0, "
+      + COLUMN_SUBREDDIT + " TEXT,"
+      + COLUMN_TITLE + " TEXT,"
+      + COLUMN_THUMBNAIL_URL + " TEXT,"
+      + COLUMN_UPS + " INTEGER DEFAULT 0,"
+      + COLUMN_URL + " TEXT";
 
-    static final String CREATE_THING_COLUMNS_V2 = CREATE_THING_COLUMNS + ","
-            + COLUMN_HIDDEN + " INTEGER DEFAULT 0,"
-            + COLUMN_SAVED + " INTEGER DEFAULT 0";
+  String CREATE_THING_COLUMNS_V2 = CREATE_THING_COLUMNS + ","
+      + COLUMN_HIDDEN + " INTEGER DEFAULT 0,"
+      + COLUMN_SAVED + " INTEGER DEFAULT 0";
 }

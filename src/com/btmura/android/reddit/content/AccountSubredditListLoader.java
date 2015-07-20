@@ -25,14 +25,14 @@ import com.btmura.android.reddit.util.Array;
 
 public class AccountSubredditListLoader extends CursorLoader {
 
-    private static final String[] PROJECTION = {
-            Subreddits._ID,
-            Subreddits.COLUMN_NAME
-    };
+  private static final String[] PROJECTION = {
+      Subreddits._ID,
+      Subreddits.COLUMN_NAME
+  };
 
-    public AccountSubredditListLoader(Context context, String accountName) {
-        super(context, SubredditProvider.SUBREDDITS_URI, PROJECTION,
-                Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED, Array.of(accountName),
-                Subreddits.SORT_BY_NAME);
-    }
+  public AccountSubredditListLoader(Context context, String accountName) {
+    super(context, SubredditProvider.SUBREDDITS_URI, PROJECTION,
+        Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED, Array.of(accountName),
+        Subreddits.SORT_BY_NAME);
+  }
 }

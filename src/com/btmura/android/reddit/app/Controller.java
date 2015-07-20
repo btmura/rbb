@@ -23,17 +23,17 @@ import android.widget.ListAdapter;
 
 interface Controller<A extends ListAdapter> {
 
-    // Lifecycle methods
+  // Lifecycle methods
 
-    void restoreInstanceState(Bundle savedInstanceState);
+  void restoreInstanceState(Bundle savedInstanceState);
 
-    void saveInstanceState(Bundle outState);
+  void saveInstanceState(Bundle outState);
 
-    // Loader-related methods
+  // Loader-related methods
 
-    Loader<Cursor> createLoader();
+  Loader<Cursor> createLoader();
 
-    void swapCursor(Cursor cursor);
+  void swapCursor(Cursor cursor);
 
-    A getAdapter();
+  A getAdapter();
 }

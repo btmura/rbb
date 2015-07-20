@@ -19,34 +19,33 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 
 abstract class ThingTableListFragment<C extends ThingListController<?>>
-        extends ThingListFragment<C, ThingTableMenuController, ThingTableActionModeController> {
+    extends ThingListFragment<C, ThingTableMenuController, ThingTableActionModeController> {
 
-    private ThingHolder thingHolder;
+  private ThingHolder thingHolder;
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof ThingHolder) {
-            thingHolder = (ThingHolder) activity;
-        }
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    if (activity instanceof ThingHolder) {
+      thingHolder = (ThingHolder) activity;
     }
+  }
 
-    @Override
-    protected ThingTableMenuController createMenuController(C controller) {
-        return new ThingTableMenuController(getActivity(),
-                getFragmentManager(),
-                controller.getAccountName(),
-                controller.getQuery(),
-                controller,
-                thingHolder,
-                this);
-    }
+  @Override
+  protected ThingTableMenuController createMenuController(C controller) {
+    return new ThingTableMenuController(getActivity(),
+        getFragmentManager(),
+        controller.getAccountName(),
+        controller,
+        thingHolder,
+        this);
+  }
 
-    @Override
-    protected ThingTableActionModeController createActionModeController(C controller) {
-        return new ThingTableActionModeController(getActivity(),
-                controller.getAccountName(),
-                controller.getSwipeAction(),
-                controller.getAdapter());
-    }
+  @Override
+  protected ThingTableActionModeController createActionModeController(C controller) {
+    return new ThingTableActionModeController(getActivity(),
+        controller.getAccountName(),
+        controller.getSwipeAction(),
+        controller.getAdapter());
+  }
 }

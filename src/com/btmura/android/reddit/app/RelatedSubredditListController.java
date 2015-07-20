@@ -26,82 +26,90 @@ import com.btmura.android.reddit.widget.RelatedSubredditAdapter;
 
 class RelatedSubredditListController implements SubredditListController<RelatedSubredditAdapter> {
 
-    static final String EXTRA_SIDEBAR_SUBREDDIT = "sidebarSubreddit";
-    static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
-    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+  static final String EXTRA_ACCOUNT_NAME = "accountName";
+  static final String EXTRA_SIDEBAR_SUBREDDIT = "sidebarSubreddit";
+  static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
+  static final String EXTRA_SINGLE_CHOICE = "singleChoice";
 
-    private final Context context;
-    private final String sidebarSubreddit;
-    private final RelatedSubredditAdapter adapter;
+  private final Context ctx;
+  private final String accountName;
+  private final String sidebarSubreddit;
+  private final RelatedSubredditAdapter adapter;
 
-    RelatedSubredditListController(Context context, Bundle args) {
-        this.context = context;
-        this.sidebarSubreddit = getSidebarSubredditExtra(args);
-        this.adapter = new RelatedSubredditAdapter(context, getSingleChoiceExtra(args));
-    }
+  // TODO(btmura): use arguments instead of bundle
+  RelatedSubredditListController(Context ctx, Bundle args) {
+    this.ctx = ctx;
+    this.accountName = getAccountNameExtra(args);
+    this.sidebarSubreddit = getSidebarSubredditExtra(args);
+    this.adapter = new RelatedSubredditAdapter(ctx, getSingleChoiceExtra(args));
+  }
 
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
-    }
+  @Override
+  public void restoreInstanceState(Bundle savedInstanceState) {
+    setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
+  }
 
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        outState.putString(EXTRA_SELECTED_SUBREDDIT, getSelectedSubreddit());
-    }
+  @Override
+  public void saveInstanceState(Bundle outState) {
+    outState.putString(EXTRA_SELECTED_SUBREDDIT, getSelectedSubreddit());
+  }
 
-    // Loader related methods
+  // Loader related methods
 
-    @Override
-    public Loader<Cursor> createLoader() {
-        return new RelatedSubredditLoader(context, sidebarSubreddit);
-    }
+  @Override
+  public Loader<Cursor> createLoader() {
+    return new RelatedSubredditLoader(ctx, accountName, sidebarSubreddit);
+  }
 
-    @Override
-    public void swapCursor(Cursor cursor) {
-        adapter.swapCursor(cursor);
-    }
+  @Override
+  public void swapCursor(Cursor cursor) {
+    adapter.swapCursor(cursor);
+  }
 
-    // Getters
+  // Getters
 
-    @Override
-    public RelatedSubredditAdapter getAdapter() {
-        return adapter;
-    }
+  @Override
+  public RelatedSubredditAdapter getAdapter() {
+    return adapter;
+  }
 
-    @Override
-    public String getSelectedSubreddit() {
-        return adapter.getSelectedSubreddit();
-    }
+  @Override
+  public String getSelectedSubreddit() {
+    return adapter.getSelectedSubreddit();
+  }
 
-    @Override
-    public boolean isSingleChoice() {
-        return adapter.isSingleChoice();
-    }
+  @Override
+  public boolean isSingleChoice() {
+    return adapter.isSingleChoice();
+  }
 
-    // Setters
+  // Setters
 
-    @Override
-    public String setSelectedPosition(int position) {
-        return adapter.setSelectedPosition(position);
-    }
+  @Override
+  public String setSelectedPosition(int position) {
+    return adapter.setSelectedPosition(position);
+  }
 
-    @Override
-    public void setSelectedSubreddit(String selectedSubreddit) {
-        adapter.setSelectedSubreddit(selectedSubreddit);
-    }
+  @Override
+  public void setSelectedSubreddit(String selectedSubreddit) {
+    adapter.setSelectedSubreddit(selectedSubreddit);
+  }
 
-    // Getters for extras.
+  // Getters for extras.
 
-    private static String getSidebarSubredditExtra(Bundle extras) {
-        return extras.getString(EXTRA_SIDEBAR_SUBREDDIT);
-    }
+  private static String getAccountNameExtra(Bundle extras) {
+    return extras.getString(EXTRA_ACCOUNT_NAME);
+  }
 
-    private static String getSelectedSubredditExtra(Bundle extras) {
-        return extras.getString(EXTRA_SELECTED_SUBREDDIT);
-    }
+  private static String getSidebarSubredditExtra(Bundle extras) {
+    return extras.getString(EXTRA_SIDEBAR_SUBREDDIT);
+  }
 
-    private static boolean getSingleChoiceExtra(Bundle extras) {
-        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
-    }
+  private static String getSelectedSubredditExtra(Bundle extras) {
+    return extras.getString(EXTRA_SELECTED_SUBREDDIT);
+  }
+
+  private static boolean getSingleChoiceExtra(Bundle extras) {
+    return extras.getBoolean(EXTRA_SINGLE_CHOICE);
+  }
 }

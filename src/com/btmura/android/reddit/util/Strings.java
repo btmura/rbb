@@ -20,26 +20,27 @@ import android.text.TextUtils;
 
 public class Strings {
 
-    static final String ELLIPSIS = "…";
+  static final String ELLIPSIS = "…";
 
-    public static CharSequence ellipsize(CharSequence text, int maxLength) {
-        if (maxLength < 0 || TextUtils.isEmpty(text) || text.length() <= maxLength) {
-            return text;
-        }
-
-        // Trim extra whitespace if we are cutting it on a blank spot.
-        int i = maxLength - 1;
-        for (; i > 0 && Character.isWhitespace(text.charAt(i)); i--) {
-        }
-
-        return new StringBuilder(text.subSequence(0, i + 1)).append(ELLIPSIS);
+  public static CharSequence ellipsize(CharSequence text, int maxLength) {
+    if (maxLength < 0 || TextUtils.isEmpty(
+        text) || text.length() <= maxLength) {
+      return text;
     }
 
-    public static String emptyToNull(String string) {
-        return TextUtils.isEmpty(string) ? null : string;
+    // Trim extra whitespace if we are cutting it on a blank spot.
+    int i = maxLength - 1;
+    for (; i > 0 && Character.isWhitespace(text.charAt(i)); i--) {
     }
 
-    public static String toString(Object object) {
-        return object != null ? object.toString() : null;
-    }
+    return new StringBuilder(text.subSequence(0, i + 1)).append(ELLIPSIS);
+  }
+
+  public static String emptyToNull(String string) {
+    return TextUtils.isEmpty(string) ? null : string;
+  }
+
+  public static String toString(Object object) {
+    return object != null ? object.toString() : null;
+  }
 }

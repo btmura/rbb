@@ -34,169 +34,173 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 
 public class SearchActivity extends AbstractBrowserActivity implements
-        LoaderCallbacks<AccountResult>,
-        TabListener,
-        SearchQueryHandler,
-        AccountResultHolder {
+    LoaderCallbacks<AccountResult>,
+    TabListener,
+    SearchQueryHandler,
+    AccountResultHolder {
 
-    private static final String TAG = "SearchActivity";
+  private static final String TAG = "SearchActivity";
 
-    /** Optional string subreddit to additionally search within a subreddit. */
-    public static final String EXTRA_SUBREDDIT = "subreddit";
+  /** Optional string subreddit to additionally search within a subreddit. */
+  public static final String EXTRA_SUBREDDIT = "subreddit";
 
-    /** Required string search query. */
-    public static final String EXTRA_QUERY = "query";
+  /** Required string search query. */
+  public static final String EXTRA_QUERY = "query";
 
-    private AccountResult accountResult;
-    private String accountName;
+  private AccountResult accountResult;
+  private String accountName;
 
-    private TabController tabController;
-    private Tab tabPostsInSubreddit;
-    private Tab tabPosts;
-    private Tab tabSubreddits;
+  private TabController tabController;
+  private Tab tabPostsInSubreddit;
+  private Tab tabPosts;
+  private Tab tabSubreddits;
 
-    public SearchActivity() {
-        super(SearchThingActivity.class);
+  public SearchActivity() {
+    super(SearchThingActivity.class);
+  }
+
+  @Override
+  protected void setContentView() {
+    setTheme(ThemePrefs.getTheme(this));
+    setContentView(R.layout.search);
+  }
+
+  @Override
+  protected boolean skipSetup(Bundle savedInstanceState) {
+    tabController = new TabController(bar, savedInstanceState);
+    if (Subreddits.hasSidebar(getSubredditArgument())) {
+      tabPostsInSubreddit = newTab(MenuHelper
+          .getSubredditTitle(this, getSubredditArgument()));
+      tabController.addTab(tabPostsInSubreddit);
     }
+    tabPosts = tabController.addTab(newTab(getString(R.string.tab_posts)));
+    tabSubreddits = tabController.addTab(
+        newTab(getString(R.string.tab_subreddits)));
+    return false;
+  }
 
-    @Override
-    protected void setContentView() {
-        setTheme(ThemePrefs.getTheme(this));
-        setContentView(R.layout.search);
-    }
+  private Tab newTab(CharSequence text) {
+    Tab tab = bar.newTab().setText(text).setTabListener(this);
+    return tab;
+  }
 
-    @Override
-    protected boolean skipSetup(Bundle savedInstanceState) {
-        tabController = new TabController(bar, savedInstanceState);
-        if (Subreddits.hasSidebar(getSubredditArgument())) {
-            tabPostsInSubreddit = newTab(MenuHelper
-                    .getSubredditTitle(this, getSubredditArgument()));
-            tabController.addTab(tabPostsInSubreddit);
-        }
-        tabPosts = tabController.addTab(newTab(getString(R.string.tab_posts)));
-        tabSubreddits = tabController.addTab(newTab(getString(R.string.tab_subreddits)));
-        return false;
+  @Override
+  protected void doSetup(Bundle savedInstanceState) {
+    if (!hasQuery()) {
+      setQuery("android");
     }
+    bar.setDisplayHomeAsUpEnabled(true);
+    getSupportLoaderManager().initLoader(0, null, this);
+  }
 
-    private Tab newTab(CharSequence text) {
-        Tab tab = bar.newTab().setText(text).setTabListener(this);
-        return tab;
-    }
+  @Override
+  public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+    return new AccountLoader(this, true, false);
+  }
 
-    @Override
-    protected void doSetup(Bundle savedInstanceState) {
-        if (!hasQuery()) {
-            setQuery("android");
-        }
-        bar.setDisplayHomeAsUpEnabled(true);
-        getSupportLoaderManager().initLoader(0, null, this);
-    }
+  @Override
+  public void onLoadFinished(
+      Loader<AccountResult> loader,
+      AccountResult result) {
+    accountResult = result;
+    accountName = result.getLastAccount(this);
+    tabController.setupTabs();
+  }
 
-    @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true, false);
-    }
+  @Override
+  public void onLoaderReset(Loader<AccountResult> loader) {
+    accountResult = null;
+    accountName = null;
+  }
 
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountResult = result;
-        accountName = result.getLastAccount(this);
-        tabController.setupTabs();
-    }
+  @Override
+  public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
+    selectTab(tab);
+  }
 
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
-        accountResult = null;
-        accountName = null;
+  @Override
+  public void onTabReselected(Tab tab, FragmentTransaction ft) {
+    if (!isSinglePane) {
+      getSupportFragmentManager().popBackStack();
     }
+  }
 
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        selectTab(tab);
+  private void selectTab(Tab tab) {
+    if (BuildConfig.DEBUG) {
+      Log.d(TAG, "selectTab tab: " + tab.getText());
     }
+    if (tabController.selectTab(tab)) {
+      if (tab == tabPostsInSubreddit) {
+        refreshThingList(getSubredditArgument());
+      } else if (tab == tabPosts) {
+        refreshThingList(null);
+      } else if (tab == tabSubreddits) {
+        refreshSubredditList();
+      }
+    }
+  }
 
-    @Override
-    public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        if (!isSinglePane) {
-            getSupportFragmentManager().popBackStack();
-        }
-    }
+  private void refreshSubredditList() {
+    setSearchSubredditsFragments(accountName, getQuery(), Filter.SUBREDDIT_HOT);
+  }
 
-    private void selectTab(Tab tab) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "selectTab tab: " + tab.getText());
-        }
-        if (tabController.selectTab(tab)) {
-            if (tab == tabPostsInSubreddit) {
-                refreshThingList(getSubredditArgument());
-            } else if (tab == tabPosts) {
-                refreshThingList(null);
-            } else if (tab == tabSubreddits) {
-                refreshSubredditList();
-            }
-        }
-    }
+  private void refreshThingList(String subreddit) {
+    // TODO(btmura): don't load the preferences here
+    int filter = AccountPrefs.getLastSearchFilter(this,
+        Filter.SEARCH_RELEVANCE);
+    setSearchThingsFragments(accountName,
+        subreddit,
+        getQuery(),
+        filter);
+  }
 
-    private void refreshSubredditList() {
-        setSearchSubredditsFragments(accountName, getQuery(), Filter.SUBREDDIT_HOT);
-    }
+  @Override
+  public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+  }
 
-    private void refreshThingList(String subreddit) {
-        // TODO(btmura): don't load the preferences here
-        int filter = AccountPrefs.getLastSearchFilter(this, Filter.SEARCH_RELEVANCE);
-        setSearchThingsFragments(accountName,
-                subreddit,
-                getQuery(),
-                filter);
-    }
+  @Override
+  protected void refreshActionBar(ControlFragment controlFrag) {
+    bar.setTitle(getQuery());
+  }
 
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-    }
+  @Override
+  protected boolean hasLeftFragment() {
+    return tabController.isTabSelected(tabSubreddits);
+  }
 
-    @Override
-    protected void refreshActionBar(ControlFragment controlFrag) {
-        bar.setTitle(getQuery());
-    }
+  @Override
+  public boolean submitQuery(String query) {
+    setQuery(query);
+    refreshActionBar(null);
+    selectTab(bar.getSelectedTab());
+    return true;
+  }
 
-    @Override
-    protected boolean hasLeftFragment() {
-        return tabController.isTabSelected(tabSubreddits);
-    }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    tabController.saveInstanceState(outState);
+  }
 
-    @Override
-    public boolean submitQuery(String query) {
-        setQuery(query);
-        refreshActionBar(null);
-        selectTab(bar.getSelectedTab());
-        return true;
-    }
+  @Override
+  public AccountResult getAccountResult() {
+    return accountResult;
+  }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        tabController.saveInstanceState(outState);
-    }
+  private String getSubredditArgument() {
+    return getIntent().getStringExtra(EXTRA_SUBREDDIT);
+  }
 
-    @Override
-    public AccountResult getAccountResult() {
-        return accountResult;
-    }
+  @Override
+  public String getQuery() {
+    return getIntent().getStringExtra(EXTRA_QUERY);
+  }
 
-    private String getSubredditArgument() {
-        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
-    }
+  private boolean hasQuery() {
+    return getIntent().hasExtra(EXTRA_QUERY);
+  }
 
-    @Override
-    public String getQuery() {
-        return getIntent().getStringExtra(EXTRA_QUERY);
-    }
-
-    private boolean hasQuery() {
-        return getIntent().hasExtra(EXTRA_QUERY);
-    }
-
-    private void setQuery(String query) {
-        getIntent().putExtra(EXTRA_QUERY, query);
-    }
+  private void setQuery(String query) {
+    getIntent().putExtra(EXTRA_QUERY, query);
+  }
 }

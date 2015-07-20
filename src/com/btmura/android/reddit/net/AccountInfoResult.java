@@ -16,52 +16,50 @@
 
 package com.btmura.android.reddit.net;
 
-import java.io.IOException;
-
 import android.util.JsonReader;
-import android.util.JsonToken;
 
 import com.btmura.android.reddit.util.JsonParser;
 
-/**
- * {@link AccountInfoResult} is the result of calling the {@link RedditApi#aboutMe(String)} or
- * {@link RedditApi#aboutUser(String, String)} methods.
- */
+import java.io.IOException;
+
 public class AccountInfoResult extends JsonParser {
 
-    /** Amount of link karma. */
-    public int linkKarma;
+  /** Amount of link karma. */
+  public int linkKarma;
 
-    /** Amount of comment karma. */
-    public int commentKarma;
+  /** Amount of comment karma. */
+  public int commentKarma;
 
-    /** True if the account has mail. False otherwise. */
-    public boolean hasMail;
+  /** True if the account has mail. False otherwise. */
+  public boolean hasMail;
 
-    /** Return a new {@link AccountInfoResult} from a {@link JsonReader}. */
-    public static AccountInfoResult fromJsonReader(JsonReader reader) throws IOException {
-        AccountInfoResult result = new AccountInfoResult();
-        result.parseEntity(reader);
-        return result;
-    }
+  static AccountInfoResult getMyInfo(JsonReader r) throws IOException {
+    AccountInfoResult result = new AccountInfoResult();
+    result.parseEntityData(r);
+    return result;
+  }
 
-    private AccountInfoResult() {
-        // Use the fromJsonReader method.
-    }
+  static AccountInfoResult getUserInfo(JsonReader r) throws IOException {
+    AccountInfoResult result = new AccountInfoResult();
+    result.parseEntity(r);
+    return result;
+  }
 
-    @Override
-    public void onLinkKarma(JsonReader reader, int index) throws IOException {
-        linkKarma = reader.nextInt();
-    }
+  private AccountInfoResult() {
+  }
 
-    @Override
-    public void onCommentKarma(JsonReader reader, int index) throws IOException {
-        commentKarma = reader.nextInt();
-    }
+  @Override
+  public void onLinkKarma(JsonReader r, int i) throws IOException {
+    linkKarma = readInt(r, 0);
+  }
 
-    @Override
-    public void onHasMail(JsonReader reader, int index) throws IOException {
-        // hasMail is null when we are viewing somebody else's account info.
-        hasMail = reader.peek() != JsonToken.NULL && reader.nextBoolean();
-    }
+  @Override
+  public void onCommentKarma(JsonReader r, int i) throws IOException {
+    commentKarma = readInt(r, 0);
+  }
+
+  @Override
+  public void onHasMail(JsonReader r, int i) throws IOException {
+    hasMail = readBoolean(r, false);
+  }
 }

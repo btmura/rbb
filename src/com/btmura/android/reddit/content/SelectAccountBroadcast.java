@@ -23,21 +23,23 @@ import android.content.IntentFilter;
 
 public class SelectAccountBroadcast {
 
-    private static final String ACTION = "com.btmura.android.reddit.content.SELECT_ACCOUNT";
+  private static final String ACTION = "com.btmura.android.reddit.content.SELECT_ACCOUNT";
 
-    public static final String EXTRA_ACCOUNT = "account";
+  public static final String EXTRA_ACCOUNT = "account";
 
-    public static void registerReceiver(Context context, BroadcastReceiver receiver) {
-        context.registerReceiver(receiver, new IntentFilter(ACTION), null, null);
-    }
+  public static void registerReceiver(Context ctx, BroadcastReceiver receiver) {
+    ctx.registerReceiver(receiver, new IntentFilter(ACTION), null, null);
+  }
 
-    public static void unregisterReceiver(Context context, BroadcastReceiver receiver) {
-        context.unregisterReceiver(receiver);
-    }
+  public static void unregisterReceiver(
+      Context ctx,
+      BroadcastReceiver receiver) {
+    ctx.unregisterReceiver(receiver);
+  }
 
-    public static void sendBroadcast(Context context, String accountName) {
-        Intent intent = new Intent(ACTION);
-        intent.putExtra(EXTRA_ACCOUNT, accountName);
-        context.sendBroadcast(intent);
-    }
+  public static void sendBroadcast(Context ctx, String accountName) {
+    Intent intent = new Intent(ACTION);
+    intent.putExtra(EXTRA_ACCOUNT, accountName);
+    ctx.sendBroadcast(intent);
+  }
 }
