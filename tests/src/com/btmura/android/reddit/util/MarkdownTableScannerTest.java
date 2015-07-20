@@ -50,60 +50,60 @@ public class MarkdownTableScannerTest extends TestCase {
     Table table = scan(OUTER_PIPES);
     assertTableSize(table, 2, 3);
 
-    assertCell(table, 0, 0, "a", Gravity.LEFT, true);
+    assertCell(table, 0, 0, "a", Gravity.START, true);
     assertCell(table, 0, 1, "b", Gravity.CENTER, true);
-    assertCell(table, 0, 2, "c", Gravity.RIGHT, true);
+    assertCell(table, 0, 2, "c", Gravity.END, true);
 
-    assertCell(table, 1, 0, "d", Gravity.LEFT, false);
+    assertCell(table, 1, 0, "d", Gravity.START, false);
     assertCell(table, 1, 1, "e", Gravity.CENTER, false);
-    assertCell(table, 1, 2, "f", Gravity.RIGHT, false);
+    assertCell(table, 1, 2, "f", Gravity.END, false);
   }
 
   public void testScan_noOuterPipes() {
     Table table = scan(NO_OUTER_PIPES);
     assertTableSize(table, 2, 3);
 
-    assertCell(table, 0, 0, "a", Gravity.LEFT, true);
+    assertCell(table, 0, 0, "a", Gravity.START, true);
     assertCell(table, 0, 1, "b", Gravity.CENTER, true);
-    assertCell(table, 0, 2, "c", Gravity.RIGHT, true);
+    assertCell(table, 0, 2, "c", Gravity.END, true);
 
-    assertCell(table, 1, 0, "d", Gravity.LEFT, false);
+    assertCell(table, 1, 0, "d", Gravity.START, false);
     assertCell(table, 1, 1, "e", Gravity.CENTER, false);
-    assertCell(table, 1, 2, "f", Gravity.RIGHT, false);
+    assertCell(table, 1, 2, "f", Gravity.END, false);
   }
 
   public void testScan_emptyHeaders() {
     Table table = scan(EMPTY_HEADERS);
     assertTableSize(table, 2, 3);
 
-    assertCell(table, 0, 0, "", Gravity.LEFT, true);
+    assertCell(table, 0, 0, "", Gravity.START, true);
     assertCell(table, 0, 1, "", Gravity.CENTER, true);
-    assertCell(table, 0, 2, "", Gravity.RIGHT, true);
+    assertCell(table, 0, 2, "", Gravity.END, true);
 
-    assertCell(table, 1, 0, "a", Gravity.LEFT, false);
+    assertCell(table, 1, 0, "a", Gravity.START, false);
     assertCell(table, 1, 1, "b", Gravity.CENTER, false);
-    assertCell(table, 1, 2, "c", Gravity.RIGHT, false);
+    assertCell(table, 1, 2, "c", Gravity.END, false);
   }
 
   public void testScan_missingCells() {
     Table table = scan(MISSING_CELLS);
     assertTableSize(table, 4, 3);
 
-    assertCell(table, 0, 0, "a", Gravity.LEFT, true);
+    assertCell(table, 0, 0, "a", Gravity.START, true);
     assertCell(table, 0, 1, "", Gravity.CENTER, true);
-    assertCell(table, 0, 2, "", Gravity.RIGHT, true);
+    assertCell(table, 0, 2, "", Gravity.END, true);
 
-    assertCell(table, 1, 0, "", Gravity.LEFT, false);
+    assertCell(table, 1, 0, "", Gravity.START, false);
     assertCell(table, 1, 1, "b", Gravity.CENTER, false);
-    assertCell(table, 1, 2, "", Gravity.RIGHT, false);
+    assertCell(table, 1, 2, "", Gravity.END, false);
 
-    assertCell(table, 2, 0, "", Gravity.LEFT, false);
+    assertCell(table, 2, 0, "", Gravity.START, false);
     assertCell(table, 2, 1, "", Gravity.CENTER, false);
-    assertCell(table, 2, 2, "c", Gravity.RIGHT, false);
+    assertCell(table, 2, 2, "c", Gravity.END, false);
 
-    assertCell(table, 3, 0, "", Gravity.LEFT, false);
+    assertCell(table, 3, 0, "", Gravity.START, false);
     assertCell(table, 3, 1, "", Gravity.CENTER, false);
-    assertCell(table, 3, 2, "", Gravity.RIGHT, false);
+    assertCell(table, 3, 2, "", Gravity.END, false);
   }
 
   private static Table scan(String tableData) {
