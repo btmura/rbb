@@ -94,8 +94,8 @@ public class Urls {
         .append("&response_type=code&state=").append(encode(state))
         .append("&redirect_uri=").append(encode(OAUTH_REDIRECT_URL))
         .append("&duration=permanent&scope=")
-        .append(encode(
-            "edit,history,identity,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote"));
+        .append(encode("edit,history,identity,mysubreddits,privatemessages,"
+            + "read,report,save,submit,subscribe,vote"));
   }
 
   public static CharSequence myInfo() {
@@ -174,16 +174,16 @@ public class Urls {
       sb.append(".json");
     }
 
-    boolean hasMore = more != null;
-    boolean hasCount = count != NO_COUNT;
+    boolean appendMore = more != null;
+    boolean appendCount = count > 0;
 
-    if (hasMore || hasCount) {
+    if (appendMore || appendCount) {
       sb.append('?');
     }
-    if (hasMore) {
+    if (appendMore) {
       sb.append("&after=").append(encode(more));
     }
-    if (hasCount) {
+    if (appendCount) {
       sb.append("&count=").append(count);
     }
     return sb;
@@ -293,16 +293,16 @@ public class Urls {
         throw new IllegalArgumentException();
     }
 
-    boolean hasMore = more != null;
-    boolean hasCount = count != NO_COUNT;
+    boolean appendMore = more != null;
+    boolean appendCount = count > 0;
 
-    if (hasMore || hasCount) {
+    if (appendMore || appendCount) {
       sb.append('?');
     }
-    if (hasMore) {
+    if (appendMore) {
       sb.append("&after=").append(encode(more));
     }
-    if (hasCount) {
+    if (appendCount) {
       sb.append("&count=").append(count);
     }
     return sb;
@@ -350,16 +350,16 @@ public class Urls {
       sb.append(".json");
     }
 
-    boolean hasMore = more != null;
-    boolean hasCount = count != NO_COUNT;
+    boolean appendMore = more != null;
+    boolean appendCount = count > 0;
 
-    if (hasMore || hasCount) {
+    if (appendMore || appendCount) {
       sb.append('?');
     }
-    if (hasMore) {
+    if (appendMore) {
       sb.append("&after=").append(encode(more));
     }
-    if (hasCount) {
+    if (appendCount) {
       sb.append("&count=").append(count);
     }
     return sb;
@@ -444,7 +444,7 @@ public class Urls {
         sb.append("&sort=comments");
         break;
     }
-    if (count != NO_COUNT) {
+    if (count > 0) {
       sb.append("&count=").append(count);
     }
     if (more != null) {
