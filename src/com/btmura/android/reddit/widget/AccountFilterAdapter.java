@@ -31,7 +31,6 @@ import java.util.ArrayList;
 public class AccountFilterAdapter extends BaseFilterAdapter {
 
   static class Item {
-    static final int NUM_TYPES = 3;
     static final int TYPE_CATEGORY = 0;
     static final int TYPE_ACCOUNT_NAME = 1;
     static final int TYPE_FILTER = 2;
@@ -173,7 +172,7 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
 
   @Override
   public int getViewTypeCount() {
-    return Item.NUM_TYPES;
+    return 1;
   }
 
   @Override
