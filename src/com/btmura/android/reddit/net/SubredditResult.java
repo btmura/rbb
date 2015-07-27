@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.net;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
@@ -30,18 +31,36 @@ public class SubredditResult extends JsonParser {
 
   public final Set<String> subreddits =
       new TreeSet<String>(Collator.getInstance());
+  @Nullable String after;
 
-  public static SubredditResult getSubreddits(JsonReader r) throws IOException {
-    SubredditResult result = new SubredditResult();
-    result.parseListingObject(r);
-    return result;
+  static SubredditResult getSubreddits(SubredditResult sr, JsonReader r)
+      throws IOException {
+    if (sr == null) {
+      sr = new SubredditResult();
+    }
+    sr.parseListingObject(r);
+    return sr;
+  }
+
+  @Override
+  public void onParseStart() {
+    super.onParseStart();
+    this.after = null;
   }
 
   @Override
   public void onDisplayName(JsonReader r, int i) throws IOException {
     String subreddit = readString(r, "");
     if (!TextUtils.isEmpty(subreddit)) {
-      subreddits.add(subreddit);
+      this.subreddits.add(subreddit);
+    }
+  }
+
+  @Override
+  public void onAfter(JsonReader r) throws IOException {
+    String after = readString(r, "");
+    if (!TextUtils.isEmpty(after)) {
+      this.after = after;
     }
   }
 }

@@ -116,7 +116,7 @@ public class CommentListFragment extends ListFragment implements
   public void onStatusClick(View view) {
     int position = getListView().getPositionForView(view);
     long id = getListView().getItemIdAtPosition(position);
-    controller.expandOrCollapse(getListView(), view, position, id);
+    controller.expandOrCollapse(position, id);
   }
 
   @Override
