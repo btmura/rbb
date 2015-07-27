@@ -124,14 +124,20 @@ public class AddAccountFragment extends DialogFragment
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    refresh();
-    if (!TextUtils.isEmpty(submittedAccountName)) {
-      getLoaderManager().initLoader(0, null, this);
+    if (savedInstanceState == null
+        && hasFixedAccountName()
+        && !hasSubmittedAccountName()) {
+      submit(getFixedAccountName());
+    } else {
+      refresh();
+      if (hasSubmittedAccountName()) {
+        getLoaderManager().initLoader(0, null, this);
+      }
     }
   }
 
   private void refresh() {
-    if (!TextUtils.isEmpty(submittedAccountName)) {
+    if (hasSubmittedAccountName()) {
       showProgressBar();
     } else {
       hideProgressBar();
@@ -261,5 +267,9 @@ public class AddAccountFragment extends DialogFragment
 
   private String getCode() {
     return getArguments().getString(ARG_CODE);
+  }
+
+  private boolean hasSubmittedAccountName() {
+    return !TextUtils.isEmpty(submittedAccountName);
   }
 }
