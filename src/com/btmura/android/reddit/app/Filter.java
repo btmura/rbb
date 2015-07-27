@@ -24,6 +24,8 @@ public interface Filter {
   int COMMENTS_HOT = 3;
   int COMMENTS_CONTROVERSIAL = 4;
   int COMMENTS_OLD = 5;
+  int COMMENTS_RANDOM = 6;
+  int COMMENTS_QA = 7;
 
   int MESSAGE_INBOX = 0;
   int MESSAGE_UNREAD = 1;

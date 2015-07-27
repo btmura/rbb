@@ -58,6 +58,8 @@
     <string name="filter_comments_hot">hot</string>
     <string name="filter_comments_new">new</string>
     <string name="filter_comments_old">old</string>
+    <string name="filter_comments_qa">Q&amp;A</string>
+    <string name="filter_comments_random">random</string>
     <string name="filter_comments_top">top</string>
     <string name="filter_message_inbox">inbox</string>
     <string name="filter_message_unread">unread</string>

@@ -264,6 +264,14 @@ public class Urls {
           sb.append("&sort=top");
           break;
 
+        case Filter.COMMENTS_RANDOM:
+          sb.append("&sort=random");
+          break;
+
+        case Filter.COMMENTS_QA:
+          sb.append("&sort=qa");
+          break;
+
         default:
           break;
       }
