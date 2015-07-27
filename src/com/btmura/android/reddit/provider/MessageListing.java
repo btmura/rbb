@@ -262,8 +262,8 @@ class MessageListing extends JsonParser implements Listing {
   }
 
   @Override
-  public void onAfter(JsonReader reader) throws IOException {
-    moreThingId = readString(reader, null);
+  public void onAfter(JsonReader r) throws IOException {
+    moreThingId = readString(r, null);
   }
 
   @Override

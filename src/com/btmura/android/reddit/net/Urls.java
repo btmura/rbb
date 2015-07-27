@@ -49,7 +49,7 @@ public class Urls {
   private static final String HIDE_URL = OAUTH_REDDIT_COM + "/api/hide";
   private static final String ME_URL = OAUTH_REDDIT_COM + "/api/v1/me";
   private static final String MY_SUBREDDITS_URL =
-      OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=1000";
+      OAUTH_REDDIT_COM + "/subreddits/mine/subscriber?limit=100";
   private static final String READ_MESSAGE =
       OAUTH_REDDIT_COM + "/api/read_message";
   private static final String SAVE_URL = OAUTH_REDDIT_COM + "/api/save";
@@ -114,8 +114,15 @@ public class Urls {
         .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
   }
 
-  public static CharSequence mySubreddits() {
-    return MY_SUBREDDITS_URL;
+  public static CharSequence mySubreddits(@Nullable String after, int count) {
+    StringBuilder sb = new StringBuilder(MY_SUBREDDITS_URL);
+    if (!TextUtils.isEmpty(after)) {
+      sb.append("&after=").append(encode(after));
+    }
+    if (count > 0) {
+      sb.append("&count=").append(count);
+    }
+    return sb;
   }
 
   public static CharSequence subreddit(

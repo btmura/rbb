@@ -395,8 +395,8 @@ public class JsonParser {
   public void onEntityEnd(int i) {
   }
 
-  public void onAfter(JsonReader reader) throws IOException {
-    reader.skipValue();
+  public void onAfter(JsonReader r) throws IOException {
+    r.skipValue();
   }
 
   public void onParseEnd() {
@@ -404,10 +404,6 @@ public class JsonParser {
 
   protected boolean shouldParseReplies() {
     return false;
-  }
-
-  protected static JsonReader newReader(InputStream in) {
-    return new JsonReader(new InputStreamReader(new BufferedInputStream(in)));
   }
 
   protected static boolean readBoolean(JsonReader r, boolean defaultValue)

@@ -118,13 +118,21 @@ public class RedditApi {
       throws AuthenticatorException, OperationCanceledException, IOException {
     HttpURLConnection conn = null;
     JsonReader r = null;
-    try {
-      conn = connect(ctx, accountName, Urls.mySubreddits());
-      r = newJsonReader(conn.getInputStream());
-      return SubredditResult.getSubreddits(r);
-    } finally {
-      close(r, conn);
-    }
+    SubredditResult sr = null;
+    String after = null;
+    int count = 0;
+    do {
+      try {
+        conn = connect(ctx, accountName, Urls.mySubreddits(after, count));
+        r = newJsonReader(conn.getInputStream());
+        sr = SubredditResult.getSubreddits(sr, r);
+        after = sr.after;
+        count = sr.subreddits.size();
+      } finally {
+        close(r, conn);
+      }
+    } while (!TextUtils.isEmpty(after));
+    return sr;
   }
 
   public static SidebarResult getSidebar(

@@ -38,7 +38,7 @@ public class SidebarResult extends JsonParser {
   private final MarkdownFormatter formatter = new MarkdownFormatter();
   private final Context ctx;
 
-  public static SidebarResult getSidebar(Context ctx, JsonReader r)
+  static SidebarResult getSidebar(Context ctx, JsonReader r)
       throws IOException {
     SidebarResult result = new SidebarResult(ctx);
     result.parseEntity(r);
