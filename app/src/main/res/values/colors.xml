@@ -15,6 +15,11 @@
      limitations under the License.
 -->
 <resources>
+	
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    
 
     <color name="arrow_down">@android:color/holo_purple</color>
     <color name="arrow_neutral">#ccc</color>
